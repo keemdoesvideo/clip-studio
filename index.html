@@ -595,32 +595,145 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
 .job-card-expanded {
-  background: var(--bg2);
-  border: 0.5px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
-  transition: border-color 0.15s;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  position: relative;
 }
-.job-card-expanded:hover { border-color: var(--border2); }
-.job-card-expanded.urgent { border-color: rgba(240,98,146,0.2); }
-.job-card-expanded.urgent:hover { border-color: rgba(240,98,146,0.35); }
+.job-card-expanded::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: var(--radius);
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  opacity: 0;
+}
+
+/* Status colour themes */
+.job-card-expanded.status-queued {
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.08);
+}
+.job-card-expanded.status-in_progress {
+  background: rgba(251,140,0,0.06);
+  border-color: rgba(251,140,0,0.2);
+  box-shadow: 0 0 20px rgba(251,140,0,0.04), inset 0 0 30px rgba(251,140,0,0.03);
+}
+.job-card-expanded.status-in_progress::before {
+  background: linear-gradient(135deg, rgba(251,140,0,0.06) 0%, transparent 60%);
+  opacity: 1;
+}
+.job-card-expanded.status-awaiting_review {
+  background: rgba(41,182,246,0.06);
+  border-color: rgba(41,182,246,0.2);
+  box-shadow: 0 0 20px rgba(41,182,246,0.04), inset 0 0 30px rgba(41,182,246,0.03);
+}
+.job-card-expanded.status-awaiting_review::before {
+  background: linear-gradient(135deg, rgba(41,182,246,0.07) 0%, transparent 60%);
+  opacity: 1;
+}
+.job-card-expanded.status-delivered {
+  background: rgba(78,205,196,0.06);
+  border-color: rgba(78,205,196,0.2);
+  box-shadow: 0 0 20px rgba(78,205,196,0.04), inset 0 0 30px rgba(78,205,196,0.03);
+}
+.job-card-expanded.status-delivered::before {
+  background: linear-gradient(135deg, rgba(78,205,196,0.07) 0%, transparent 60%);
+  opacity: 1;
+}
+.job-card-expanded.urgent {
+  border-color: rgba(240,98,146,0.3) !important;
+  background: rgba(240,98,146,0.06) !important;
+}
 
 .job-card-header {
-  padding: 16px 20px;
+  padding: 18px 20px;
   display: flex; align-items: center; gap: 16px;
   cursor: pointer;
+  position: relative; z-index: 1;
 }
 
 .job-card-body {
+  border-top: 0.5px solid rgba(255,255,255,0.06);
   animation: slideDown 0.2s ease;
+  position: relative; z-index: 1;
 }
 @keyframes slideDown { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 
-.expand-arrow { display: inline-block; font-size: 16px; color: var(--text3); transition: transform 0.2s; }
+.expand-arrow { display: inline-block; font-size: 16px; color: rgba(255,255,255,0.3); transition: transform 0.2s; }
 .icon-btn.amber-btn { background: var(--amber-dim); border-color: rgba(251,191,36,0.2); color: var(--amber); }
 .icon-btn.amber-btn:hover { background: rgba(251,191,36,0.2); }
 .icon-btn.delete-btn { background: transparent; border-color: transparent; color: var(--text3); }
 .icon-btn.delete-btn:hover { background: var(--pink-dim); border-color: rgba(240,98,146,0.2); color: var(--pink); }
+
+/* Job pills */
+.job-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px; }
+.job-pill {
+  font-size: 11px; color: var(--text3);
+  background: rgba(255,255,255,0.05);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 20px; padding: 2px 9px;
+}
+.pill-urgent { background: var(--pink-dim); color: var(--pink); border-color: rgba(240,98,146,0.2); }
+
+/* Expand section */
+.job-expand-section {
+  padding: 14px 0;
+  border-bottom: 0.5px solid rgba(255,255,255,0.06);
+}
+.job-expand-section:last-of-type { border-bottom: none; }
+.job-expand-label {
+  font-size: 10px; font-weight: 600; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+/* Status pills inside expanded */
+.status-pill {
+  font-size: 12px; font-weight: 500;
+  padding: 7px 14px; border-radius: 20px;
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid var(--border2);
+  color: var(--text3); cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+.status-pill:hover { background: rgba(255,255,255,0.08); color: var(--text2); }
+.active-pill { background: rgba(255,255,255,0.08); color: var(--text); border-color: var(--border2); }
+.active-pill-purple { background: var(--purple-dim); color: var(--purple); border-color: var(--purple-border); }
+.active-pill-amber { background: var(--amber-dim); color: var(--amber); border-color: rgba(251,191,36,0.25); }
+
+/* Full-width action buttons inside expanded */
+.job-expand-actions { display: flex; flex-direction: column; gap: 8px; padding-top: 14px; }
+.btn-expand-full {
+  width: 100%; padding: 11px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer; border: 0.5px solid;
+  transition: opacity 0.15s;
+  text-align: left;
+}
+.btn-expand-full:hover { opacity: 0.8; }
+.btn-expand-full.teal { background: var(--teal-dim); color: var(--teal); border-color: rgba(78,205,196,0.25); }
+.btn-expand-full.amber { background: var(--amber-dim); color: var(--amber); border-color: rgba(251,191,36,0.25); }
+.btn-expand-full.danger { background: transparent; color: var(--text3); border-color: transparent; }
+.btn-expand-full.danger:hover { background: var(--pink-dim); color: var(--pink); border-color: rgba(240,98,146,0.2); opacity: 1; }
+
+/* Expand action link button */
+.btn-expand-action {
+  font-size: 12px; font-weight: 500;
+  padding: 7px 14px; border-radius: var(--radius-sm);
+  border: 0.5px solid; cursor: pointer;
+  text-decoration: none; white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+  transition: opacity 0.15s; flex-shrink: 0;
+}
+.btn-expand-action:hover { opacity: 0.8; }
 
 .status-select {
   background: var(--bg3);
@@ -963,19 +1076,19 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 <div class="modal-backdrop" id="modal-deliver">
   <div class="modal" style="max-width:480px;">
     <div class="modal-header">
-      <div class="modal-title">Mark as delivered</div>
+      <div class="modal-title">Deliver final file</div>
       <div class="modal-close" onclick="closeModal('modal-deliver')">×</div>
     </div>
     <p style="font-size:13px; color:var(--text2); margin-bottom:20px;" id="deliver-job-title"></p>
     <div class="form-group">
-      <div class="form-label">Dropbox / download link *</div>
+      <div class="form-label">Final Dropbox download link *</div>
       <input class="form-input" id="deliver-link" placeholder="https://dropbox.com/...">
     </div>
     <div class="form-group">
       <div class="form-label">Client email (for notification)</div>
       <input class="form-input" id="deliver-email" placeholder="client@email.com">
     </div>
-    <p style="font-size:11px; color:var(--text3); margin-top:-10px; margin-bottom:16px;">ℹ️ The client will receive an email with their download link automatically.</p>
+    <p style="font-size:11px; color:var(--text3); margin-top:-10px; margin-bottom:16px;">ℹ️ This will mark the job as Delivered, move it to the Delivered tab, and email the client to check their portal.</p>
     <div class="modal-actions">
       <button class="btn-ghost" onclick="closeModal('modal-deliver')">Cancel</button>
       <button class="btn-deliver" id="deliver-btn" onclick="deliverJob()" style="border-radius:var(--radius-sm); padding:12px 24px; font-size:13px;">
@@ -1243,6 +1356,11 @@ async function loadEditorData() {
   document.getElementById('editor-subline').textContent = subline;
 
   renderEditorJobs(jobs);
+
+  // If delivered tab is currently visible, refresh it too
+  if (document.getElementById('editor-tab-delivered').style.display !== 'none') {
+    loadDeliveredJobs();
+  }
 }
 
 async function loadDeliveredJobs() {
@@ -1266,76 +1384,101 @@ function jobCardHTML(job, isActive) {
   const isUrgent = job.deadline && ((new Date(job.deadline) - new Date()) / (1000*60*60*24)) <= 3 && job.status !== 'delivered';
   const clips = (job.clips || []).filter(c => c);
   const clipCount = clips.length;
-  const deadlineStr = job.deadline ? formatDate(job.deadline) : 'No deadline';
-  const statusBadge = {
-    queued:          '<span class="badge badge-gray">Requested</span>',
-    in_progress:     '<span class="badge badge-purple">Currently Editing</span>',
-    awaiting_review: '<span class="badge badge-amber">Awaiting Review</span>',
-    delivered:       '<span class="badge badge-teal">Delivered</span>',
-  }[job.status] || '';
+  const deadlineStr = job.deadline ? formatDate(job.deadline) : null;
+  const createdStr = job.created_at ? formatDate(job.created_at) : '';
 
-  const statusDropdown = isActive ? `
-    <select class="status-select" onchange="changeStatus(${job.id}, this.value)" title="Change status">
-      <option value="queued"          ${job.status==='queued'?'selected':''}>Requested</option>
-      <option value="in_progress"     ${job.status==='in_progress'?'selected':''}>Currently Editing</option>
-      <option value="awaiting_review" ${job.status==='awaiting_review'?'selected':''}>Awaiting Review</option>
-    </select>
-  ` : '';
-
-  const actionBtns = isActive ? `
-    ${job.status === 'awaiting_review' ? `<button class="icon-btn amber-btn" title="Send review link" onclick="event.stopPropagation();openReviewModal(${job.id})">🔗</button>` : ''}
-    ${job.status !== 'delivered' ? `<button class="icon-btn teal-btn" title="Mark delivered" onclick="event.stopPropagation();openDeliverModal(${job.id})">✓</button>` : ''}
-    <button class="icon-btn delete-btn" title="Delete job" onclick="event.stopPropagation();deleteJob(${job.id})">🗑</button>
-  ` : `<button class="icon-btn delete-btn" title="Delete job" onclick="event.stopPropagation();deleteJob(${job.id})">🗑</button>`;
+  const statusInfo = {
+    queued:          { badge: 'badge-gray',   label: 'Requested' },
+    in_progress:     { badge: 'badge-purple', label: 'Currently Editing' },
+    awaiting_review: { badge: 'badge-amber',  label: 'Awaiting Review' },
+    delivered:       { badge: 'badge-teal',   label: 'Delivered' },
+  }[job.status] || { badge: 'badge-gray', label: job.status };
 
   const iconClass = isUrgent ? 'pink' : job.status === 'delivered' ? 'teal' : job.status === 'awaiting_review' ? 'amber' : 'purple';
   const iconEmoji = isUrgent ? '🔥' : job.status === 'delivered' ? '✅' : job.status === 'awaiting_review' ? '👀' : '🎬';
 
-  const clipsHTML = clips.length ? clips.map((c, i) => `
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-      <span style="font-size:11px;color:var(--purple);font-weight:600;min-width:18px;">${i+1}</span>
-      <a href="${c}" target="_blank" style="font-size:12px;color:var(--purple);text-decoration:none;word-break:break-all;line-height:1.4;">${c}</a>
-    </div>`).join('') : '<p style="font-size:12px;color:var(--text3);">No clip links added</p>';
+  // ── Clip buttons ──
+  const clipsHTML = clips.length ? `<div style="display:flex;gap:8px;flex-wrap:wrap;">` +
+    clips.map((c, i) => `<a href="${c}" target="_blank" class="clip-btn">Clip ${i+1}</a>`).join('') +
+    `</div>` : '<p style="font-size:12px;color:var(--text3);">No clip links added</p>';
 
+  // ── Notes ──
   const notesHTML = job.notes ? `
-    <div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border);">
-      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Notes</div>
-      <p style="font-size:12px;color:var(--text2);line-height:1.5;">${job.notes}</p>
+    <div class="job-expand-section">
+      <div class="job-expand-label">Notes</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.6;">${job.notes}</p>
     </div>` : '';
 
+  // ── Review link ──
   const reviewHTML = job.review_link ? `
-    <div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-      <span style="font-size:11px;color:var(--text3);">Review link sent</span>
-      <a href="${job.review_link}" target="_blank" style="font-size:12px;color:var(--amber);text-decoration:none;">Open Replay →</a>
+    <div class="job-expand-section" style="display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div class="job-expand-label">Review link</div>
+        <p style="font-size:12px;color:var(--text3);">Sent for client review</p>
+      </div>
+      <a href="${job.review_link}" target="_blank" class="btn-expand-action" style="background:var(--amber-dim);color:var(--amber);border-color:rgba(251,191,36,0.2);">👀 Open Replay</a>
     </div>` : '';
+
+  // ── Download link (delivered) ──
+  const downloadHTML = job.download_link ? `
+    <div class="job-expand-section" style="display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div class="job-expand-label">Final download</div>
+        <p style="font-size:12px;color:var(--text3);">Delivered to client</p>
+      </div>
+      <a href="${job.download_link}" target="_blank" class="btn-expand-action" style="background:var(--teal-dim);color:var(--teal);border-color:rgba(78,205,196,0.2);">⬇ Open file</a>
+    </div>` : '';
+
+  // ── Status buttons (active jobs only) ──
+  const statusButtonsHTML = isActive ? `
+    <div class="job-expand-section">
+      <div class="job-expand-label">Update status</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+        <button class="status-pill ${job.status==='queued'?'active-pill':''}" onclick="changeStatus(${job.id},'queued')">Requested</button>
+        <button class="status-pill ${job.status==='in_progress'?'active-pill active-pill-purple':''}" onclick="changeStatus(${job.id},'in_progress')">✏️ Currently Editing</button>
+        <button class="status-pill ${job.status==='awaiting_review'?'active-pill active-pill-amber':''}" onclick="changeStatus(${job.id},'awaiting_review')">👀 Awaiting Review</button>
+      </div>
+    </div>` : '';
+
+  // ── Action buttons (active jobs only) ──
+  const actionsHTML = isActive ? `
+    <div class="job-expand-actions">
+      ${job.status === 'awaiting_review' ? `<button class="btn-expand-full amber" onclick="openReviewModal(${job.id})">🔗 Send / update review link</button>` : ''}
+      <button class="btn-expand-full teal" onclick="openDeliverModal(${job.id})">⬇ Paste final link &amp; deliver</button>
+      <button class="btn-expand-full danger" onclick="deleteJob(${job.id})">🗑 Delete job</button>
+    </div>` : `
+    <div class="job-expand-actions">
+      <button class="btn-expand-full danger" onclick="deleteJob(${job.id})">🗑 Delete job</button>
+    </div>`;
 
   return `<div class="job-card-expanded ${isUrgent ? 'urgent' : ''}" id="jobcard-${job.id}">
     <div class="job-card-header" onclick="toggleJobCard(${job.id})">
       <div class="job-icon ${iconClass}">${iconEmoji}</div>
-      <div class="job-info">
+      <div class="job-info" style="flex:1;min-width:0;">
         <div class="job-title">${job.title}</div>
-        <div class="job-meta">
-          <span>${job.client}</span>
-          <span>${job.format || 'Short Form'}</span>
-          <span>${clipCount} clip${clipCount !== 1 ? 's' : ''}</span>
-          <span>${isUrgent ? '⚠️ ' : ''}${deadlineStr}</span>
+        <div class="job-pills">
+          <span class="job-pill">${job.format || 'Short Form'}</span>
+          <span class="job-pill">${clipCount} clip${clipCount !== 1 ? 's' : ''}</span>
+          ${deadlineStr ? `<span class="job-pill ${isUrgent ? 'pill-urgent' : ''}">📅 ${deadlineStr}</span>` : ''}
+          <span class="job-pill">Added ${createdStr}</span>
         </div>
       </div>
-      <div class="job-actions">
-        ${isActive ? statusDropdown : statusBadge}
-        ${actionBtns}
-        <button class="icon-btn expand-btn" title="Expand" onclick="event.stopPropagation();toggleJobCard(${job.id})">
-          <span class="expand-arrow">▾</span>
-        </button>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+        <span class="badge ${statusInfo.badge}">${statusInfo.label}</span>
+        <span class="expand-arrow">▾</span>
       </div>
     </div>
     <div class="job-card-body" id="jobbody-${job.id}" style="display:none;">
-      <div style="padding:14px 16px 16px;border-top:0.5px solid var(--border);">
-        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;">Clip links (${clipCount})</div>
-        ${clipsHTML}
+      <div style="padding:0 20px 20px;">
+        <div class="job-expand-section">
+          <div class="job-expand-label">Clip links (${clipCount})</div>
+          ${clipsHTML}
+        </div>
         ${notesHTML}
         ${reviewHTML}
-        ${job.download_link ? `<div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text3);">Download link</span><a href="${job.download_link}" target="_blank" style="font-size:12px;color:var(--teal);text-decoration:none;">Open →</a></div>` : ''}
+        ${downloadHTML}
+        ${statusButtonsHTML}
+        ${actionsHTML}
       </div>
     </div>
   </div>`;
