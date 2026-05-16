@@ -594,6 +594,24 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 .screen { animation: fadeIn 0.25s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
+.icon-btn.amber-btn { background: var(--amber-dim); border-color: rgba(251,191,36,0.2); color: var(--amber); }
+.icon-btn.amber-btn:hover { background: rgba(251,191,36,0.2); }
+
+.status-select {
+  background: var(--bg3);
+  border: 0.5px solid var(--border2);
+  border-radius: var(--radius-sm);
+  color: var(--text2);
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  padding: 6px 10px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.status-select:focus { border-color: var(--purple); }
+.status-select option { background: var(--bg3); }
+
 /* ── Responsive ── */
 @media (max-width: 700px) {
   .stats-row { grid-template-columns: repeat(2, 1fr); }
@@ -890,6 +908,32 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
   </div>
 </div>
 
+<!-- ════════ MODAL: SEND REVIEW LINK ════════ -->
+<div class="modal-backdrop" id="modal-review">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <div class="modal-title">Send review link</div>
+      <div class="modal-close" onclick="closeModal('modal-review')">×</div>
+    </div>
+    <p style="font-size:13px; color:var(--text2); margin-bottom:20px;" id="review-job-title"></p>
+    <div class="form-group">
+      <div class="form-label">Dropbox Replay link *</div>
+      <input class="form-input" id="review-link" placeholder="https://replay.dropbox.com/...">
+    </div>
+    <div class="form-group">
+      <div class="form-label">Client email</div>
+      <input class="form-input" id="review-email" placeholder="client@email.com">
+    </div>
+    <p style="font-size:11px; color:var(--text3); margin-top:-10px; margin-bottom:16px;">ℹ️ Status will update to "Awaiting Review" and the client will be notified with the link.</p>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('modal-review')">Cancel</button>
+      <button class="btn-deliver" id="review-btn" onclick="sendReviewLink()" style="border-radius:var(--radius-sm);padding:12px 24px;font-size:13px;background:var(--amber);color:#0c0c10;">
+        <span id="review-btn-text">🔗 Send review link</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ════════ MODAL: DELIVER JOB ════════ -->
 <div class="modal-backdrop" id="modal-deliver">
   <div class="modal" style="max-width:480px;">
@@ -943,8 +987,10 @@ const CONFIG = {
   editorEmail: 'keemdoesvideo@gmail.com',
   editorPassword: 'ClipStudio2026',
   emailjsServiceId: 'service_qike8ko',
-  emailjsTemplateId: 'template_ixqevf9',
+  emailjsDeliveryTemplateId: 'template_ixqevf9',
+  emailjsReviewTemplateId: 'template_ihg6vxh',
   emailjsPublicKey: '9eEUxHp-Qv_Eq_a5U',
+  portalUrl: 'https://keemdoesvideo.github.io/clip-studio/', // e.g. https://yourusername.github.io/clip-studio
 };
 
 // ── Supabase client ──
@@ -1146,7 +1192,7 @@ async function loadEditorData() {
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
   document.getElementById('editor-greeting').textContent = greeting;
 
-  const jobs = await getJobs({ status: ['queued', 'in_progress'] });
+  const jobs = await getJobs({ status: ['queued', 'in_progress', 'awaiting_review'] });
   allJobs = jobs;
 
   const delivered = await getJobs({ status: 'delivered' });
@@ -1163,7 +1209,7 @@ async function loadEditorData() {
   });
 
   document.getElementById('stat-queue').textContent = jobs.filter(j => j.status === 'queued').length;
-  document.getElementById('stat-progress').textContent = jobs.filter(j => j.status === 'in_progress').length;
+  document.getElementById('stat-progress').textContent = jobs.filter(j => j.status === 'in_progress' || j.status === 'awaiting_review').length;
   document.getElementById('stat-delivered').textContent = thisMonth.length;
   document.getElementById('stat-month').textContent = now.toLocaleString('default', { month: 'long' });
   document.getElementById('stat-urgent').textContent = urgent.length;
@@ -1196,19 +1242,28 @@ function jobCardHTML(job, isActive) {
   const clipCount = (job.clips || []).filter(c => c).length;
   const deadlineStr = job.deadline ? formatDate(job.deadline) : 'No deadline';
   const statusBadge = {
-    queued: '<span class="badge badge-gray">Queued</span>',
-    in_progress: '<span class="badge badge-purple">In progress</span>',
-    delivered: '<span class="badge badge-teal">Delivered</span>',
+    queued:          '<span class="badge badge-gray">Requested</span>',
+    in_progress:     '<span class="badge badge-purple">Currently Editing</span>',
+    awaiting_review: '<span class="badge badge-amber">Awaiting Review</span>',
+    delivered:       '<span class="badge badge-teal">Delivered</span>',
   }[job.status] || '';
+
+  const statusDropdown = isActive ? `
+    <select class="status-select" onchange="changeStatus(${job.id}, this.value)" title="Change status">
+      <option value="queued"          ${job.status==='queued'?'selected':''}>Requested</option>
+      <option value="in_progress"     ${job.status==='in_progress'?'selected':''}>Currently Editing</option>
+      <option value="awaiting_review" ${job.status==='awaiting_review'?'selected':''}>Awaiting Review</option>
+    </select>
+  ` : '';
 
   const actions = isActive ? `
     <button class="icon-btn" title="View details" onclick="viewJob(${job.id})">🔍</button>
-    ${job.status === 'queued' ? `<button class="icon-btn" title="Mark in progress" onclick="markInProgress(${job.id})">▶</button>` : ''}
+    ${job.status === 'awaiting_review' ? `<button class="icon-btn amber-btn" title="Send review link" onclick="openReviewModal(${job.id})">🔗</button>` : ''}
     ${job.status !== 'delivered' ? `<button class="icon-btn teal-btn" title="Mark delivered" onclick="openDeliverModal(${job.id})">✓</button>` : ''}
   ` : `<button class="icon-btn" title="View" onclick="viewJob(${job.id})">🔍</button>`;
 
   return `<div class="job-card ${isUrgent ? 'urgent' : ''}">
-    <div class="job-icon ${isUrgent ? 'pink' : job.status === 'delivered' ? 'teal' : 'purple'}">${isUrgent ? '🔥' : job.status === 'delivered' ? '✅' : '🎬'}</div>
+    <div class="job-icon ${isUrgent ? 'pink' : job.status === 'delivered' ? 'teal' : job.status === 'awaiting_review' ? 'amber' : 'purple'}">${isUrgent ? '🔥' : job.status === 'delivered' ? '✅' : job.status === 'awaiting_review' ? '👀' : '🎬'}</div>
     <div class="job-info">
       <div class="job-title">${job.title}</div>
       <div class="job-meta">
@@ -1218,13 +1273,50 @@ function jobCardHTML(job, isActive) {
         <span>${isUrgent ? '⚠️ ' : ''}${deadlineStr}</span>
       </div>
     </div>
-    <div class="job-actions">${statusBadge}${actions}</div>
+    <div class="job-actions">${isActive ? statusDropdown : statusBadge}${actions}</div>
   </div>`;
 }
 
-async function markInProgress(id) {
-  await updateJob(id, { status: 'in_progress' });
-  showToast('Marked as in progress', 'success');
+async function changeStatus(id, newStatus) {
+  await updateJob(id, { status: newStatus });
+  const labels = { queued: 'Requested', in_progress: 'Currently Editing', awaiting_review: 'Awaiting Review' };
+  showToast(`Status updated to "${labels[newStatus]}"`, 'success');
+  loadEditorData();
+}
+
+let reviewJobId = null;
+function openReviewModal(id) {
+  reviewJobId = id;
+  const job = (DEMO_MODE ? demoJobs : allJobs).find(j => j.id === id);
+  document.getElementById('review-job-title').textContent = job ? `"${job.title}"` : '';
+  document.getElementById('review-link').value = job?.review_link || '';
+  document.getElementById('review-email').value = job?.client_email || '';
+  document.getElementById('modal-review').classList.add('open');
+}
+
+async function sendReviewLink() {
+  const link = document.getElementById('review-link').value.trim();
+  const email = document.getElementById('review-email').value.trim();
+  if (!link) { showToast('Please paste the Dropbox Replay link', 'error'); return; }
+
+  setLoading('review-btn', 'review-btn-text', true, 'Sending...');
+  const job = (DEMO_MODE ? demoJobs : allJobs).find(j => j.id === reviewJobId);
+  await updateJob(reviewJobId, { status: 'awaiting_review', review_link: link });
+
+  if (email && CONFIG.emailjsServiceId !== 'YOUR_EMAILJS_SERVICE_ID') {
+    try {
+      await emailjs.send(CONFIG.emailjsServiceId, CONFIG.emailjsReviewTemplateId, {
+        to_email: email,
+        to_name: job?.client || 'there',
+        clip_title: job?.title || 'Your clip',
+        portal_url: CONFIG.portalUrl,
+      }, CONFIG.emailjsPublicKey);
+    } catch(e) { console.warn('EmailJS error:', e); }
+  }
+
+  setLoading('review-btn', 'review-btn-text', false, '🔗 Send review link');
+  closeModal('modal-review');
+  showToast('Review link sent! Client notified.', 'success');
   loadEditorData();
 }
 
@@ -1249,11 +1341,11 @@ async function deliverJob() {
   // Send email notification
   if (email && CONFIG.emailjsServiceId !== 'YOUR_EMAILJS_SERVICE_ID') {
     try {
-      await emailjs.send(CONFIG.emailjsServiceId, CONFIG.emailjsTemplateId, {
+      await emailjs.send(CONFIG.emailjsServiceId, CONFIG.emailjsDeliveryTemplateId, {
         to_email: email,
         to_name: job?.client || 'there',
         clip_title: job?.title || 'Your clip',
-        download_link: link,
+        portal_url: CONFIG.portalUrl,
       }, CONFIG.emailjsPublicKey);
     } catch(e) { console.warn('EmailJS error:', e); }
   }
@@ -1364,13 +1456,29 @@ async function loadClientHistory() {
   const list = document.getElementById('client-history-list');
   if (!jobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No requests yet.</p></div>'; return; }
   list.innerHTML = jobs.map(j => {
-    const badgeMap = { queued: 'badge-gray', in_progress: 'badge-purple', delivered: 'badge-teal' };
+    const badgeMap = {
+      queued:          'badge-gray',
+      in_progress:     'badge-purple',
+      awaiting_review: 'badge-amber',
+      delivered:       'badge-teal'
+    };
+    const labelMap = {
+      queued:          'Requested',
+      in_progress:     'Currently Editing',
+      awaiting_review: 'Awaiting Review',
+      delivered:       'Delivered'
+    };
+    const reviewBtn = j.review_link ? `<a href="${j.review_link}" target="_blank" class="btn-download" style="background:var(--amber-dim);color:var(--amber);border-color:rgba(251,191,36,0.2);">👀 View edit</a>` : '';
+    const downloadBtn = j.download_link ? `<a href="${j.download_link}" target="_blank" class="btn-download">⬇ Download</a>` : '';
     return `<div class="request-row">
       <div class="request-info">
         <div class="request-title">${j.title}</div>
         <div class="request-meta">${j.format || 'Short Form'} · ${(j.clips||[]).filter(Boolean).length} clip(s) · ${j.deadline ? 'Due ' + formatDate(j.deadline) : 'No deadline'}</div>
       </div>
-      <span class="badge ${badgeMap[j.status] || 'badge-gray'}">${j.status.replace('_',' ')}</span>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+        ${reviewBtn}${downloadBtn}
+        <span class="badge ${badgeMap[j.status] || 'badge-gray'}">${labelMap[j.status] || j.status}</span>
+      </div>
     </div>`;
   }).join('');
 }
