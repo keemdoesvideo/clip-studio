@@ -594,7 +594,29 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 .screen { animation: fadeIn 0.25s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-.icon-btn.amber-btn { background: var(--amber-dim); border-color: rgba(251,191,36,0.2); color: var(--amber); }
+.job-card-expanded {
+  background: var(--bg2);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+.job-card-expanded:hover { border-color: var(--border2); }
+.job-card-expanded.urgent { border-color: rgba(240,98,146,0.2); }
+.job-card-expanded.urgent:hover { border-color: rgba(240,98,146,0.35); }
+
+.job-card-header {
+  padding: 16px 20px;
+  display: flex; align-items: center; gap: 16px;
+  cursor: pointer;
+}
+
+.job-card-body {
+  animation: slideDown 0.2s ease;
+}
+@keyframes slideDown { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+.expand-arrow { display: inline-block; font-size: 16px; color: var(--text3); transition: transform 0.2s; }
 .icon-btn.amber-btn:hover { background: rgba(251,191,36,0.2); }
 
 .status-select {
@@ -865,11 +887,11 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
     </div>
     <div class="form-group">
       <div class="form-label">Client name *</div>
-      <input class="form-input" id="m-client" placeholder="e.g. Ailinicia">
+      <input class="form-input" id="m-client">
     </div>
     <div class="form-group">
       <div class="form-label">Edit title *</div>
-      <input class="form-input" id="m-title" placeholder="e.g. Valorant Moments Vol. 5">
+      <input class="form-input" id="m-title">
     </div>
     <div class="form-row-2">
       <div class="form-group" style="margin-bottom:0;">
@@ -889,7 +911,7 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
       <div class="clip-links-wrapper" id="m-links-wrapper">
         <div class="clip-link-row">
           <span class="clip-link-num">1</span>
-          <input class="clip-link-input" placeholder="https://clips.twitch.tv/...">
+          <input class="clip-link-input">
           <button class="clip-link-remove" onclick="removeClipLink(this)">×</button>
         </div>
       </div>
@@ -1239,7 +1261,8 @@ function renderEditorJobs(jobs) {
 
 function jobCardHTML(job, isActive) {
   const isUrgent = job.deadline && ((new Date(job.deadline) - new Date()) / (1000*60*60*24)) <= 3 && job.status !== 'delivered';
-  const clipCount = (job.clips || []).filter(c => c).length;
+  const clips = (job.clips || []).filter(c => c);
+  const clipCount = clips.length;
   const deadlineStr = job.deadline ? formatDate(job.deadline) : 'No deadline';
   const statusBadge = {
     queued:          '<span class="badge badge-gray">Requested</span>',
@@ -1256,24 +1279,61 @@ function jobCardHTML(job, isActive) {
     </select>
   ` : '';
 
-  const actions = isActive ? `
-    <button class="icon-btn" title="View details" onclick="viewJob(${job.id})">🔍</button>
+  const actionBtns = isActive ? `
     ${job.status === 'awaiting_review' ? `<button class="icon-btn amber-btn" title="Send review link" onclick="openReviewModal(${job.id})">🔗</button>` : ''}
     ${job.status !== 'delivered' ? `<button class="icon-btn teal-btn" title="Mark delivered" onclick="openDeliverModal(${job.id})">✓</button>` : ''}
-  ` : `<button class="icon-btn" title="View" onclick="viewJob(${job.id})">🔍</button>`;
+  ` : '';
 
-  return `<div class="job-card ${isUrgent ? 'urgent' : ''}">
-    <div class="job-icon ${isUrgent ? 'pink' : job.status === 'delivered' ? 'teal' : job.status === 'awaiting_review' ? 'amber' : 'purple'}">${isUrgent ? '🔥' : job.status === 'delivered' ? '✅' : job.status === 'awaiting_review' ? '👀' : '🎬'}</div>
-    <div class="job-info">
-      <div class="job-title">${job.title}</div>
-      <div class="job-meta">
-        <span>${job.client}</span>
-        <span>${job.format || 'Short Form'}</span>
-        <span>${clipCount} clip${clipCount !== 1 ? 's' : ''}</span>
-        <span>${isUrgent ? '⚠️ ' : ''}${deadlineStr}</span>
+  const iconClass = isUrgent ? 'pink' : job.status === 'delivered' ? 'teal' : job.status === 'awaiting_review' ? 'amber' : 'purple';
+  const iconEmoji = isUrgent ? '🔥' : job.status === 'delivered' ? '✅' : job.status === 'awaiting_review' ? '👀' : '🎬';
+
+  const clipsHTML = clips.length ? clips.map((c, i) => `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <span style="font-size:11px;color:var(--purple);font-weight:600;min-width:18px;">${i+1}</span>
+      <a href="${c}" target="_blank" style="font-size:12px;color:var(--purple);text-decoration:none;word-break:break-all;line-height:1.4;">${c}</a>
+    </div>`).join('') : '<p style="font-size:12px;color:var(--text3);">No clip links added</p>';
+
+  const notesHTML = job.notes ? `
+    <div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border);">
+      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Notes</div>
+      <p style="font-size:12px;color:var(--text2);line-height:1.5;">${job.notes}</p>
+    </div>` : '';
+
+  const reviewHTML = job.review_link ? `
+    <div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:11px;color:var(--text3);">Review link sent</span>
+      <a href="${job.review_link}" target="_blank" style="font-size:12px;color:var(--amber);text-decoration:none;">Open Replay →</a>
+    </div>` : '';
+
+  return `<div class="job-card-expanded ${isUrgent ? 'urgent' : ''}" id="jobcard-${job.id}">
+    <div class="job-card-header" onclick="toggleJobCard(${job.id})">
+      <div class="job-icon ${iconClass}">${iconEmoji}</div>
+      <div class="job-info">
+        <div class="job-title">${job.title}</div>
+        <div class="job-meta">
+          <span>${job.client}</span>
+          <span>${job.format || 'Short Form'}</span>
+          <span>${clipCount} clip${clipCount !== 1 ? 's' : ''}</span>
+          <span>${isUrgent ? '⚠️ ' : ''}${deadlineStr}</span>
+        </div>
+      </div>
+      <div class="job-actions">
+        ${isActive ? statusDropdown : statusBadge}
+        ${actionBtns}
+        <button class="icon-btn expand-btn" title="Expand" onclick="event.stopPropagation();toggleJobCard(${job.id})">
+          <span class="expand-arrow">▾</span>
+        </button>
       </div>
     </div>
-    <div class="job-actions">${isActive ? statusDropdown : statusBadge}${actions}</div>
+    <div class="job-card-body" id="jobbody-${job.id}" style="display:none;">
+      <div style="padding:14px 16px 16px;border-top:0.5px solid var(--border);">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;">Clip links (${clipCount})</div>
+        ${clipsHTML}
+        ${notesHTML}
+        ${reviewHTML}
+        ${job.download_link ? `<div style="margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:var(--text3);">Download link</span><a href="${job.download_link}" target="_blank" style="font-size:12px;color:var(--teal);text-decoration:none;">Open →</a></div>` : ''}
+      </div>
+    </div>
   </div>`;
 }
 
@@ -1282,6 +1342,17 @@ async function changeStatus(id, newStatus) {
   const labels = { queued: 'Requested', in_progress: 'Currently Editing', awaiting_review: 'Awaiting Review' };
   showToast(`Status updated to "${labels[newStatus]}"`, 'success');
   loadEditorData();
+}
+
+function toggleJobCard(id) {
+  const body = document.getElementById('jobbody-' + id);
+  const card = document.getElementById('jobcard-' + id);
+  const arrow = card.querySelector('.expand-arrow');
+  if (!body) return;
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+  arrow.style.transition = 'transform 0.2s';
 }
 
 let reviewJobId = null;
@@ -1411,7 +1482,13 @@ async function editorAddJob() {
 }
 
 function addEditorClipLink() {
-  addClipLinkTo('m-links-wrapper');
+  const wrapper = document.getElementById('m-links-wrapper');
+  const rows = wrapper.querySelectorAll('.clip-link-row');
+  const num = rows.length + 1;
+  const div = document.createElement('div');
+  div.className = 'clip-link-row';
+  div.innerHTML = `<span class="clip-link-num">${num}</span><input class="clip-link-input"><button class="clip-link-remove" onclick="removeClipLink(this)">×</button>`;
+  wrapper.appendChild(div);
 }
 
 // ══════════════════════════════════════
