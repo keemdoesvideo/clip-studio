@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clip Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg: #0c0c10;
+  --bg2: #13131a;
+  --bg3: #1a1a24;
+  --bg4: #21212e;
+  --purple: #8b7ff5;
+  --purple-dim: rgba(139,127,245,0.15);
+  --purple-border: rgba(139,127,245,0.25);
+  --teal: #4ecdc4;
+  --teal-dim: rgba(78,205,196,0.12);
+  --pink: #f06292;
+  --pink-dim: rgba(240,98,146,0.12);
+  --amber: #fbbf24;
+  --amber-dim: rgba(251,191,36,0.12);
+  --text: #f0f0f8;
+  --text2: rgba(240,240,248,0.55);
+  --text3: rgba(240,240,248,0.3);
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.1);
+  --radius: 14px;
+  --radius-sm: 9px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Noise texture overlay ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 0; opacity: 0.4;
+}
+
+/* ── Typography ── */
+h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(139,127,245,0.3); border-radius: 2px; }
+
+/* ════════════════════════════════════
+   SCREENS
+════════════════════════════════════ */
+.screen { display: none; min-height: 100vh; position: relative; z-index: 1; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* ════════════════════════════════════
+   LOGIN SCREEN
+════════════════════════════════════ */
+#screen-login {
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.login-glow {
+  position: fixed;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(139,127,245,0.08) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -60%);
+  pointer-events: none;
+}
+
+.login-box {
+  background: var(--bg2);
+  border: 0.5px solid var(--border2);
+  border-radius: 20px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+}
+
+.login-logo {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 36px;
+}
+.login-logo-icon {
+  width: 44px; height: 44px;
+  background: var(--purple);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.login-logo-icon svg { width: 22px; height: 22px; fill: #fff; }
+.logo-text { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+
+.login-title { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; color: var(--text); margin-bottom: 8px; letter-spacing: -0.02em; }
+.login-sub { font-size: 14px; color: var(--text2); margin-bottom: 32px; line-height: 1.5; }
+
+.field-label { font-size: 11px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+.field-input {
+  width: 100%;
+  background: var(--bg3);
+  border: 0.5px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 13px 16px;
+  font-size: 14px; color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+  margin-bottom: 16px;
+}
+.field-input:focus { border-color: var(--purple); }
+.field-input::placeholder { color: var(--text3); }
+
+.btn-primary {
+  width: 100%;
+  background: var(--purple);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  font-size: 14px; font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.login-divider { text-align: center; margin: 20px 0; font-size: 12px; color: var(--text3); }
+.login-switch { text-align: center; font-size: 13px; color: var(--text2); margin-top: 20px; }
+.login-switch a { color: var(--purple); cursor: pointer; text-decoration: none; }
+.login-switch a:hover { text-decoration: underline; }
+
+.alert { padding: 12px 16px; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 16px; display: none; }
+.alert.error { background: var(--pink-dim); border: 0.5px solid rgba(240,98,146,0.25); color: var(--pink); }
+.alert.success { background: var(--teal-dim); border: 0.5px solid rgba(78,205,196,0.25); color: var(--teal); }
+
+/* ════════════════════════════════════
+   SHARED LAYOUT
+════════════════════════════════════ */
+.topbar {
+  background: var(--bg2);
+  border-bottom: 0.5px solid var(--border);
+  padding: 0 28px;
+  height: 58px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  flex-shrink: 0;
+}
+
+.topbar-logo { display: flex; align-items: center; gap: 10px; }
+.topbar-logo-icon {
+  width: 32px; height: 32px;
+  background: var(--purple);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+}
+.topbar-logo-icon svg { width: 17px; height: 17px; fill: #fff; }
+.topbar-logo-name { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
+
+.topbar-nav { display: flex; gap: 2px; }
+.topbar-tab {
+  font-size: 13px; color: var(--text2);
+  padding: 7px 14px; border-radius: var(--radius-sm);
+  cursor: pointer; transition: all 0.15s;
+  font-weight: 400;
+}
+.topbar-tab:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+.topbar-tab.active { color: var(--text); background: var(--purple-dim); }
+
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.user-chip {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg3);
+  border: 0.5px solid var(--border);
+  border-radius: 30px;
+  padding: 5px 12px 5px 5px;
+  cursor: pointer;
+}
+.user-avatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--purple);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: #fff;
+  font-family: 'Syne', sans-serif;
+}
+.user-name { font-size: 12px; color: var(--text2); }
+.btn-logout {
+  background: transparent;
+  border: 0.5px solid var(--border2);
+  border-radius: var(--radius-sm);
+  color: var(--text3);
+  font-size: 12px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-logout:hover { color: var(--text); border-color: var(--border2); }
+
+.main-content { flex: 1; padding: 32px 28px; max-width: 1100px; width: 100%; margin: 0 auto; }
+
+/* ════════════════════════════════════
+   STATS ROW
+════════════════════════════════════ */
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 32px; }
+.stat-card {
+  background: var(--bg2);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: relative; overflow: hidden;
+}
+.stat-card::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--accent, var(--purple));
+  opacity: 0.6;
+}
+.stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; font-weight: 500; }
+.stat-num { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; margin-bottom: 4px; }
+.stat-sub { font-size: 11px; color: var(--text3); }
+.stat-card.urgent { --accent: var(--pink); }
+.stat-card.delivered { --accent: var(--teal); }
+.stat-card.queue { --accent: var(--amber); }
+
+/* ════════════════════════════════════
+   SECTION HEADERS
+════════════════════════════════════ */
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.section-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; }
+
+.btn-accent {
+  background: var(--purple-dim);
+  color: var(--purple);
+  border: 0.5px solid var(--purple-border);
+  border-radius: var(--radius-sm);
+  padding: 7px 14px;
+  font-size: 12px; font-weight: 500;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: all 0.15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-accent:hover { background: rgba(139,127,245,0.22); }
+
+/* ════════════════════════════════════
+   JOB CARDS
+════════════════════════════════════ */
+.job-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px; }
+
+.job-card {
+  background: var(--bg2);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex; align-items: center; gap: 16px;
+  transition: border-color 0.15s, background 0.15s;
+  cursor: pointer;
+}
+.job-card:hover { border-color: var(--border2); background: var(--bg3); }
+.job-card.urgent { border-color: rgba(240,98,146,0.2); }
+.job-card.urgent:hover { border-color: rgba(240,98,146,0.35); }
+
+.job-icon {
+  width: 40px; height: 40px; border-radius: 11px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.job-icon.purple { background: var(--purple-dim); }
+.job-icon.teal { background: var(--teal-dim); }
+.job-icon.pink { background: var(--pink-dim); }
+.job-icon.amber { background: var(--amber-dim); }
+
+.job-info { flex: 1; min-width: 0; }
+.job-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.job-meta { font-size: 12px; color: var(--text3); display: flex; gap: 12px; }
+.job-meta span { display: flex; align-items: center; gap: 4px; }
+
+.job-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+.badge {
+  font-size: 11px; font-weight: 500;
+  padding: 4px 10px; border-radius: 20px;
+  white-space: nowrap;
+}
+.badge-purple { background: var(--purple-dim); color: var(--purple); border: 0.5px solid var(--purple-border); }
+.badge-teal { background: var(--teal-dim); color: var(--teal); border: 0.5px solid rgba(78,205,196,0.2); }
+.badge-pink { background: var(--pink-dim); color: var(--pink); border: 0.5px solid rgba(240,98,146,0.2); }
+.badge-amber { background: var(--amber-dim); color: var(--amber); border: 0.5px solid rgba(251,191,36,0.2); }
+.badge-gray { background: rgba(255,255,255,0.05); color: var(--text3); border: 0.5px solid var(--border); }
+
+.icon-btn {
+  width: 34px; height: 34px;
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.15s;
+  font-size: 16px; color: var(--text3);
+}
+.icon-btn:hover { background: rgba(255,255,255,0.08); color: var(--text2); border-color: var(--border2); }
+.icon-btn.teal-btn { background: var(--teal-dim); border-color: rgba(78,205,196,0.2); color: var(--teal); }
+.icon-btn.teal-btn:hover { background: rgba(78,205,196,0.2); }
+
+/* ════════════════════════════════════
+   MODAL
+════════════════════════════════════ */
+.modal-backdrop {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 200;
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-backdrop.open { display: flex; }
+
+.modal {
+  background: var(--bg2);
+  border: 0.5px solid var(--border2);
+  border-radius: 20px;
+  width: 100%; max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 32px;
+}
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.modal-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); }
+.modal-close {
+  width: 32px; height: 32px;
+  background: var(--bg3);
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 18px; color: var(--text3);
+  transition: all 0.15s;
+}
+.modal-close:hover { color: var(--text); border-color: var(--border2); }
+
+.form-group { margin-bottom: 18px; }
+.form-label { font-size: 11px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
+.form-label .optional { color: rgba(255,255,255,0.2); text-transform: none; font-size: 10px; letter-spacing: 0; margin-left: 4px; }
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  background: var(--bg3);
+  border: 0.5px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 13px; color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--purple); }
+.form-input::placeholder, .form-textarea::placeholder { color: var(--text3); }
+.form-select { appearance: none; cursor: pointer; }
+.form-select option { background: var(--bg3); }
+.form-textarea { resize: vertical; min-height: 80px; }
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+
+/* Clip links area */
+.clip-links-wrapper {
+  background: var(--bg3);
+  border: 0.5px solid var(--purple-border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+}
+.clip-link-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.clip-link-num { font-size: 11px; color: var(--purple); font-weight: 500; min-width: 20px; font-family: 'Syne', sans-serif; }
+.clip-link-input {
+  flex: 1;
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 7px;
+  padding: 8px 12px;
+  font-size: 12px; color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.clip-link-input:focus { border-color: var(--purple); }
+.clip-link-input::placeholder { color: var(--text3); }
+.clip-link-remove {
+  width: 26px; height: 26px;
+  background: transparent;
+  border: none;
+  cursor: pointer; color: var(--text3); font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+.clip-link-remove:hover { color: var(--pink); background: var(--pink-dim); }
+.add-clip-btn {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--purple);
+  background: none; border: none;
+  cursor: pointer; padding: 4px 0; margin-top: 4px;
+  font-family: 'DM Sans', sans-serif;
+  transition: opacity 0.15s;
+}
+.add-clip-btn:hover { opacity: 0.7; }
+
+.modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+.btn-ghost {
+  flex: 1;
+  background: transparent;
+  border: 0.5px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-size: 13px; color: var(--text2);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+.btn-ghost:hover { border-color: var(--border2); background: rgba(255,255,255,0.04); }
+.btn-submit {
+  flex: 2;
+  background: var(--purple);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-size: 13px; font-weight: 500; color: #fff;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: opacity 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-submit:hover { opacity: 0.88; }
+.btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Deliver modal extras */
+.deliver-input-row { display: flex; gap: 10px; }
+.deliver-input-row .form-input { flex: 1; }
+.btn-deliver {
+  background: var(--teal);
+  color: #0c0c10;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 12px 20px;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+.btn-deliver:hover { opacity: 0.88; }
+
+/* ════════════════════════════════════
+   CLIENT PORTAL SPECIFIC
+════════════════════════════════════ */
+.client-hero {
+  background: var(--bg2);
+  border-bottom: 0.5px solid var(--border);
+  padding: 28px 28px 0;
+}
+.client-hero-inner { max-width: 1100px; margin: 0 auto; }
+.client-greeting { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+.client-avatar-big {
+  width: 54px; height: 54px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: #fff;
+}
+.client-hello { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 3px; letter-spacing: -0.01em; }
+.client-sub { font-size: 13px; color: var(--text3); }
+
+.client-tabs { display: flex; gap: 0; }
+.client-tab {
+  font-size: 13px; color: var(--text3);
+  padding: 10px 18px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  font-weight: 400;
+  margin-bottom: -0.5px;
+}
+.client-tab:hover { color: var(--text2); }
+.client-tab.active { color: var(--purple); border-bottom-color: var(--purple); }
+
+.client-body { flex: 1; padding: 28px; max-width: 1100px; width: 100%; margin: 0 auto; }
+
+/* Request form card */
+.request-card {
+  background: var(--bg2);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.request-card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px; font-weight: 700; color: var(--text);
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px;
+}
+.request-card-title .icon { font-size: 20px; }
+
+/* Download cards */
+.download-card {
+  background: var(--bg2);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 8px;
+  transition: border-color 0.15s;
+}
+.download-card:hover { border-color: var(--border2); }
+.download-icon {
+  width: 40px; height: 40px; border-radius: 11px;
+  background: var(--teal-dim);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.download-info { flex: 1; min-width: 0; }
+.download-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.download-meta { font-size: 11px; color: var(--text3); }
+.btn-download {
+  background: var(--teal-dim);
+  color: var(--teal);
+  border: 0.5px solid rgba(78,205,196,0.2);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  font-size: 12px; font-weight: 500;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: all 0.15s;
+  font-family: 'DM Sans', sans-serif;
+  flex-shrink: 0;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-download:hover { background: rgba(78,205,196,0.2); }
+
+/* My requests tab */
+.request-row {
+  background: var(--bg2);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 20px;
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 8px;
+}
+.request-info { flex: 1; min-width: 0; }
+.request-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.request-meta { font-size: 11px; color: var(--text3); }
+
+/* ── Empty states ── */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
+.empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+.empty-state p { font-size: 14px; }
+
+/* ── Toast ── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--bg3);
+  border: 0.5px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  font-size: 13px; color: var(--text);
+  z-index: 999;
+  transform: translateY(100px); opacity: 0;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-width: 320px;
+  display: flex; align-items: center; gap: 10px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-color: rgba(78,205,196,0.3); }
+.toast.success .toast-dot { background: var(--teal); }
+.toast.error { border-color: rgba(240,98,146,0.3); }
+.toast.error .toast-dot { background: var(--pink); }
+.toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── Loading spinner ── */
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Page transition ── */
+.screen { animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .form-row-2 { grid-template-columns: 1fr; }
+  .topbar-nav { display: none; }
+  .main-content, .client-body { padding: 20px 16px; }
+  .client-hero { padding: 20px 16px 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════ LOGIN SCREEN ════════ -->
+<div id="screen-login" class="screen active">
+  <div class="login-glow"></div>
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M4 4l4 4-4 4 4 4-4 4h16V4H4z"/></svg>
+      </div>
+      <div class="logo-text">Clip Studio</div>
+    </div>
+
+    <div id="login-form-view">
+      <h1 class="login-title">Welcome back</h1>
+      <p class="login-sub">Enter your email to receive a magic link — no password needed.</p>
+      <div id="login-alert" class="alert"></div>
+      <div class="field-label">Your email</div>
+      <input class="field-input" id="login-email" type="email" placeholder="you@email.com" autocomplete="email">
+      <button class="btn-primary" id="login-btn" onclick="sendMagicLink()">
+        <span id="login-btn-text">Send magic link</span>
+      </button>
+      <div class="login-divider">or</div>
+      <div class="login-switch">Editor? <a onclick="showEditorLogin()">Sign in with password →</a></div>
+    </div>
+
+    <div id="editor-form-view" style="display:none;">
+      <h1 class="login-title">Editor login</h1>
+      <p class="login-sub">Sign in to your editor dashboard.</p>
+      <div id="editor-alert" class="alert"></div>
+      <div class="field-label">Email</div>
+      <input class="field-input" id="editor-email" type="email" placeholder="your@email.com">
+      <div class="field-label">Password</div>
+      <input class="field-input" id="editor-pass" type="password" placeholder="••••••••">
+      <button class="btn-primary" id="editor-btn" onclick="editorLogin()">
+        <span id="editor-btn-text">Sign in</span>
+      </button>
+      <div class="login-switch"><a onclick="showClientLogin()">← Back to client login</a></div>
+    </div>
+
+    <div id="check-email-view" style="display:none;">
+      <div style="text-align:center; padding: 20px 0;">
+        <div style="font-size:48px; margin-bottom:16px;">📬</div>
+        <h2 style="font-family:'Syne',sans-serif; font-size:20px; font-weight:700; margin-bottom:10px;">Check your inbox</h2>
+        <p style="font-size:14px; color:var(--text2); line-height:1.6;">We've sent a magic link to <strong id="sent-to-email" style="color:var(--purple);"></strong>. Click it to sign in — no password required.</p>
+        <button class="btn-primary" style="margin-top:24px;" onclick="showClientLogin()">Send another link</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ EDITOR DASHBOARD ════════ -->
+<div id="screen-editor" class="screen">
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="topbar-logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M4 4l4 4-4 4 4 4-4 4h16V4H4z"/></svg>
+      </div>
+      <span class="topbar-logo-name">Clip Studio</span>
+    </div>
+    <div class="topbar-nav">
+      <div class="topbar-tab active" onclick="editorTab('queue', this)">Queue</div>
+      <div class="topbar-tab" onclick="editorTab('delivered', this)">Delivered</div>
+    </div>
+    <div class="topbar-right">
+      <div class="user-chip">
+        <div class="user-avatar" id="editor-avatar">KB</div>
+        <span class="user-name" id="editor-name-display">Karim</span>
+      </div>
+      <button class="btn-logout" onclick="logout()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div id="editor-tab-queue">
+      <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:28px;">
+        <div>
+          <h1 style="font-family:'Syne',sans-serif; font-size:24px; font-weight:700; letter-spacing:-0.02em; margin-bottom:4px;" id="editor-greeting">Good morning</h1>
+          <p style="font-size:13px; color:var(--text3);" id="editor-subline">Loading your queue...</p>
+        </div>
+        <button class="btn-accent" onclick="openNewJobModal()">
+          ✦ New job
+        </button>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card queue">
+          <div class="stat-label">In queue</div>
+          <div class="stat-num" id="stat-queue">—</div>
+          <div class="stat-sub">Awaiting edit</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">In progress</div>
+          <div class="stat-num" id="stat-progress">—</div>
+          <div class="stat-sub">Being worked on</div>
+        </div>
+        <div class="stat-card delivered">
+          <div class="stat-label">Delivered this month</div>
+          <div class="stat-num" id="stat-delivered">—</div>
+          <div class="stat-sub" id="stat-month">—</div>
+        </div>
+        <div class="stat-card urgent">
+          <div class="stat-label">Due within 3 days</div>
+          <div class="stat-num" id="stat-urgent">—</div>
+          <div class="stat-sub">Check deadlines</div>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div class="section-title">Active jobs</div>
+      </div>
+      <div class="job-list" id="editor-job-list">
+        <div class="empty-state"><div class="empty-icon">📋</div><p>No active jobs. Add one above!</p></div>
+      </div>
+    </div>
+
+    <div id="editor-tab-delivered" style="display:none;">
+      <h1 style="font-family:'Syne',sans-serif; font-size:22px; font-weight:700; letter-spacing:-0.02em; margin-bottom:24px;">Delivered</h1>
+      <div class="job-list" id="editor-delivered-list">
+        <div class="empty-state"><div class="empty-icon">✅</div><p>No delivered jobs yet.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ CLIENT PORTAL ════════ -->
+<div id="screen-client" class="screen">
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="topbar-logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M4 4l4 4-4 4 4 4-4 4h16V4H4z"/></svg>
+      </div>
+      <span class="topbar-logo-name">Clip Studio</span>
+    </div>
+    <div class="topbar-right">
+      <div class="user-chip">
+        <div class="user-avatar" id="client-avatar-top">A</div>
+        <span class="user-name" id="client-name-top">Ailinicia</span>
+      </div>
+      <button class="btn-logout" onclick="logout()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="client-hero">
+    <div class="client-hero-inner">
+      <div class="client-greeting">
+        <div class="client-avatar-big" id="client-avatar-big">A</div>
+        <div>
+          <div class="client-hello" id="client-hello">Hey Ailinicia! 👋</div>
+          <div class="client-sub">Submit clips, track progress, and download your edits</div>
+        </div>
+      </div>
+      <div class="client-tabs">
+        <div class="client-tab active" onclick="clientTab('request', this)">Request a clip</div>
+        <div class="client-tab" onclick="clientTab('downloads', this)">My downloads</div>
+        <div class="client-tab" onclick="clientTab('history', this)">All requests</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="client-body">
+
+    <!-- REQUEST TAB -->
+    <div id="client-tab-request">
+      <div class="request-card">
+        <div class="request-card-title"><span class="icon">✦</span> New edit request</div>
+
+        <div class="form-row-2">
+          <div class="form-group" style="margin-bottom:0;">
+            <div class="form-label">Edit title *</div>
+            <input class="form-input" id="c-title" placeholder="e.g. Valorant Moments Vol. 5">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <div class="form-label">Video format *</div>
+            <select class="form-select" id="c-format">
+              <option value="">Select format</option>
+              <option value="Short Form">Short Form</option>
+              <option value="Long Form">Long Form</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:18px;">
+          <div class="form-label">Clip links * <span style="color:var(--purple); text-transform:none; font-size:10px; letter-spacing:0; margin-left:4px;">— add as many as you need</span></div>
+          <div class="clip-links-wrapper" id="c-links-wrapper">
+            <div class="clip-link-row">
+              <span class="clip-link-num">1</span>
+              <input class="clip-link-input" placeholder="https://clips.twitch.tv/... or Dropbox link">
+              <button class="clip-link-remove" onclick="removeClipLink(this)" title="Remove">×</button>
+            </div>
+          </div>
+          <button class="add-clip-btn" onclick="addClipLink()">＋ Add another clip link</button>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group" style="margin-bottom:0;">
+            <div class="form-label">Deadline <span class="optional">optional</span></div>
+            <input class="form-input" id="c-deadline" type="date">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <div class="form-label">Notes for editor <span class="optional">optional</span></div>
+            <input class="form-input" id="c-notes" placeholder="Any special instructions...">
+          </div>
+        </div>
+
+        <button class="btn-submit" style="margin-top:20px; width:100%;" id="c-submit-btn" onclick="submitClientRequest()">
+          <span id="c-submit-text">Submit request</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- DOWNLOADS TAB -->
+    <div id="client-tab-downloads" style="display:none;">
+      <div class="section-header" style="margin-bottom:16px;">
+        <div class="section-title">Delivered edits</div>
+      </div>
+      <div id="client-downloads-list">
+        <div class="empty-state"><div class="empty-icon">📥</div><p>No delivered clips yet — check back soon!</p></div>
+      </div>
+    </div>
+
+    <!-- HISTORY TAB -->
+    <div id="client-tab-history" style="display:none;">
+      <div class="section-header" style="margin-bottom:16px;">
+        <div class="section-title">Your requests</div>
+      </div>
+      <div id="client-history-list">
+        <div class="empty-state"><div class="empty-icon">📋</div><p>No requests yet.</p></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════ MODAL: NEW JOB (Editor) ════════ -->
+<div class="modal-backdrop" id="modal-new-job">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add new job</div>
+      <div class="modal-close" onclick="closeModal('modal-new-job')">×</div>
+    </div>
+    <div class="form-group">
+      <div class="form-label">Client name *</div>
+      <input class="form-input" id="m-client" placeholder="e.g. Ailinicia">
+    </div>
+    <div class="form-group">
+      <div class="form-label">Edit title *</div>
+      <input class="form-input" id="m-title" placeholder="e.g. Valorant Moments Vol. 5">
+    </div>
+    <div class="form-row-2">
+      <div class="form-group" style="margin-bottom:0;">
+        <div class="form-label">Format</div>
+        <select class="form-select" id="m-format">
+          <option value="Short Form">Short Form</option>
+          <option value="Long Form">Long Form</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <div class="form-label">Deadline <span class="optional">optional</span></div>
+        <input class="form-input" id="m-deadline" type="date">
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:18px;">
+      <div class="form-label">Clip links</div>
+      <div class="clip-links-wrapper" id="m-links-wrapper">
+        <div class="clip-link-row">
+          <span class="clip-link-num">1</span>
+          <input class="clip-link-input" placeholder="https://clips.twitch.tv/...">
+          <button class="clip-link-remove" onclick="removeClipLink(this)">×</button>
+        </div>
+      </div>
+      <button class="add-clip-btn" onclick="addEditorClipLink()">＋ Add clip link</button>
+    </div>
+    <div class="form-group">
+      <div class="form-label">Notes <span class="optional">optional</span></div>
+      <textarea class="form-textarea" id="m-notes" placeholder="Any notes about this job..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('modal-new-job')">Cancel</button>
+      <button class="btn-submit" id="m-submit-btn" onclick="editorAddJob()">
+        <span id="m-submit-text">Add job</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ MODAL: DELIVER JOB ════════ -->
+<div class="modal-backdrop" id="modal-deliver">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <div class="modal-title">Mark as delivered</div>
+      <div class="modal-close" onclick="closeModal('modal-deliver')">×</div>
+    </div>
+    <p style="font-size:13px; color:var(--text2); margin-bottom:20px;" id="deliver-job-title"></p>
+    <div class="form-group">
+      <div class="form-label">Dropbox / download link *</div>
+      <input class="form-input" id="deliver-link" placeholder="https://dropbox.com/...">
+    </div>
+    <div class="form-group">
+      <div class="form-label">Client email (for notification)</div>
+      <input class="form-input" id="deliver-email" placeholder="client@email.com">
+    </div>
+    <p style="font-size:11px; color:var(--text3); margin-top:-10px; margin-bottom:16px;">ℹ️ The client will receive an email with their download link automatically.</p>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('modal-deliver')">Cancel</button>
+      <button class="btn-deliver" id="deliver-btn" onclick="deliverJob()" style="border-radius:var(--radius-sm); padding:12px 24px; font-size:13px;">
+        <span id="deliver-btn-text">✓ Mark delivered &amp; notify</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ MODAL: VIEW JOB DETAILS ════════ -->
+<div class="modal-backdrop" id="modal-view-job">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <div class="modal-title" id="view-job-title-modal">Job details</div>
+      <div class="modal-close" onclick="closeModal('modal-view-job')">×</div>
+    </div>
+    <div id="view-job-body"></div>
+  </div>
+</div>
+
+<!-- ════════ TOAST ════════ -->
+<div class="toast" id="toast">
+  <div class="toast-dot" id="toast-dot"></div>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// CONFIG — Fill these in before deploying
+// ══════════════════════════════════════
+const CONFIG = {
+  supabaseUrl: 'https://ncgwiqjkcnpsenfijnhm.supabase.co',
+  supabaseKey: 'sb_publishable_pT_si_8TekryKyp0M10Fhw_51PET-_-',
+  editorEmail: 'keemdoesvideo@gmail.com',
+  editorPassword: 'ClipStudio2026',
+  emailjsServiceId: 'service_qike8ko',
+  emailjsTemplateId: 'template_ixqevf9',
+  emailjsPublicKey: '9eEUxHp-Qv_Eq_a5U',
+};
+
+// ── Supabase client ──
+let sb;
+try {
+  sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
+} catch(e) {
+  console.warn('Supabase not configured yet — running in demo mode');
+}
+
+let currentUser = null;
+let isEditor = false;
+let allJobs = [];
+let deliverJobId = null;
+
+// ══════════════════════════════════════
+// DEMO DATA (used when Supabase not configured)
+// ══════════════════════════════════════
+const DEMO_JOBS = [
+  { id: 1, client: 'Ailinicia', title: 'Valorant Moments Vol. 5', format: 'Short Form', status: 'queued', deadline: '2026-05-18', clips: ['https://clips.twitch.tv/clip1', 'https://clips.twitch.tv/clip2'], notes: '20 clips total, best moments only', created_at: '2026-05-14', client_email: 'ailinicia@email.com' },
+  { id: 2, client: 'Ailinicia', title: 'First Time Minecraft Survival', format: 'Long Form', status: 'in_progress', deadline: null, clips: ['https://clips.twitch.tv/mc1'], notes: 'YouTube video, first time playing', created_at: '2026-05-13', client_email: 'ailinicia@email.com' },
+  { id: 3, client: 'Ailinicia', title: 'Norway has me dohh!', format: 'Short Form', status: 'queued', deadline: null, clips: ['https://clips.twitch.tv/n1', 'https://clips.twitch.tv/n2', 'https://clips.twitch.tv/n3'], notes: '', created_at: '2026-05-12', client_email: 'ailinicia@email.com' },
+  { id: 4, client: 'Ailinicia', title: 'This is why I keep voice chat on', format: 'Short Form', status: 'delivered', deadline: null, clips: ['https://clips.twitch.tv/vc1'], notes: '', created_at: '2026-04-23', download_link: 'https://dropbox.com/example1', delivered_at: '2026-04-24', client_email: 'ailinicia@email.com' },
+  { id: 5, client: 'Ailinicia', title: 'Bad Rizz / 6K On Pearl', format: 'Short Form', status: 'delivered', deadline: null, clips: ['https://clips.twitch.tv/br1'], notes: 'REVISED', created_at: '2026-03-30', download_link: 'https://dropbox.com/example2', delivered_at: '2026-04-01', client_email: 'ailinicia@email.com' },
+];
+let demoJobs = JSON.parse(JSON.stringify(DEMO_JOBS));
+let demoNextId = 6;
+
+const DEMO_MODE = CONFIG.supabaseUrl === 'YOUR_SUPABASE_URL';
+const DEMO_CLIENT_EMAIL = 'ailinicia@email.com';
+
+// ══════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+
+function showEditorLogin() {
+  document.getElementById('login-form-view').style.display = 'none';
+  document.getElementById('editor-form-view').style.display = 'block';
+  document.getElementById('check-email-view').style.display = 'none';
+}
+function showClientLogin() {
+  document.getElementById('login-form-view').style.display = 'block';
+  document.getElementById('editor-form-view').style.display = 'none';
+  document.getElementById('check-email-view').style.display = 'none';
+}
+
+async function sendMagicLink() {
+  const email = document.getElementById('login-email').value.trim();
+  if (!email) { showAlert('login-alert', 'Please enter your email.', 'error'); return; }
+
+  if (DEMO_MODE) {
+    // Demo: any email logs in as client
+    document.getElementById('sent-to-email').textContent = email;
+    document.getElementById('login-form-view').style.display = 'none';
+    document.getElementById('check-email-view').style.display = 'block';
+    // Simulate click after 1.5s for demo purposes
+    setTimeout(() => loginAsClient({ email, name: email.split('@')[0] }), 1500);
+    return;
+  }
+
+  setLoading('login-btn', 'login-btn-text', true, 'Sending...');
+  const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
+  setLoading('login-btn', 'login-btn-text', false, 'Send magic link');
+  if (error) { showAlert('login-alert', error.message, 'error'); return; }
+  document.getElementById('sent-to-email').textContent = email;
+  document.getElementById('login-form-view').style.display = 'none';
+  document.getElementById('check-email-view').style.display = 'block';
+}
+
+async function editorLogin() {
+  const email = document.getElementById('editor-email').value.trim();
+  const pass = document.getElementById('editor-pass').value;
+
+  if (DEMO_MODE) {
+    if (email === CONFIG.editorEmail || email === 'editor@clipstudio.com') {
+      loginAsEditor({ email, name: 'Karim' });
+    } else {
+      showAlert('editor-alert', 'Invalid credentials. In demo mode, use editor@clipstudio.com', 'error');
+    }
+    return;
+  }
+
+  setLoading('editor-btn', 'editor-btn-text', true, 'Signing in...');
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  setLoading('editor-btn', 'editor-btn-text', false, 'Sign in');
+  if (error) { showAlert('editor-alert', error.message, 'error'); return; }
+  if (data.user.email === CONFIG.editorEmail) {
+    loginAsEditor(data.user);
+  } else {
+    loginAsClient(data.user);
+  }
+}
+
+function loginAsEditor(user) {
+  currentUser = user;
+  isEditor = true;
+  const name = user.name || user.email.split('@')[0];
+  const initials = name.substring(0, 2).toUpperCase();
+  document.getElementById('editor-avatar').textContent = initials;
+  document.getElementById('editor-name-display').textContent = name;
+  showScreen('editor');
+  loadEditorData();
+}
+
+function loginAsClient(user) {
+  currentUser = user;
+  isEditor = false;
+  const name = user.name || user.email.split('@')[0];
+  const initials = name.substring(0, 2).toUpperCase();
+  document.getElementById('client-avatar-top').textContent = initials;
+  document.getElementById('client-name-top').textContent = name;
+  document.getElementById('client-avatar-big').textContent = initials;
+  document.getElementById('client-hello').textContent = `Hey ${name}! 👋`;
+  showScreen('client');
+  loadClientData(user.email);
+}
+
+async function logout() {
+  if (!DEMO_MODE && sb) await sb.auth.signOut();
+  currentUser = null; isEditor = false;
+  showClientLogin();
+  showScreen('login');
+}
+
+// Check for magic link session on load
+window.addEventListener('load', async () => {
+  if (DEMO_MODE) return; // skip in demo
+  if (!sb) return;
+  const { data } = await sb.auth.getSession();
+  if (data.session) {
+    const user = data.session.user;
+    if (user.email === CONFIG.editorEmail) loginAsEditor(user);
+    else loginAsClient(user);
+  }
+});
+
+// ══════════════════════════════════════
+// DATA LAYER
+// ══════════════════════════════════════
+async function getJobs(filter = {}) {
+  if (DEMO_MODE) {
+    let jobs = [...demoJobs];
+    if (filter.status) {
+      if (Array.isArray(filter.status)) jobs = jobs.filter(j => filter.status.includes(j.status));
+      else jobs = jobs.filter(j => j.status === filter.status);
+    }
+    if (filter.client_email) jobs = jobs.filter(j => j.client_email === filter.client_email);
+    return jobs;
+  }
+  let query = sb.from('jobs').select('*').order('created_at', { ascending: false });
+  if (filter.status) {
+    if (Array.isArray(filter.status)) query = query.in('status', filter.status);
+    else query = query.eq('status', filter.status);
+  }
+  if (filter.client_email) query = query.eq('client_email', filter.client_email);
+  const { data } = await query;
+  return data || [];
+}
+
+async function addJob(job) {
+  if (DEMO_MODE) {
+    const newJob = { ...job, id: demoNextId++, created_at: new Date().toISOString() };
+    demoJobs.unshift(newJob);
+    return newJob;
+  }
+  const { data } = await sb.from('jobs').insert([job]).select().single();
+  return data;
+}
+
+async function updateJob(id, updates) {
+  if (DEMO_MODE) {
+    const idx = demoJobs.findIndex(j => j.id === id);
+    if (idx !== -1) { demoJobs[idx] = { ...demoJobs[idx], ...updates }; return demoJobs[idx]; }
+    return null;
+  }
+  const { data } = await sb.from('jobs').update(updates).eq('id', id).select().single();
+  return data;
+}
+
+// ══════════════════════════════════════
+// EDITOR DASHBOARD
+// ══════════════════════════════════════
+function editorTab(tab, el) {
+  document.querySelectorAll('.topbar-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('editor-tab-queue').style.display = tab === 'queue' ? 'block' : 'none';
+  document.getElementById('editor-tab-delivered').style.display = tab === 'delivered' ? 'block' : 'none';
+  if (tab === 'delivered') loadDeliveredJobs();
+}
+
+async function loadEditorData() {
+  const now = new Date();
+  const hour = now.getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('editor-greeting').textContent = greeting;
+
+  const jobs = await getJobs({ status: ['queued', 'in_progress'] });
+  allJobs = jobs;
+
+  const delivered = await getJobs({ status: 'delivered' });
+  const thisMonth = delivered.filter(j => {
+    if (!j.delivered_at) return false;
+    const d = new Date(j.delivered_at);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  });
+
+  const urgent = jobs.filter(j => {
+    if (!j.deadline) return false;
+    const diff = (new Date(j.deadline) - now) / (1000 * 60 * 60 * 24);
+    return diff <= 3 && diff >= 0;
+  });
+
+  document.getElementById('stat-queue').textContent = jobs.filter(j => j.status === 'queued').length;
+  document.getElementById('stat-progress').textContent = jobs.filter(j => j.status === 'in_progress').length;
+  document.getElementById('stat-delivered').textContent = thisMonth.length;
+  document.getElementById('stat-month').textContent = now.toLocaleString('default', { month: 'long' });
+  document.getElementById('stat-urgent').textContent = urgent.length;
+
+  const subline = jobs.length === 0 ? 'Queue is clear — nice work!' : `${jobs.length} job${jobs.length > 1 ? 's' : ''} in the queue`;
+  document.getElementById('editor-subline').textContent = subline;
+
+  renderEditorJobs(jobs);
+}
+
+async function loadDeliveredJobs() {
+  const jobs = await getJobs({ status: 'delivered' });
+  const list = document.getElementById('editor-delivered-list');
+  if (!jobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><p>No delivered jobs yet.</p></div>'; return; }
+  list.innerHTML = jobs.map(j => jobCardHTML(j, false)).join('');
+}
+
+function renderEditorJobs(jobs) {
+  const list = document.getElementById('editor-job-list');
+  if (!jobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No active jobs. Hit "New job" to add one!</p></div>'; return; }
+  const sorted = [...jobs].sort((a, b) => {
+    if (a.deadline && b.deadline) return new Date(a.deadline) - new Date(b.deadline);
+    if (a.deadline) return -1; if (b.deadline) return 1; return 0;
+  });
+  list.innerHTML = sorted.map(j => jobCardHTML(j, true)).join('');
+}
+
+function jobCardHTML(job, isActive) {
+  const isUrgent = job.deadline && ((new Date(job.deadline) - new Date()) / (1000*60*60*24)) <= 3 && job.status !== 'delivered';
+  const clipCount = (job.clips || []).filter(c => c).length;
+  const deadlineStr = job.deadline ? formatDate(job.deadline) : 'No deadline';
+  const statusBadge = {
+    queued: '<span class="badge badge-gray">Queued</span>',
+    in_progress: '<span class="badge badge-purple">In progress</span>',
+    delivered: '<span class="badge badge-teal">Delivered</span>',
+  }[job.status] || '';
+
+  const actions = isActive ? `
+    <button class="icon-btn" title="View details" onclick="viewJob(${job.id})">🔍</button>
+    ${job.status === 'queued' ? `<button class="icon-btn" title="Mark in progress" onclick="markInProgress(${job.id})">▶</button>` : ''}
+    ${job.status !== 'delivered' ? `<button class="icon-btn teal-btn" title="Mark delivered" onclick="openDeliverModal(${job.id})">✓</button>` : ''}
+  ` : `<button class="icon-btn" title="View" onclick="viewJob(${job.id})">🔍</button>`;
+
+  return `<div class="job-card ${isUrgent ? 'urgent' : ''}">
+    <div class="job-icon ${isUrgent ? 'pink' : job.status === 'delivered' ? 'teal' : 'purple'}">${isUrgent ? '🔥' : job.status === 'delivered' ? '✅' : '🎬'}</div>
+    <div class="job-info">
+      <div class="job-title">${job.title}</div>
+      <div class="job-meta">
+        <span>${job.client}</span>
+        <span>${job.format || 'Short Form'}</span>
+        <span>${clipCount} clip${clipCount !== 1 ? 's' : ''}</span>
+        <span>${isUrgent ? '⚠️ ' : ''}${deadlineStr}</span>
+      </div>
+    </div>
+    <div class="job-actions">${statusBadge}${actions}</div>
+  </div>`;
+}
+
+async function markInProgress(id) {
+  await updateJob(id, { status: 'in_progress' });
+  showToast('Marked as in progress', 'success');
+  loadEditorData();
+}
+
+function openDeliverModal(id) {
+  deliverJobId = id;
+  const job = demoJobs.find(j => j.id === id) || allJobs.find(j => j.id === id);
+  document.getElementById('deliver-job-title').textContent = job ? `"${job.title}"` : '';
+  document.getElementById('deliver-link').value = '';
+  document.getElementById('deliver-email').value = job?.client_email || '';
+  document.getElementById('modal-deliver').classList.add('open');
+}
+
+async function deliverJob() {
+  const link = document.getElementById('deliver-link').value.trim();
+  const email = document.getElementById('deliver-email').value.trim();
+  if (!link) { showToast('Please add a download link', 'error'); return; }
+
+  setLoading('deliver-btn', 'deliver-btn-text', true, 'Delivering...');
+  const job = (DEMO_MODE ? demoJobs : allJobs).find(j => j.id === deliverJobId);
+  await updateJob(deliverJobId, { status: 'delivered', download_link: link, delivered_at: new Date().toISOString() });
+
+  // Send email notification
+  if (email && CONFIG.emailjsServiceId !== 'YOUR_EMAILJS_SERVICE_ID') {
+    try {
+      await emailjs.send(CONFIG.emailjsServiceId, CONFIG.emailjsTemplateId, {
+        to_email: email,
+        to_name: job?.client || 'there',
+        clip_title: job?.title || 'Your clip',
+        download_link: link,
+      }, CONFIG.emailjsPublicKey);
+    } catch(e) { console.warn('EmailJS error:', e); }
+  }
+
+  setLoading('deliver-btn', 'deliver-btn-text', false, '✓ Mark delivered & notify');
+  closeModal('modal-deliver');
+  showToast('Delivered! Client notified.', 'success');
+  loadEditorData();
+}
+
+function viewJob(id) {
+  const job = [...demoJobs, ...allJobs].find(j => j.id === id);
+  if (!job) return;
+  document.getElementById('view-job-title-modal').textContent = job.title;
+  const clips = (job.clips || []).filter(c => c);
+  document.getElementById('view-job-body').innerHTML = `
+    <div style="display:grid; gap:12px;">
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <span class="badge badge-purple">${job.format || 'Short Form'}</span>
+        <span class="badge ${job.status === 'delivered' ? 'badge-teal' : job.status === 'in_progress' ? 'badge-purple' : 'badge-gray'}">${job.status.replace('_',' ')}</span>
+        ${job.deadline ? `<span class="badge badge-amber">Due ${formatDate(job.deadline)}</span>` : ''}
+      </div>
+      <div style="background:var(--bg3); border-radius:var(--radius-sm); padding:14px;">
+        <div class="form-label" style="margin-bottom:8px;">Clip links (${clips.length})</div>
+        ${clips.map((c, i) => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="font-size:11px;color:var(--purple);min-width:18px;">${i+1}</span><a href="${c}" target="_blank" style="font-size:12px;color:var(--purple);text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c}</a></div>`).join('')}
+      </div>
+      ${job.notes ? `<div style="background:var(--bg3);border-radius:var(--radius-sm);padding:14px;"><div class="form-label" style="margin-bottom:6px;">Notes</div><p style="font-size:13px;color:var(--text2);">${job.notes}</p></div>` : ''}
+      ${job.download_link ? `<div style="background:var(--teal-dim);border:0.5px solid rgba(78,205,196,0.2);border-radius:var(--radius-sm);padding:14px;"><div class="form-label" style="margin-bottom:6px;">Download link</div><a href="${job.download_link}" target="_blank" style="font-size:13px;color:var(--teal);text-decoration:none;">${job.download_link}</a></div>` : ''}
+    </div>
+  `;
+  document.getElementById('modal-view-job').classList.add('open');
+}
+
+function openNewJobModal() {
+  document.getElementById('m-title').value = '';
+  document.getElementById('m-client').value = '';
+  document.getElementById('m-deadline').value = '';
+  document.getElementById('m-notes').value = '';
+  document.getElementById('m-links-wrapper').innerHTML = `<div class="clip-link-row"><span class="clip-link-num">1</span><input class="clip-link-input" placeholder="https://clips.twitch.tv/..."><button class="clip-link-remove" onclick="removeClipLink(this)">×</button></div>`;
+  document.getElementById('modal-new-job').classList.add('open');
+}
+
+async function editorAddJob() {
+  const title = document.getElementById('m-title').value.trim();
+  const client = document.getElementById('m-client').value.trim();
+  if (!title || !client) { showToast('Title and client name are required', 'error'); return; }
+  const clips = [...document.querySelectorAll('#m-links-wrapper .clip-link-input')].map(i => i.value.trim()).filter(Boolean);
+  const job = {
+    title, client,
+    format: document.getElementById('m-format').value,
+    deadline: document.getElementById('m-deadline').value || null,
+    notes: document.getElementById('m-notes').value.trim(),
+    clips,
+    status: 'queued',
+    client_email: '',
+  };
+  setLoading('m-submit-btn', 'm-submit-text', true, 'Adding...');
+  await addJob(job);
+  setLoading('m-submit-btn', 'm-submit-text', false, 'Add job');
+  closeModal('modal-new-job');
+  showToast('Job added!', 'success');
+  loadEditorData();
+}
+
+function addEditorClipLink() {
+  addClipLinkTo('m-links-wrapper');
+}
+
+// ══════════════════════════════════════
+// CLIENT PORTAL
+// ══════════════════════════════════════
+function clientTab(tab, el) {
+  document.querySelectorAll('.client-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['request','downloads','history'].forEach(t => {
+    document.getElementById('client-tab-' + t).style.display = t === tab ? 'block' : 'none';
+  });
+  if (tab === 'downloads') loadClientDownloads();
+  if (tab === 'history') loadClientHistory();
+}
+
+async function loadClientData(email) {
+  // preload
+}
+
+async function loadClientDownloads() {
+  const email = currentUser?.email || DEMO_CLIENT_EMAIL;
+  const jobs = await getJobs({ status: 'delivered', client_email: email });
+  const list = document.getElementById('client-downloads-list');
+  if (!jobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📥</div><p>No delivered clips yet — check back soon!</p></div>'; return; }
+  list.innerHTML = jobs.map(j => `
+    <div class="download-card">
+      <div class="download-icon">✅</div>
+      <div class="download-info">
+        <div class="download-title">${j.title}</div>
+        <div class="download-meta">${j.format || 'Short Form'} · Delivered ${j.delivered_at ? formatDate(j.delivered_at) : ''}</div>
+      </div>
+      <a class="btn-download" href="${j.download_link}" target="_blank">⬇ Download</a>
+    </div>
+  `).join('');
+}
+
+async function loadClientHistory() {
+  const email = currentUser?.email || DEMO_CLIENT_EMAIL;
+  const jobs = await getJobs({ client_email: email });
+  const list = document.getElementById('client-history-list');
+  if (!jobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No requests yet.</p></div>'; return; }
+  list.innerHTML = jobs.map(j => {
+    const badgeMap = { queued: 'badge-gray', in_progress: 'badge-purple', delivered: 'badge-teal' };
+    return `<div class="request-row">
+      <div class="request-info">
+        <div class="request-title">${j.title}</div>
+        <div class="request-meta">${j.format || 'Short Form'} · ${(j.clips||[]).filter(Boolean).length} clip(s) · ${j.deadline ? 'Due ' + formatDate(j.deadline) : 'No deadline'}</div>
+      </div>
+      <span class="badge ${badgeMap[j.status] || 'badge-gray'}">${j.status.replace('_',' ')}</span>
+    </div>`;
+  }).join('');
+}
+
+async function submitClientRequest() {
+  const title = document.getElementById('c-title').value.trim();
+  const format = document.getElementById('c-format').value;
+  if (!title || !format) { showToast('Please fill in title and format', 'error'); return; }
+  const clips = [...document.querySelectorAll('#c-links-wrapper .clip-link-input')].map(i => i.value.trim()).filter(Boolean);
+  if (!clips.length) { showToast('Add at least one clip link', 'error'); return; }
+
+  const job = {
+    title, format, clips,
+    deadline: document.getElementById('c-deadline').value || null,
+    notes: document.getElementById('c-notes').value.trim(),
+    status: 'queued',
+    client: currentUser?.name || (currentUser?.email?.split('@')[0]) || 'Client',
+    client_email: currentUser?.email || DEMO_CLIENT_EMAIL,
+  };
+
+  setLoading('c-submit-btn', 'c-submit-text', true, 'Submitting...');
+  await addJob(job);
+  setLoading('c-submit-btn', 'c-submit-text', false, 'Submit request');
+
+  // Reset form
+  document.getElementById('c-title').value = '';
+  document.getElementById('c-format').value = '';
+  document.getElementById('c-deadline').value = '';
+  document.getElementById('c-notes').value = '';
+  document.getElementById('c-links-wrapper').innerHTML = `<div class="clip-link-row"><span class="clip-link-num">1</span><input class="clip-link-input" placeholder="https://clips.twitch.tv/... or Dropbox link"><button class="clip-link-remove" onclick="removeClipLink(this)">×</button></div>`;
+
+  showToast('Request submitted! Your editor will get on it.', 'success');
+}
+
+// ══════════════════════════════════════
+// CLIP LINK MANAGEMENT
+// ══════════════════════════════════════
+function addClipLink() { addClipLinkTo('c-links-wrapper'); }
+
+function addClipLinkTo(wrapperId) {
+  const wrapper = document.getElementById(wrapperId);
+  const rows = wrapper.querySelectorAll('.clip-link-row');
+  const num = rows.length + 1;
+  const div = document.createElement('div');
+  div.className = 'clip-link-row';
+  div.innerHTML = `<span class="clip-link-num">${num}</span><input class="clip-link-input" placeholder="https://clips.twitch.tv/..."><button class="clip-link-remove" onclick="removeClipLink(this)">×</button>`;
+  wrapper.appendChild(div);
+}
+
+function removeClipLink(btn) {
+  const row = btn.closest('.clip-link-row');
+  const wrapper = row.parentElement;
+  if (wrapper.querySelectorAll('.clip-link-row').length > 1) {
+    row.remove();
+    wrapper.querySelectorAll('.clip-link-num').forEach((n, i) => n.textContent = i + 1);
+  }
+}
+
+// ══════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.className = `toast ${type}`;
+  void t.offsetWidth;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function showAlert(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = `alert ${type}`;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 5000);
+}
+
+function setLoading(btnId, textId, loading, text) {
+  const btn = document.getElementById(btnId);
+  const txtEl = document.getElementById(textId);
+  btn.disabled = loading;
+  txtEl.innerHTML = loading ? `<span class="spinner"></span> ${text}` : text;
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// Close modals on backdrop click
+document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+  backdrop.addEventListener('click', e => { if (e.target === backdrop) backdrop.classList.remove('open'); });
+});
+
+// Demo shortcut hint
+if (DEMO_MODE) {
+  setTimeout(() => {
+    showToast('Demo mode — enter any email to try the client portal, or use editor@clipstudio.com for the editor dashboard', 'success');
+  }, 500);
+}
+</script>
+
+<!-- EmailJS (load only when configured) -->
+<script>
+if ('YOUR_EMAILJS_PUBLIC_KEY' !== 'YOUR_EMAILJS_PUBLIC_KEY') {
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+  document.head.appendChild(s);
+}
+</script>
+</body>
+</html>
