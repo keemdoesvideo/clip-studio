@@ -1103,6 +1103,7 @@ async function getJobs(filter = {}) {
     if (Array.isArray(filter.status)) query = query.in('status', filter.status);
     else query = query.eq('status', filter.status);
   }
+  // For clients, always filter by their own email — enforced here AND at DB level via RLS
   if (filter.client_email) query = query.eq('client_email', filter.client_email);
   const { data } = await query;
   return data || [];
@@ -1339,8 +1340,9 @@ async function loadClientData(email) {
 }
 
 async function loadClientDownloads() {
-  const email = currentUser?.email || DEMO_CLIENT_EMAIL;
-  const jobs = await getJobs({ status: 'delivered', client_email: email });
+  const email = currentUser?.email;
+  if (!email && !DEMO_MODE) return;
+  const jobs = await getJobs({ status: 'delivered', client_email: email || DEMO_CLIENT_EMAIL });
   const list = document.getElementById('client-downloads-list');
   if (!jobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📥</div><p>No delivered clips yet — check back soon!</p></div>'; return; }
   list.innerHTML = jobs.map(j => `
@@ -1356,8 +1358,9 @@ async function loadClientDownloads() {
 }
 
 async function loadClientHistory() {
-  const email = currentUser?.email || DEMO_CLIENT_EMAIL;
-  const jobs = await getJobs({ client_email: email });
+  const email = currentUser?.email;
+  if (!email && !DEMO_MODE) return;
+  const jobs = await getJobs({ client_email: email || DEMO_CLIENT_EMAIL });
   const list = document.getElementById('client-history-list');
   if (!jobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No requests yet.</p></div>'; return; }
   list.innerHTML = jobs.map(j => {
@@ -1384,7 +1387,7 @@ async function submitClientRequest() {
     deadline: document.getElementById('c-deadline').value || null,
     notes: document.getElementById('c-notes').value.trim(),
     status: 'queued',
-    client: currentUser?.name || (currentUser?.email?.split('@')[0]) || 'Client',
+    client: currentUser?.user_metadata?.name || currentUser?.email?.split('@')[0] || 'Client',
     client_email: currentUser?.email || DEMO_CLIENT_EMAIL,
   };
 
