@@ -724,7 +724,20 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 .btn-expand-full.danger { background: transparent; color: var(--text3); border-color: transparent; }
 .btn-expand-full.danger:hover { background: var(--pink-dim); color: var(--pink); border-color: rgba(240,98,146,0.2); opacity: 1; }
 
-/* Expand action link button */
+/* Clip buttons */
+.clip-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 500;
+  padding: 6px 14px; border-radius: 20px;
+  background: var(--purple-dim);
+  border: 0.5px solid var(--purple-border);
+  color: var(--purple);
+  text-decoration: none;
+  transition: all 0.15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.clip-btn:hover { background: rgba(139,127,245,0.25); }
+.clip-btn::before { content: '▶'; font-size: 9px; }
 .btn-expand-action {
   font-size: 12px; font-weight: 500;
   padding: 7px 14px; border-radius: var(--radius-sm);
@@ -1451,12 +1464,13 @@ function jobCardHTML(job, isActive) {
       <button class="btn-expand-full danger" onclick="deleteJob(${job.id})">🗑 Delete job</button>
     </div>`;
 
-  return `<div class="job-card-expanded ${isUrgent ? 'urgent' : ''}" id="jobcard-${job.id}">
+  return `<div class="job-card-expanded status-${job.status} ${isUrgent ? 'urgent' : ''}" id="jobcard-${job.id}">
     <div class="job-card-header" onclick="toggleJobCard(${job.id})">
       <div class="job-icon ${iconClass}">${iconEmoji}</div>
       <div class="job-info" style="flex:1;min-width:0;">
         <div class="job-title">${job.title}</div>
         <div class="job-pills">
+          <span class="job-pill">👤 ${job.client}</span>
           <span class="job-pill">${job.format || 'Short Form'}</span>
           <span class="job-pill">${clipCount} clip${clipCount !== 1 ? 's' : ''}</span>
           ${deadlineStr ? `<span class="job-pill ${isUrgent ? 'pill-urgent' : ''}">📅 ${deadlineStr}</span>` : ''}
@@ -1488,6 +1502,11 @@ async function changeStatus(id, newStatus) {
   await updateJob(id, { status: newStatus });
   const labels = { queued: 'Requested', in_progress: 'Currently Editing', awaiting_review: 'Awaiting Review' };
   showToast(`Status updated to "${labels[newStatus]}"`, 'success');
+  // Update the card colour class immediately
+  const card = document.getElementById('jobcard-' + id);
+  if (card) {
+    card.className = card.className.replace(/status-\w+/g, '') + ` status-${newStatus}`;
+  }
   loadEditorData();
 }
 
