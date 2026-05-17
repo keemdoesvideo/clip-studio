@@ -1011,12 +1011,13 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
   to   { opacity: 1; }
 }
 
-/* Expanded job body — smooth accordion */
+/* Expanded job body — animation applied via JS only */
 .job-card-body {
-  animation: accordionOpen 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  position: relative; z-index: 1;
 }
 @keyframes accordionOpen {
-  from { opacity: 0; transform: translateY(-8px); }
+  from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
@@ -1839,19 +1840,11 @@ function renderEditorJobs(jobs) {
     if (a.deadline && b.deadline) return new Date(a.deadline) - new Date(b.deadline);
     if (a.deadline) return -1; if (b.deadline) return 1; return 0;
   });
-  list.innerHTML = sorted.map((j, i) => {
-    const html = jobCardHTML(j, true);
-    return html.replace(
-      `id="jobcard-${j.id}"`,
-      `id="jobcard-${j.id}" style="animation-delay:${i * 60}ms"`
-    ).replace(
-      `class="job-card-expanded status-${j.status}`,
-      `class="job-card-expanded job-card-stagger status-${j.status}`
-    ).replace(
-      `class="job-card-expanded urgent`,
-      `class="job-card-expanded job-card-stagger urgent`
-    );
-  }).join('');
+  list.innerHTML = sorted.map(j => jobCardHTML(j, true)).join('');
+  // Apply stagger delays after render
+  list.querySelectorAll('.job-card-stagger').forEach((el, i) => {
+    el.style.animationDelay = `${i * 60}ms`;
+  });
 }
 
 function jobCardHTML(job, isActive) {
@@ -1925,7 +1918,7 @@ function jobCardHTML(job, isActive) {
       <button class="btn-expand-full danger" onclick="deleteJob(${job.id})">🗑 Delete job</button>
     </div>`;
 
-  return `<div class="job-card-expanded status-${job.status} ${isUrgent ? 'urgent' : ''}" id="jobcard-${job.id}">
+  return `<div class="job-card-expanded job-card-stagger status-${job.status}${isUrgent ? ' urgent' : ''}" id="jobcard-${job.id}">
     <div class="job-card-header" onclick="toggleJobCard(${job.id})">
       <div class="job-icon ${iconClass}">${iconEmoji}</div>
       <div class="job-info" style="flex:1;min-width:0;">
