@@ -635,26 +635,9 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
   border-radius: var(--radius-sm);
   padding: 14px 18px;
   font-size: 13px; color: var(--text);
-  z-index: 999;
-  transform: translateY(100px); opacity: 0;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  max-width: 320px;
-  display: flex; align-items: center; gap: 10px;
-}
-.toast.show { transform: translateY(0); opacity: 1; }
-.toast.success { border-color: rgba(78,205,196,0.3); }
-.toast.success .toast-dot { background: var(--teal); }
-.toast.error { border-color: rgba(240,98,146,0.3); }
-.toast.error .toast-dot { background: var(--pink); }
-.toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-
 /* ── Loading spinner ── */
 .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── Page transition ── */
-.screen { animation: fadeIn 0.25s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
 .job-card-expanded {
   border-radius: var(--radius);
@@ -821,6 +804,34 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 .status-select:focus { border-color: var(--purple); }
 .status-select option { background: #fff; }
 
+/* ── Stagger animation ── */
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.job-card-stagger { opacity: 0; animation: cardIn 0.35s ease forwards; }
+
+/* ── Archive month group ── */
+.archive-month-group { margin-bottom: 28px; }
+.archive-month-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 12px; font-weight: 700;
+  color: var(--text3); text-transform: uppercase;
+  letter-spacing: 0.1em; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 10px;
+}
+.archive-month-label::after {
+  content: ''; flex: 1;
+  height: 1px; background: var(--border);
+}
+.archive-month-count {
+  font-size: 11px; color: var(--text3);
+  background: rgba(0,0,0,0.05);
+  border-radius: 20px; padding: 2px 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400; text-transform: none; letter-spacing: 0;
+}
+
 /* ── Empty states ── */
 .empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
 .empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
@@ -850,13 +861,253 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 .toast.error .toast-dot { background: var(--pink); }
 .toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
+/* ── Toast ── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255,255,255,0.95);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  padding: 14px 18px;
+  font-size: 13px; color: var(--text);
+  z-index: 999;
+  transform: translateY(20px) scale(0.95); opacity: 0;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-width: 320px;
+  display: flex; align-items: center; gap: 10px;
+}
+.toast.show { transform: translateY(0) scale(1); opacity: 1; }
+.toast.success { border-color: rgba(0,180,166,0.3); }
+.toast.success .toast-dot { background: var(--teal); }
+.toast.error { border-color: rgba(224,92,138,0.3); }
+.toast.error .toast-dot { background: var(--pink); }
+.toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
 /* ── Loading spinner ── */
 .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── Page transition ── */
-.screen { animation: fadeIn 0.25s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+/* ════════════════════════════════════
+   ANIMATION SYSTEM
+════════════════════════════════════ */
+
+/* Screen entrance — smooth upward fade */
+.screen.active { animation: screenIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes screenIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Login box — spring up from below */
+.login-box {
+  animation: loginBoxIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: 0.05s;
+}
+@keyframes loginBoxIn {
+  from { opacity: 0; transform: translateY(32px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Topbar — slides down from top */
+.topbar {
+  animation: topbarIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes topbarIn {
+  from { opacity: 0; transform: translateY(-100%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Stat cards — bounce up with stagger */
+.stat-card {
+  animation: statCardIn 0.5s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+.stat-card:nth-child(1) { animation-delay: 0.08s; }
+.stat-card:nth-child(2) { animation-delay: 0.14s; }
+.stat-card:nth-child(3) { animation-delay: 0.20s; }
+.stat-card:nth-child(4) { animation-delay: 0.26s; }
+@keyframes statCardIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Job cards — stagger slide up */
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(18px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.job-card-stagger {
+  opacity: 0;
+  animation: cardIn 0.4s cubic-bezier(0.34, 1.3, 0.64, 1) forwards;
+}
+
+/* Download cards — same as job cards */
+.download-card {
+  animation: cardIn 0.4s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+}
+
+/* Request card (client form) — fades in with scale */
+.request-card {
+  animation: requestCardIn 0.5s cubic-bezier(0.34, 1.2, 0.64, 1) both;
+  animation-delay: 0.1s;
+}
+@keyframes requestCardIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Section headers — fade in slightly delayed */
+.section-header {
+  animation: fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.05s;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Page heading + subline */
+#editor-greeting, #editor-subline, .client-hello, .client-sub {
+  animation: fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+#editor-subline, .client-sub { animation-delay: 0.06s; }
+
+/* Client avatar + greeting */
+.client-avatar-big {
+  animation: avatarPop 0.55s cubic-bezier(0.34, 1.8, 0.64, 1) both;
+  animation-delay: 0.05s;
+}
+@keyframes avatarPop {
+  from { opacity: 0; transform: scale(0.5) rotate(-8deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* Client tabs — slide in from left */
+.client-tab {
+  animation: tabSlideIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.client-tab:nth-child(1) { animation-delay: 0.10s; }
+.client-tab:nth-child(2) { animation-delay: 0.16s; }
+.client-tab:nth-child(3) { animation-delay: 0.22s; }
+@keyframes tabSlideIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Modal — spring scale up from centre */
+.modal-backdrop.open .modal {
+  animation: modalIn 0.4s cubic-bezier(0.34, 1.5, 0.64, 1) both;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.92) translateY(16px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Modal backdrop — fade in */
+.modal-backdrop.open {
+  animation: backdropIn 0.25s ease both;
+}
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Expanded job body — smooth accordion */
+.job-card-body {
+  animation: accordionOpen 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes accordionOpen {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Form fields — subtle fade in stagger inside modals */
+.form-group {
+  animation: fadeUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.form-group:nth-child(1) { animation-delay: 0.08s; }
+.form-group:nth-child(2) { animation-delay: 0.13s; }
+.form-group:nth-child(3) { animation-delay: 0.18s; }
+.form-group:nth-child(4) { animation-delay: 0.23s; }
+
+/* Clip buttons inside expanded — pop in */
+.clip-btn {
+  animation: clipBtnIn 0.3s cubic-bezier(0.34, 1.6, 0.64, 1) both;
+}
+@keyframes clipBtnIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Status pills — slide in from left */
+.status-pill {
+  animation: pillIn 0.3s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+@keyframes pillIn {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Badge — bouncy pop */
+.notif-badge {
+  display: inline-block;
+  color: var(--pink);
+  font-size: 14px;
+  margin-left: 2px;
+  animation: badgePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  vertical-align: middle;
+  line-height: 1;
+}
+@keyframes badgePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.55; transform: scale(0.75); }
+}
+
+/* Empty state icon — gentle float */
+.empty-state .empty-icon {
+  display: block;
+  animation: floatIcon 3s ease-in-out infinite;
+}
+@keyframes floatIcon {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+
+/* Archive month labels — fade in */
+.archive-month-label {
+  animation: fadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Logo icon — subtle rotate on load */
+.topbar-logo-icon, .login-logo-icon {
+  animation: logoIn 0.5s cubic-bezier(0.34, 1.6, 0.64, 1) both;
+  animation-delay: 0.1s;
+}
+@keyframes logoIn {
+  from { opacity: 0; transform: scale(0.6) rotate(-12deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* User chip — slides in from right */
+.user-chip {
+  animation: chipIn 0.4s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  animation-delay: 0.2s;
+}
+@keyframes chipIn {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Hover interactions — lift feel */
+.stat-card { transition: transform 0.2s cubic-bezier(0.34, 1.4, 0.64, 1), box-shadow 0.2s ease; }
+.stat-card:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9); }
+
+.download-card { transition: transform 0.2s cubic-bezier(0.34, 1.4, 0.64, 1), box-shadow 0.2s ease; }
+.download-card:hover { transform: translateY(-2px); }
+
+.request-row { transition: transform 0.2s cubic-bezier(0.34, 1.4, 0.64, 1); }
+.request-row:hover { transform: translateY(-2px); }
 
 /* ── Responsive ── */
 @media (max-width: 700px) {
@@ -865,6 +1116,8 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
   .topbar-nav { display: none; }
   .main-content, .client-body { padding: 20px 16px; }
   .client-hero { padding: 20px 16px 0; }
+  /* Reduce animations on mobile for performance */
+  .stat-card, .job-card-stagger, .download-card { animation-duration: 0.25s; }
 }
 </style>
 </head>
@@ -931,6 +1184,7 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
     <div class="topbar-nav">
       <div class="topbar-tab active" onclick="editorTab('queue', this)">Queue</div>
       <div class="topbar-tab" onclick="editorTab('delivered', this)">Delivered</div>
+      <div class="topbar-tab" onclick="editorTab('archive', this)">Archive</div>
     </div>
     <div class="topbar-right">
       <div class="user-chip">
@@ -990,6 +1244,19 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
         <div class="empty-state"><div class="empty-icon">✅</div><p>No delivered jobs yet.</p></div>
       </div>
     </div>
+
+    <div id="editor-tab-archive" style="display:none;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+        <h1 style="font-family:'Syne',sans-serif; font-size:22px; font-weight:700; letter-spacing:-0.02em;">Archive</h1>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:12px; color:var(--text3); font-weight:500;">Filter by client:</span>
+          <select class="status-select" id="archive-client-filter" onchange="renderArchive()">
+            <option value="">All clients</option>
+          </select>
+        </div>
+      </div>
+      <div id="archive-list"></div>
+    </div>
   </div>
 </div>
 
@@ -1022,7 +1289,9 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
       </div>
       <div class="client-tabs">
         <div class="client-tab active" onclick="clientTab('request', this)">Request a clip</div>
-        <div class="client-tab" onclick="clientTab('downloads', this)">My downloads</div>
+        <div class="client-tab" onclick="clientTab('downloads', this)" id="downloads-tab">
+          My downloads <span class="notif-badge" id="notif-badge" style="display:none;">●</span>
+        </div>
         <div class="client-tab" onclick="clientTab('history', this)">All requests</div>
       </div>
     </div>
@@ -1355,7 +1624,19 @@ function loginAsClient(user) {
   document.getElementById('client-avatar-big').textContent = initials;
   document.getElementById('client-hello').textContent = `Hey ${name}! 👋`;
   showScreen('client');
+  // Check for unseen deliveries and show badge
+  checkNotificationBadge(user.email);
   loadClientData(user.email);
+}
+
+async function checkNotificationBadge(email) {
+  const jobs = await getJobs({ status: 'delivered', client_email: email || DEMO_CLIENT_EMAIL });
+  const storageKey = `seen_deliveries_${email || 'demo'}`;
+  const seenCount = parseInt(localStorage.getItem(storageKey) || '0');
+  const badge = document.getElementById('notif-badge');
+  if (jobs.length > seenCount) {
+    badge.style.display = 'inline-block';
+  }
 }
 
 async function logout() {
@@ -1429,7 +1710,9 @@ function editorTab(tab, el) {
   el.classList.add('active');
   document.getElementById('editor-tab-queue').style.display = tab === 'queue' ? 'block' : 'none';
   document.getElementById('editor-tab-delivered').style.display = tab === 'delivered' ? 'block' : 'none';
+  document.getElementById('editor-tab-archive').style.display = tab === 'archive' ? 'block' : 'none';
   if (tab === 'delivered') loadDeliveredJobs();
+  if (tab === 'archive') loadArchive();
 }
 
 async function loadEditorData() {
@@ -1454,11 +1737,11 @@ async function loadEditorData() {
     return diff <= 3 && diff >= 0;
   });
 
-  document.getElementById('stat-queue').textContent = jobs.filter(j => j.status === 'queued').length;
-  document.getElementById('stat-progress').textContent = jobs.filter(j => j.status === 'in_progress' || j.status === 'awaiting_review').length;
-  document.getElementById('stat-delivered').textContent = thisMonth.length;
+  animateCount(document.getElementById('stat-queue'), jobs.filter(j => j.status === 'queued').length);
+  animateCount(document.getElementById('stat-progress'), jobs.filter(j => j.status === 'in_progress' || j.status === 'awaiting_review').length);
+  animateCount(document.getElementById('stat-delivered'), thisMonth.length);
   document.getElementById('stat-month').textContent = now.toLocaleString('default', { month: 'long' });
-  document.getElementById('stat-urgent').textContent = urgent.length;
+  animateCount(document.getElementById('stat-urgent'), urgent.length);
 
   const subline = jobs.length === 0 ? 'Queue is clear — nice work!' : `${jobs.length} job${jobs.length > 1 ? 's' : ''} in the queue`;
   document.getElementById('editor-subline').textContent = subline;
@@ -1475,17 +1758,90 @@ async function loadDeliveredJobs() {
   const jobs = await getJobs({ status: 'delivered' });
   const list = document.getElementById('editor-delivered-list');
   if (!jobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><p>No delivered jobs yet.</p></div>'; return; }
-  list.innerHTML = jobs.map(j => jobCardHTML(j, false)).join('');
+  list.innerHTML = jobs.map((j, i) => {
+    const html = jobCardHTML(j, false);
+    return html.replace('class="job-card-expanded', `class="job-card-expanded job-card-stagger" style="animation-delay:${i * 50}ms`);
+  }).join('');
+}
+
+let archiveJobs = [];
+async function loadArchive() {
+  archiveJobs = await getJobs({ status: 'delivered' });
+  // Populate client filter dropdown
+  const clients = [...new Set(archiveJobs.map(j => j.client))].filter(Boolean).sort();
+  const select = document.getElementById('archive-client-filter');
+  const current = select.value;
+  select.innerHTML = '<option value="">All clients</option>' +
+    clients.map(c => `<option value="${c}" ${c === current ? 'selected' : ''}>${c}</option>`).join('');
+  renderArchive();
+}
+
+function renderArchive() {
+  const filter = document.getElementById('archive-client-filter').value;
+  let jobs = filter ? archiveJobs.filter(j => j.client === filter) : archiveJobs;
+
+  if (!jobs.length) {
+    document.getElementById('archive-list').innerHTML = '<div class="empty-state"><div class="empty-icon">🗂</div><p>No archived jobs yet.</p></div>';
+    return;
+  }
+
+  // Group by month — most recent first
+  const groups = {};
+  jobs.forEach(j => {
+    const d = new Date(j.delivered_at || j.created_at);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const label = d.toLocaleString('default', { month: 'long', year: 'numeric' });
+    if (!groups[key]) groups[key] = { label, jobs: [] };
+    groups[key].jobs.push(j);
+  });
+
+  const sorted = Object.entries(groups).sort((a, b) => b[0].localeCompare(a[0]));
+
+  document.getElementById('archive-list').innerHTML = sorted.map(([, group], gi) => `
+    <div class="archive-month-group">
+      <div class="archive-month-label">
+        ${group.label}
+        <span class="archive-month-count">${group.jobs.length} clip${group.jobs.length !== 1 ? 's' : ''}</span>
+      </div>
+      <div class="job-list" style="margin-bottom:0;">
+        ${group.jobs.map((j, i) => {
+          const html = jobCardHTML(j, false);
+          return html.replace('class="job-card-expanded', `class="job-card-expanded job-card-stagger" style="animation-delay:${(gi * 3 + i) * 40}ms`);
+        }).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+// Count-up animation for stat numbers
+function animateCount(el, target) {
+  if (target === '—' || isNaN(target)) { el.textContent = target; return; }
+  const num = parseInt(target);
+  if (num === 0) { el.textContent = 0; return; }
+  const duration = 600;
+  const steps = 20;
+  const increment = num / steps;
+  let current = 0; let step = 0;
+  const timer = setInterval(() => {
+    step++;
+    current = Math.min(Math.round(increment * step), num);
+    el.textContent = current;
+    if (step >= steps) clearInterval(timer);
+  }, duration / steps);
 }
 
 function renderEditorJobs(jobs) {
   const list = document.getElementById('editor-job-list');
-  if (!jobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No active jobs. Hit "New job" to add one!</p></div>'; return; }
+  if (!jobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No active jobs. Hit "✦ New job" to add one!</p></div>'; return; }
   const sorted = [...jobs].sort((a, b) => {
     if (a.deadline && b.deadline) return new Date(a.deadline) - new Date(b.deadline);
     if (a.deadline) return -1; if (b.deadline) return 1; return 0;
   });
-  list.innerHTML = sorted.map(j => jobCardHTML(j, true)).join('');
+  list.innerHTML = sorted.map((j, i) => {
+    const html = jobCardHTML(j, true);
+    // Inject stagger delay into the card div
+    return html.replace('class="job-card-expanded', `class="job-card-expanded job-card-stagger" style="animation-delay:${i * 60}ms`);
+  }).join('');
 }
 
 function jobCardHTML(job, isActive) {
@@ -1763,9 +2119,23 @@ async function loadClientDownloads() {
   if (!email && !DEMO_MODE) return;
   const jobs = await getJobs({ status: 'delivered', client_email: email || DEMO_CLIENT_EMAIL });
   const list = document.getElementById('client-downloads-list');
+
+  // Notification badge logic
+  const storageKey = `seen_deliveries_${email || 'demo'}`;
+  const seenCount = parseInt(localStorage.getItem(storageKey) || '0');
+  const badge = document.getElementById('notif-badge');
+  if (jobs.length > seenCount) {
+    badge.style.display = 'inline-block';
+  } else {
+    badge.style.display = 'none';
+  }
+  // Mark as seen when they open downloads
+  localStorage.setItem(storageKey, jobs.length);
+  badge.style.display = 'none';
+
   if (!jobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📥</div><p>No delivered clips yet — check back soon!</p></div>'; return; }
-  list.innerHTML = jobs.map(j => `
-    <div class="download-card">
+  list.innerHTML = jobs.map((j, i) => `
+    <div class="download-card job-card-stagger" style="animation-delay:${i * 60}ms;">
       <div class="download-icon">✅</div>
       <div class="download-info">
         <div class="download-title">${j.title}</div>
