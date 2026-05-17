@@ -622,6 +622,82 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 .request-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .request-meta { font-size: 11px; color: var(--text3); }
 
+/* ── Profile chip & dropdown ── */
+.profile-chip {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.62);
+  border: 1px solid rgba(255,255,255,0.85);
+  border-radius: 30px; padding: 5px 12px 5px 5px;
+  cursor: pointer; backdrop-filter: blur(8px);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  position: relative; user-select: none; transition: all 0.15s;
+}
+.profile-chip:hover { background: rgba(255,255,255,0.80); }
+.profile-menu {
+  position: absolute; top: calc(100% + 8px); right: 0;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.95);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12), inset 0 1px 0 #fff;
+  min-width: 180px; z-index: 200; overflow: hidden;
+  animation: menuIn 0.2s cubic-bezier(0.34,1.4,0.64,1) both;
+}
+@keyframes menuIn { from{opacity:0;transform:translateY(-6px) scale(0.97)}to{opacity:1;transform:none} }
+.profile-menu-item {
+  padding: 12px 16px; font-size: 13px; color: var(--text);
+  cursor: pointer; transition: background 0.12s;
+  display: flex; align-items: center; gap: 8px;
+}
+.profile-menu-item:hover { background: rgba(0,0,0,0.04); }
+.profile-menu-item.danger { color: var(--pink); }
+.profile-menu-item.danger:hover { background: var(--pink-dim); }
+.profile-menu-divider { height: 0.5px; background: rgba(0,0,0,0.07); }
+
+/* ── Overview ── */
+.client-overview-header {
+  font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700;
+  color: var(--text); margin-bottom: 20px; letter-spacing: -0.01em;
+}
+
+/* ── Profile avatar (modal) ── */
+.profile-avatar-big {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; color: #fff;
+  box-shadow: 0 4px 16px rgba(108,99,255,0.28); overflow: hidden;
+}
+.profile-avatar-big img { width:100%; height:100%; object-fit:cover; }
+
+/* ── Client job cards ── */
+.client-job-card {
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.9);
+  border-radius: var(--radius); overflow: hidden; margin-bottom: 10px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.client-job-card.s-awaiting_review { border-color: rgba(14,165,233,0.22); background: rgba(224,242,254,0.5); }
+.client-job-card.s-in_progress { border-color: rgba(108,99,255,0.18); background: rgba(235,233,255,0.45); }
+.client-job-card.s-delivered { border-color: rgba(0,180,166,0.18); background: rgba(209,250,229,0.45); }
+.client-job-card.s-queued { border-color: rgba(0,0,0,0.08); }
+.client-job-header { padding:16px 20px; display:flex; align-items:center; gap:14px; cursor:pointer; }
+.client-job-body { border-top:1px solid rgba(0,0,0,0.06); padding:14px 20px 18px; }
+
+/* ── Review link button ── */
+.btn-review-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(14,165,233,0.12); color: #0284c7;
+  border: 1px solid rgba(14,165,233,0.22);
+  border-radius: 20px; padding: 8px 18px;
+  font-size: 13px; font-weight: 600; text-decoration: none;
+  font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+  box-shadow: 0 2px 8px rgba(14,165,233,0.15);
+}
+.btn-review-link:hover { background: rgba(14,165,233,0.2); transform: translateY(-1px); }
+
 /* ── Empty states ── */
 .empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
 .empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
@@ -635,37 +711,21 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
   border-radius: var(--radius-sm);
   padding: 14px 18px;
   font-size: 13px; color: var(--text);
-  z-index: 999;
-  transform: translateY(100px); opacity: 0;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  max-width: 320px;
-  display: flex; align-items: center; gap: 10px;
-}
-.toast.show { transform: translateY(0); opacity: 1; }
-.toast.success { border-color: rgba(78,205,196,0.3); }
-.toast.success .toast-dot { background: var(--teal); }
-.toast.error { border-color: rgba(240,98,146,0.3); }
-.toast.error .toast-dot { background: var(--pink); }
-.toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-
 /* ── Loading spinner ── */
 .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── Page transition ── */
-.screen { animation: fadeIn 0.25s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
 .job-card-expanded {
   border-radius: var(--radius);
   overflow: hidden;
-  transition: all 0.25s ease;
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid rgba(255,255,255,0.75);
   background: rgba(255,255,255,0.45);
   box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.9);
   position: relative;
+  opacity: 1;
+  transition: box-shadow 0.2s ease, border-color 0.25s ease, background 0.25s ease;
 }
 .job-card-expanded::before {
   content: '';
@@ -721,10 +781,8 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 
 .job-card-body {
   border-top: 1px solid rgba(0,0,0,0.06);
-  animation: slideDown 0.2s ease;
   position: relative; z-index: 1;
 }
-@keyframes slideDown { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 
 .expand-arrow { display: inline-block; font-size: 16px; color: var(--text3); transition: transform 0.2s; }
 .icon-btn.amber-btn { background: rgba(234,88,12,0.08); border-color: rgba(234,88,12,0.15); color: var(--orange); }
@@ -821,6 +879,34 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 .status-select:focus { border-color: var(--purple); }
 .status-select option { background: #fff; }
 
+/* ── Stagger animation ── */
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.job-card-stagger { opacity: 0; animation: cardIn 0.35s ease forwards; }
+
+/* ── Archive month group ── */
+.archive-month-group { margin-bottom: 28px; }
+.archive-month-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 12px; font-weight: 700;
+  color: var(--text3); text-transform: uppercase;
+  letter-spacing: 0.1em; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 10px;
+}
+.archive-month-label::after {
+  content: ''; flex: 1;
+  height: 1px; background: var(--border);
+}
+.archive-month-count {
+  font-size: 11px; color: var(--text3);
+  background: rgba(0,0,0,0.05);
+  border-radius: 20px; padding: 2px 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400; text-transform: none; letter-spacing: 0;
+}
+
 /* ── Empty states ── */
 .empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
 .empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
@@ -850,13 +936,254 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 .toast.error .toast-dot { background: var(--pink); }
 .toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
+/* ── Toast ── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255,255,255,0.95);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  padding: 14px 18px;
+  font-size: 13px; color: var(--text);
+  z-index: 999;
+  transform: translateY(20px) scale(0.95); opacity: 0;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-width: 320px;
+  display: flex; align-items: center; gap: 10px;
+}
+.toast.show { transform: translateY(0) scale(1); opacity: 1; }
+.toast.success { border-color: rgba(0,180,166,0.3); }
+.toast.success .toast-dot { background: var(--teal); }
+.toast.error { border-color: rgba(224,92,138,0.3); }
+.toast.error .toast-dot { background: var(--pink); }
+.toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
 /* ── Loading spinner ── */
 .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── Page transition ── */
-.screen { animation: fadeIn 0.25s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+/* ════════════════════════════════════
+   ANIMATION SYSTEM
+════════════════════════════════════ */
+
+/* Screen entrance — smooth upward fade */
+.screen.active { animation: screenIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes screenIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Login box — spring up from below */
+.login-box {
+  animation: loginBoxIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: 0.05s;
+}
+@keyframes loginBoxIn {
+  from { opacity: 0; transform: translateY(32px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Topbar — slides down from top */
+.topbar {
+  animation: topbarIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes topbarIn {
+  from { opacity: 0; transform: translateY(-100%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Stat cards — bounce up with stagger */
+.stat-card {
+  animation: statCardIn 0.5s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+.stat-card:nth-child(1) { animation-delay: 0.08s; }
+.stat-card:nth-child(2) { animation-delay: 0.14s; }
+.stat-card:nth-child(3) { animation-delay: 0.20s; }
+.stat-card:nth-child(4) { animation-delay: 0.26s; }
+@keyframes statCardIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Job cards — stagger slide up */
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(18px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.job-card-stagger {
+  animation: cardIn 0.4s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+}
+
+/* Download cards — same as job cards */
+.download-card {
+  animation: cardIn 0.4s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+}
+
+/* Request card (client form) — fades in with scale */
+.request-card {
+  animation: requestCardIn 0.5s cubic-bezier(0.34, 1.2, 0.64, 1) both;
+  animation-delay: 0.1s;
+}
+@keyframes requestCardIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Section headers — fade in slightly delayed */
+.section-header {
+  animation: fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.05s;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Page heading + subline */
+#editor-greeting, #editor-subline, .client-hello, .client-sub {
+  animation: fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+#editor-subline, .client-sub { animation-delay: 0.06s; }
+
+/* Client avatar + greeting */
+.client-avatar-big {
+  animation: avatarPop 0.55s cubic-bezier(0.34, 1.8, 0.64, 1) both;
+  animation-delay: 0.05s;
+}
+@keyframes avatarPop {
+  from { opacity: 0; transform: scale(0.5) rotate(-8deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* Client tabs — slide in from left */
+.client-tab {
+  animation: tabSlideIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.client-tab:nth-child(1) { animation-delay: 0.10s; }
+.client-tab:nth-child(2) { animation-delay: 0.16s; }
+.client-tab:nth-child(3) { animation-delay: 0.22s; }
+.client-tab:nth-child(4) { animation-delay: 0.28s; }
+@keyframes tabSlideIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Modal — spring scale up from centre */
+.modal-backdrop.open .modal {
+  animation: modalIn 0.4s cubic-bezier(0.34, 1.5, 0.64, 1) both;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.92) translateY(16px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Modal backdrop — fade in */
+.modal-backdrop.open {
+  animation: backdropIn 0.25s ease both;
+}
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Expanded job body — animation applied via JS only */
+.job-card-body {
+  border-top: 1px solid rgba(0,0,0,0.06);
+  position: relative; z-index: 1;
+}
+@keyframes accordionOpen {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Form fields — subtle fade in stagger inside modals */
+.form-group {
+  animation: fadeUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.form-group:nth-child(1) { animation-delay: 0.08s; }
+.form-group:nth-child(2) { animation-delay: 0.13s; }
+.form-group:nth-child(3) { animation-delay: 0.18s; }
+.form-group:nth-child(4) { animation-delay: 0.23s; }
+
+/* Clip buttons inside expanded — pop in */
+.clip-btn {
+  animation: clipBtnIn 0.3s cubic-bezier(0.34, 1.6, 0.64, 1) both;
+}
+@keyframes clipBtnIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Status pills — slide in from left */
+.status-pill {
+  animation: pillIn 0.3s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+@keyframes pillIn {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Badge — bouncy pop */
+.notif-badge {
+  display: inline-block;
+  color: var(--pink);
+  font-size: 14px;
+  margin-left: 2px;
+  animation: badgePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  vertical-align: middle;
+  line-height: 1;
+}
+@keyframes badgePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.55; transform: scale(0.75); }
+}
+
+/* Empty state icon — gentle float */
+.empty-state .empty-icon {
+  display: block;
+  animation: floatIcon 3s ease-in-out infinite;
+}
+@keyframes floatIcon {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+
+/* Archive month labels — fade in */
+.archive-month-label {
+  animation: fadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Logo icon — subtle rotate on load */
+.topbar-logo-icon, .login-logo-icon {
+  animation: logoIn 0.5s cubic-bezier(0.34, 1.6, 0.64, 1) both;
+  animation-delay: 0.1s;
+}
+@keyframes logoIn {
+  from { opacity: 0; transform: scale(0.6) rotate(-12deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* User chip — slides in from right */
+.user-chip {
+  animation: chipIn 0.4s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  animation-delay: 0.2s;
+}
+@keyframes chipIn {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Hover interactions — lift feel */
+.stat-card { transition: transform 0.2s cubic-bezier(0.34, 1.4, 0.64, 1), box-shadow 0.2s ease; }
+.stat-card:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9); }
+
+.download-card { transition: transform 0.2s cubic-bezier(0.34, 1.4, 0.64, 1), box-shadow 0.2s ease; }
+.download-card:hover { transform: translateY(-2px); }
+
+.request-row { transition: transform 0.2s cubic-bezier(0.34, 1.4, 0.64, 1); }
+.request-row:hover { transform: translateY(-2px); }
 
 /* ── Responsive ── */
 @media (max-width: 700px) {
@@ -865,6 +1192,8 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
   .topbar-nav { display: none; }
   .main-content, .client-body { padding: 20px 16px; }
   .client-hero { padding: 20px 16px 0; }
+  /* Reduce animations on mobile for performance */
+  .stat-card, .job-card-stagger, .download-card { animation-duration: 0.25s; }
 }
 </style>
 </head>
@@ -931,6 +1260,7 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
     <div class="topbar-nav">
       <div class="topbar-tab active" onclick="editorTab('queue', this)">Queue</div>
       <div class="topbar-tab" onclick="editorTab('delivered', this)">Delivered</div>
+      <div class="topbar-tab" onclick="editorTab('archive', this)">Archive</div>
     </div>
     <div class="topbar-right">
       <div class="user-chip">
@@ -990,6 +1320,19 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
         <div class="empty-state"><div class="empty-icon">✅</div><p>No delivered jobs yet.</p></div>
       </div>
     </div>
+
+    <div id="editor-tab-archive" style="display:none;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+        <h1 style="font-family:'Syne',sans-serif; font-size:22px; font-weight:700; letter-spacing:-0.02em;">Archive</h1>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:12px; color:var(--text3); font-weight:500;">Filter by client:</span>
+          <select class="status-select" id="archive-client-filter" onchange="renderArchive()">
+            <option value="">All clients</option>
+          </select>
+        </div>
+      </div>
+      <div id="archive-list"></div>
+    </div>
   </div>
 </div>
 
@@ -1003,11 +1346,17 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
       <span class="topbar-logo-name">Clip Studio</span>
     </div>
     <div class="topbar-right">
-      <div class="user-chip">
+      <!-- Profile dropdown -->
+      <div class="profile-chip" id="profile-chip" onclick="toggleProfileMenu()">
         <div class="user-avatar" id="client-avatar-top">A</div>
-        <span class="user-name" id="client-name-top">Ailinicia</span>
+        <span class="user-name" id="client-name-top">Client</span>
+        <span style="font-size:11px;color:var(--text3);margin-left:2px;">▾</span>
       </div>
-      <button class="btn-logout" onclick="logout()">Sign out</button>
+      <div class="profile-menu" id="profile-menu" style="display:none;">
+        <div class="profile-menu-item" onclick="openProfileModal()">👤 Edit profile</div>
+        <div class="profile-menu-divider"></div>
+        <div class="profile-menu-item danger" onclick="logout()">Sign out</div>
+      </div>
     </div>
   </div>
 
@@ -1016,25 +1365,58 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
       <div class="client-greeting">
         <div class="client-avatar-big" id="client-avatar-big">A</div>
         <div>
-          <div class="client-hello" id="client-hello">Hey Ailinicia! 👋</div>
-          <div class="client-sub">Submit clips, track progress, and download your edits</div>
+          <div class="client-hello" id="client-hello">Hey there! 👋</div>
+          <div class="client-sub" id="client-month-sub">Here is your overview</div>
         </div>
       </div>
       <div class="client-tabs">
-        <div class="client-tab active" onclick="clientTab('request', this)">Request a clip</div>
-        <div class="client-tab" onclick="clientTab('downloads', this)">My downloads</div>
-        <div class="client-tab" onclick="clientTab('history', this)">All requests</div>
+        <div class="client-tab active" onclick="clientTab('overview', this)">Overview</div>
+        <div class="client-tab" onclick="clientTab('request', this)">Request a clip</div>
+        <div class="client-tab" onclick="clientTab('jobs', this)">My jobs</div>
+        <div class="client-tab" onclick="clientTab('downloads', this)" id="downloads-tab">
+          Downloads <span class="notif-badge" id="notif-badge" style="display:none;">●</span>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="client-body">
 
+    <!-- OVERVIEW TAB -->
+    <div id="client-tab-overview">
+      <div class="client-overview-header" id="client-overview-header"></div>
+      <div class="stats-row" id="client-stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Requested</div>
+          <div class="stat-num" id="c-stat-requested">—</div>
+          <div class="stat-sub">Awaiting edit</div>
+        </div>
+        <div class="stat-card" style="--accent:var(--purple)">
+          <div class="stat-label">In progress</div>
+          <div class="stat-num" id="c-stat-progress">—</div>
+          <div class="stat-sub">Being worked on</div>
+        </div>
+        <div class="stat-card" style="--accent:var(--amber)">
+          <div class="stat-label">Awaiting review</div>
+          <div class="stat-num" id="c-stat-review">—</div>
+          <div class="stat-sub">Ready to view</div>
+        </div>
+        <div class="stat-card delivered">
+          <div class="stat-label">Delivered</div>
+          <div class="stat-num" id="c-stat-delivered">—</div>
+          <div class="stat-sub" id="c-stat-month">This month</div>
+        </div>
+      </div>
+      <div class="section-header" style="margin-bottom:14px;">
+        <div class="section-title">Recent activity</div>
+      </div>
+      <div id="client-overview-recent"></div>
+    </div>
+
     <!-- REQUEST TAB -->
-    <div id="client-tab-request">
+    <div id="client-tab-request" style="display:none;">
       <div class="request-card">
         <div class="request-card-title"><span class="icon">✦</span> New edit request</div>
-
         <div class="form-row-2">
           <div class="form-group" style="margin-bottom:0;">
             <div class="form-label">Edit title *</div>
@@ -1049,9 +1431,8 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
             </select>
           </div>
         </div>
-
         <div class="form-group" style="margin-top:18px;">
-          <div class="form-label">Clip links * <span style="color:var(--purple); text-transform:none; font-size:10px; letter-spacing:0; margin-left:4px;">— add as many as you need</span></div>
+          <div class="form-label">Clip links * <span style="color:var(--purple);text-transform:none;font-size:10px;letter-spacing:0;margin-left:4px;">— add as many as you need</span></div>
           <div class="clip-links-wrapper" id="c-links-wrapper">
             <div class="clip-link-row">
               <span class="clip-link-num">1</span>
@@ -1061,7 +1442,6 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
           </div>
           <button class="add-clip-btn" onclick="addClipLink()">＋ Add another clip link</button>
         </div>
-
         <div class="form-row-2">
           <div class="form-group" style="margin-bottom:0;">
             <div class="form-label">Deadline <span class="optional">optional</span></div>
@@ -1072,10 +1452,26 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
             <input class="form-input" id="c-notes" placeholder="Any special instructions...">
           </div>
         </div>
-
-        <button class="btn-submit" style="margin-top:20px; width:100%;" id="c-submit-btn" onclick="submitClientRequest()">
+        <button class="btn-submit" style="margin-top:20px;width:100%;" id="c-submit-btn" onclick="submitClientRequest()">
           <span id="c-submit-text">Submit request</span>
         </button>
+      </div>
+    </div>
+
+    <!-- JOBS TAB -->
+    <div id="client-tab-jobs" style="display:none;">
+      <div class="section-header" style="margin-bottom:16px;">
+        <div class="section-title">My jobs</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span style="font-size:12px;color:var(--text3);">Sort by:</span>
+          <select class="form-select" id="client-jobs-sort" style="width:auto;padding:6px 12px;font-size:12px;" onchange="loadClientJobs()">
+            <option value="date">Date</option>
+            <option value="status">Status</option>
+          </select>
+        </div>
+      </div>
+      <div id="client-jobs-list">
+        <div class="empty-state"><div class="empty-icon">📋</div><p>No jobs yet.</p></div>
       </div>
     </div>
 
@@ -1089,16 +1485,35 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
       </div>
     </div>
 
-    <!-- HISTORY TAB -->
-    <div id="client-tab-history" style="display:none;">
-      <div class="section-header" style="margin-bottom:16px;">
-        <div class="section-title">Your requests</div>
-      </div>
-      <div id="client-history-list">
-        <div class="empty-state"><div class="empty-icon">📋</div><p>No requests yet.</p></div>
-      </div>
-    </div>
+  </div>
+</div>
 
+<!-- ════════ MODAL: PROFILE ════════ -->
+<div class="modal-backdrop" id="modal-profile">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <div class="modal-title">Edit profile</div>
+      <div class="modal-close" onclick="closeModal('modal-profile')">×</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:24px;">
+      <div class="profile-avatar-big" id="profile-avatar-preview">A</div>
+      <button class="add-clip-btn" style="margin-top:8px;" onclick="document.getElementById('avatar-upload').click()">Change photo</button>
+      <input type="file" id="avatar-upload" accept="image/*" style="display:none;" onchange="handleAvatarUpload(this)">
+    </div>
+    <div class="form-group">
+      <div class="form-label">Display name</div>
+      <input class="form-input" id="profile-name" placeholder="How you want to be known">
+    </div>
+    <div class="form-group">
+      <div class="form-label">Contact / social <span class="optional">optional</span></div>
+      <input class="form-input" id="profile-contact" placeholder="e.g. @yourtwitch or Discord tag">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('modal-profile')">Cancel</button>
+      <button class="btn-submit" id="profile-save-btn" onclick="saveProfile()">
+        <span id="profile-save-text">Save profile</span>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -1227,8 +1642,7 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 // ══════════════════════════════════════
 // CONFIG — Fill these in before deploying
 // ══════════════════════════════════════
-const CONFIG = {
-  supabaseUrl: 'https://ncgwiqjkcnpsenfijnhm.supabase.co',
+supabaseUrl: 'https://ncgwiqjkcnpsenfijnhm.supabase.co',
   supabaseKey: 'sb_publishable_pT_si_8TekryKyp0M10Fhw_51PET-_-',
   editorEmail: 'keemdoesvideo@gmail.com',
   editorPassword: 'ClipStudio2026',
@@ -1349,14 +1763,36 @@ function loginAsEditor(user) {
 function loginAsClient(user) {
   currentUser = user;
   isEditor = false;
-  const name = user.name || user.email.split('@')[0];
+  const name = user.user_metadata?.display_name || user.name || user.email.split('@')[0];
   const initials = name.substring(0, 2).toUpperCase();
-  document.getElementById('client-avatar-top').textContent = initials;
+  const avatarUrl = user.user_metadata?.avatar_url;
+
   document.getElementById('client-name-top').textContent = name;
-  document.getElementById('client-avatar-big').textContent = initials;
   document.getElementById('client-hello').textContent = `Hey ${name}! 👋`;
+
+  const avatarTop = document.getElementById('client-avatar-top');
+  const avatarBig = document.getElementById('client-avatar-big');
+  if (avatarUrl) {
+    avatarTop.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="avatar">`;
+    avatarBig.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="avatar">`;
+  } else {
+    avatarTop.textContent = initials;
+    avatarBig.textContent = initials;
+  }
+
   showScreen('client');
+  checkNotificationBadge(user.email);
   loadClientData(user.email);
+}
+
+async function checkNotificationBadge(email) {
+  const jobs = await getJobs({ status: 'delivered', client_email: email || DEMO_CLIENT_EMAIL });
+  const storageKey = `seen_deliveries_${email || 'demo'}`;
+  const seenCount = parseInt(localStorage.getItem(storageKey) || '0');
+  const badge = document.getElementById('notif-badge');
+  if (jobs.length > seenCount) {
+    badge.style.display = 'inline-block';
+  }
 }
 
 async function logout() {
@@ -1430,7 +1866,9 @@ function editorTab(tab, el) {
   el.classList.add('active');
   document.getElementById('editor-tab-queue').style.display = tab === 'queue' ? 'block' : 'none';
   document.getElementById('editor-tab-delivered').style.display = tab === 'delivered' ? 'block' : 'none';
+  document.getElementById('editor-tab-archive').style.display = tab === 'archive' ? 'block' : 'none';
   if (tab === 'delivered') loadDeliveredJobs();
+  if (tab === 'archive') loadArchive();
 }
 
 async function loadEditorData() {
@@ -1455,11 +1893,11 @@ async function loadEditorData() {
     return diff <= 3 && diff >= 0;
   });
 
-  document.getElementById('stat-queue').textContent = jobs.filter(j => j.status === 'queued').length;
-  document.getElementById('stat-progress').textContent = jobs.filter(j => j.status === 'in_progress' || j.status === 'awaiting_review').length;
-  document.getElementById('stat-delivered').textContent = thisMonth.length;
+  animateCount(document.getElementById('stat-queue'), jobs.filter(j => j.status === 'queued').length);
+  animateCount(document.getElementById('stat-progress'), jobs.filter(j => j.status === 'in_progress' || j.status === 'awaiting_review').length);
+  animateCount(document.getElementById('stat-delivered'), thisMonth.length);
   document.getElementById('stat-month').textContent = now.toLocaleString('default', { month: 'long' });
-  document.getElementById('stat-urgent').textContent = urgent.length;
+  animateCount(document.getElementById('stat-urgent'), urgent.length);
 
   const subline = jobs.length === 0 ? 'Queue is clear — nice work!' : `${jobs.length} job${jobs.length > 1 ? 's' : ''} in the queue`;
   document.getElementById('editor-subline').textContent = subline;
@@ -1476,17 +1914,94 @@ async function loadDeliveredJobs() {
   const jobs = await getJobs({ status: 'delivered' });
   const list = document.getElementById('editor-delivered-list');
   if (!jobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><p>No delivered jobs yet.</p></div>'; return; }
-  list.innerHTML = jobs.map(j => jobCardHTML(j, false)).join('');
+  list.innerHTML = jobs.map((j, i) => {
+    const html = jobCardHTML(j, false);
+    return html
+      .replace(`id="jobcard-${j.id}"`, `id="jobcard-${j.id}" style="animation-delay:${i * 50}ms"`)
+      .replace(`class="job-card-expanded status-${j.status}`, `class="job-card-expanded job-card-stagger status-${j.status}`);
+  }).join('');
+}
+
+let archiveJobs = [];
+async function loadArchive() {
+  archiveJobs = await getJobs({ status: 'delivered' });
+  // Populate client filter dropdown
+  const clients = [...new Set(archiveJobs.map(j => j.client))].filter(Boolean).sort();
+  const select = document.getElementById('archive-client-filter');
+  const current = select.value;
+  select.innerHTML = '<option value="">All clients</option>' +
+    clients.map(c => `<option value="${c}" ${c === current ? 'selected' : ''}>${c}</option>`).join('');
+  renderArchive();
+}
+
+function renderArchive() {
+  const filter = document.getElementById('archive-client-filter').value;
+  let jobs = filter ? archiveJobs.filter(j => j.client === filter) : archiveJobs;
+
+  if (!jobs.length) {
+    document.getElementById('archive-list').innerHTML = '<div class="empty-state"><div class="empty-icon">🗂</div><p>No archived jobs yet.</p></div>';
+    return;
+  }
+
+  // Group by month — most recent first
+  const groups = {};
+  jobs.forEach(j => {
+    const d = new Date(j.delivered_at || j.created_at);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const label = d.toLocaleString('default', { month: 'long', year: 'numeric' });
+    if (!groups[key]) groups[key] = { label, jobs: [] };
+    groups[key].jobs.push(j);
+  });
+
+  const sorted = Object.entries(groups).sort((a, b) => b[0].localeCompare(a[0]));
+
+  document.getElementById('archive-list').innerHTML = sorted.map(([, group], gi) => `
+    <div class="archive-month-group">
+      <div class="archive-month-label">
+        ${group.label}
+        <span class="archive-month-count">${group.jobs.length} clip${group.jobs.length !== 1 ? 's' : ''}</span>
+      </div>
+      <div class="job-list" style="margin-bottom:0;">
+        ${group.jobs.map((j, i) => {
+          const html = jobCardHTML(j, false);
+          return html
+            .replace(`id="jobcard-${j.id}"`, `id="jobcard-${j.id}" style="animation-delay:${(gi * 3 + i) * 40}ms"`)
+            .replace(`class="job-card-expanded status-${j.status}`, `class="job-card-expanded job-card-stagger status-${j.status}`);
+        }).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+// Count-up animation for stat numbers
+function animateCount(el, target) {
+  if (target === '—' || isNaN(target)) { el.textContent = target; return; }
+  const num = parseInt(target);
+  if (num === 0) { el.textContent = 0; return; }
+  const duration = 600;
+  const steps = 20;
+  const increment = num / steps;
+  let current = 0; let step = 0;
+  const timer = setInterval(() => {
+    step++;
+    current = Math.min(Math.round(increment * step), num);
+    el.textContent = current;
+    if (step >= steps) clearInterval(timer);
+  }, duration / steps);
 }
 
 function renderEditorJobs(jobs) {
   const list = document.getElementById('editor-job-list');
-  if (!jobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No active jobs. Hit "New job" to add one!</p></div>'; return; }
+  if (!jobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No active jobs. Hit "✦ New job" to add one!</p></div>'; return; }
   const sorted = [...jobs].sort((a, b) => {
     if (a.deadline && b.deadline) return new Date(a.deadline) - new Date(b.deadline);
     if (a.deadline) return -1; if (b.deadline) return 1; return 0;
   });
   list.innerHTML = sorted.map(j => jobCardHTML(j, true)).join('');
+  // Apply stagger delays after render
+  list.querySelectorAll('.job-card-stagger').forEach((el, i) => {
+    el.style.animationDelay = `${i * 60}ms`;
+  });
 }
 
 function jobCardHTML(job, isActive) {
@@ -1560,7 +2075,7 @@ function jobCardHTML(job, isActive) {
       <button class="btn-expand-full danger" onclick="deleteJob(${job.id})">🗑 Delete job</button>
     </div>`;
 
-  return `<div class="job-card-expanded status-${job.status} ${isUrgent ? 'urgent' : ''}" id="jobcard-${job.id}">
+  return `<div class="job-card-expanded job-card-stagger status-${job.status}${isUrgent ? ' urgent' : ''}" id="jobcard-${job.id}">
     <div class="job-card-header" onclick="toggleJobCard(${job.id})">
       <div class="job-icon ${iconClass}">${iconEmoji}</div>
       <div class="job-info" style="flex:1;min-width:0;">
@@ -1612,9 +2127,17 @@ function toggleJobCard(id) {
   const arrow = card.querySelector('.expand-arrow');
   if (!body) return;
   const isOpen = body.style.display !== 'none';
-  body.style.display = isOpen ? 'none' : 'block';
-  arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
-  arrow.style.transition = 'transform 0.2s';
+  if (!isOpen) {
+    body.style.display = 'block';
+    body.style.animation = 'none';
+    void body.offsetWidth; // force reflow
+    body.style.animation = 'accordionOpen 0.3s cubic-bezier(0.22, 1, 0.36, 1) both';
+    arrow.style.transform = 'rotate(180deg)';
+  } else {
+    body.style.display = 'none';
+    arrow.style.transform = 'rotate(0deg)';
+  }
+  arrow.style.transition = 'transform 0.25s cubic-bezier(0.34, 1.4, 0.64, 1)';
 }
 
 async function deleteJob(id) {
@@ -1745,18 +2268,227 @@ function addEditorClipLink() {
 // ══════════════════════════════════════
 // CLIENT PORTAL
 // ══════════════════════════════════════
+// ══════════════════════════════════════
+// PROFILE
+// ══════════════════════════════════════
+let profileMenuOpen = false;
+function toggleProfileMenu() {
+  profileMenuOpen = !profileMenuOpen;
+  document.getElementById('profile-menu').style.display = profileMenuOpen ? 'block' : 'none';
+}
+document.addEventListener('click', e => {
+  if (!document.getElementById('profile-chip')?.contains(e.target)) {
+    profileMenuOpen = false;
+    const m = document.getElementById('profile-menu');
+    if (m) m.style.display = 'none';
+  }
+});
+
+function openProfileModal() {
+  profileMenuOpen = false;
+  document.getElementById('profile-menu').style.display = 'none';
+  const name = currentUser?.user_metadata?.display_name || currentUser?.email?.split('@')[0] || '';
+  const contact = currentUser?.user_metadata?.contact || '';
+  document.getElementById('profile-name').value = name;
+  document.getElementById('profile-contact').value = contact;
+  // Preview avatar
+  const avatarUrl = currentUser?.user_metadata?.avatar_url;
+  const preview = document.getElementById('profile-avatar-preview');
+  if (avatarUrl) {
+    preview.innerHTML = `<img src="${avatarUrl}" alt="avatar">`;
+  } else {
+    preview.textContent = name.substring(0,2).toUpperCase() || 'A';
+  }
+  document.getElementById('modal-profile').classList.add('open');
+}
+
+function handleAvatarUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const preview = document.getElementById('profile-avatar-preview');
+    preview.innerHTML = `<img src="${e.target.result}" alt="avatar">`;
+    // Store as data URL in user metadata (small images only)
+    if (file.size > 200000) { showToast('Image too large — keep it under 200KB', 'error'); return; }
+    window._pendingAvatarUrl = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveProfile() {
+  const name = document.getElementById('profile-name').value.trim();
+  const contact = document.getElementById('profile-contact').value.trim();
+  if (!name) { showToast('Please enter a display name', 'error'); return; }
+  setLoading('profile-save-btn', 'profile-save-text', true, 'Saving...');
+  const meta = { display_name: name, contact };
+  if (window._pendingAvatarUrl) meta.avatar_url = window._pendingAvatarUrl;
+  if (!DEMO_MODE && sb) {
+    await sb.auth.updateUser({ data: meta });
+    // Also update client name in jobs
+    await sb.from('jobs').update({ client: name }).eq('client_email', currentUser.email);
+  }
+  // Update local user object
+  if (!currentUser.user_metadata) currentUser.user_metadata = {};
+  Object.assign(currentUser.user_metadata, meta);
+  // Update UI
+  const initials = name.substring(0,2).toUpperCase();
+  document.getElementById('client-name-top').textContent = name;
+  document.getElementById('client-hello').textContent = `Hey ${name}! 👋`;
+  const avatarTop = document.getElementById('client-avatar-top');
+  const avatarBig = document.getElementById('client-avatar-big');
+  if (meta.avatar_url) {
+    avatarTop.innerHTML = `<img src="${meta.avatar_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="avatar">`;
+    avatarBig.innerHTML = `<img src="${meta.avatar_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="avatar">`;
+  } else {
+    avatarTop.textContent = initials;
+    avatarBig.textContent = initials;
+  }
+  setLoading('profile-save-btn', 'profile-save-text', false, 'Save profile');
+  closeModal('modal-profile');
+  showToast('Profile updated!', 'success');
+  window._pendingAvatarUrl = null;
+}
+
+// ══════════════════════════════════════
+// CLIENT PORTAL
+// ══════════════════════════════════════
 function clientTab(tab, el) {
   document.querySelectorAll('.client-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  ['request','downloads','history'].forEach(t => {
+  ['overview','request','jobs','downloads'].forEach(t => {
     document.getElementById('client-tab-' + t).style.display = t === tab ? 'block' : 'none';
   });
+  if (tab === 'overview') loadClientOverview();
+  if (tab === 'jobs') loadClientJobs();
   if (tab === 'downloads') loadClientDownloads();
-  if (tab === 'history') loadClientHistory();
 }
 
 async function loadClientData(email) {
-  // preload
+  loadClientOverview();
+}
+
+async function loadClientOverview() {
+  const email = currentUser?.email;
+  if (!email && !DEMO_MODE) return;
+  const allJobs = await getJobs({ client_email: email || DEMO_CLIENT_EMAIL });
+  const now = new Date();
+  const monthName = now.toLocaleString('default', { month: 'long' });
+
+  document.getElementById('client-overview-header').textContent = `${monthName} Overview`;
+  document.getElementById('c-stat-month').textContent = monthName;
+
+  const queued   = allJobs.filter(j => j.status === 'queued').length;
+  const progress = allJobs.filter(j => j.status === 'in_progress').length;
+  const review   = allJobs.filter(j => j.status === 'awaiting_review').length;
+  const delivered = allJobs.filter(j => {
+    if (j.status !== 'delivered' || !j.delivered_at) return false;
+    const d = new Date(j.delivered_at);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).length;
+
+  document.getElementById('c-stat-requested').textContent = queued;
+  document.getElementById('c-stat-progress').textContent = progress;
+  document.getElementById('c-stat-review').textContent = review;
+  document.getElementById('c-stat-delivered').textContent = delivered;
+
+  // Recent activity — last 5 jobs
+  const recent = [...allJobs].slice(0, 5);
+  const recentEl = document.getElementById('client-overview-recent');
+  if (!recent.length) {
+    recentEl.innerHTML = '<div class="empty-state"><div class="empty-icon">✨</div><p>No activity yet — submit your first request!</p></div>';
+    return;
+  }
+  const badgeMap = { queued:'badge-gray', in_progress:'badge-purple', awaiting_review:'badge-amber', delivered:'badge-teal' };
+  const labelMap = { queued:'Requested', in_progress:'Currently Editing', awaiting_review:'Awaiting Review', delivered:'Delivered' };
+  recentEl.innerHTML = recent.map(j => `
+    <div class="request-row">
+      <div class="request-info">
+        <div class="request-title">${j.title}</div>
+        <div class="request-meta">${j.format || 'Short Form'} · ${formatDate(j.created_at)}</div>
+      </div>
+      <span class="badge ${badgeMap[j.status] || 'badge-gray'}">${labelMap[j.status] || j.status}</span>
+    </div>`).join('');
+}
+
+async function loadClientJobs() {
+  const email = currentUser?.email;
+  if (!email && !DEMO_MODE) return;
+  const sort = document.getElementById('client-jobs-sort')?.value || 'date';
+  const jobs = await getJobs({ client_email: email || DEMO_CLIENT_EMAIL });
+  // Exclude delivered — those go in downloads
+  const active = jobs.filter(j => j.status !== 'delivered');
+  const list = document.getElementById('client-jobs-list');
+
+  if (!active.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No active jobs yet.</p></div>';
+    return;
+  }
+
+  const statusOrder = { awaiting_review: 0, in_progress: 1, queued: 2 };
+  const sorted = [...active].sort((a, b) => {
+    if (sort === 'status') return (statusOrder[a.status] ?? 9) - (statusOrder[b.status] ?? 9);
+    return new Date(b.created_at) - new Date(a.created_at);
+  });
+
+  const labelMap = { queued:'Requested', in_progress:'Currently Editing', awaiting_review:'Awaiting Review' };
+  const badgeMap = { queued:'badge-gray', in_progress:'badge-purple', awaiting_review:'badge-amber' };
+  const iconMap  = { queued:'🎬', in_progress:'✏️', awaiting_review:'👀' };
+
+  list.innerHTML = sorted.map(j => {
+    const clips = (j.clips || []).filter(c => c);
+    const reviewSection = j.review_link && j.status === 'awaiting_review' ? `
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(0,0,0,0.06);">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;">Your edit is ready to review</div>
+        <a href="${j.review_link}" target="_blank" class="btn-review-link">👀 Watch &amp; leave feedback on Replay</a>
+      </div>` : '';
+
+    const clipsSection = clips.length ? `
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(0,0,0,0.06);">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Your clip links (${clips.length})</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">${clips.map((c,i)=>`<a href="${c}" target="_blank" class="clip-btn">Clip ${i+1}</a>`).join('')}</div>
+      </div>` : '';
+
+    const notesSection = j.notes ? `
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(0,0,0,0.06);">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Notes</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.55;">${j.notes}</p>
+      </div>` : '';
+
+    return `
+    <div class="client-job-card s-${j.status}" id="cjob-${j.id}">
+      <div class="client-job-header" onclick="toggleClientJob(${j.id})">
+        <div class="job-icon ${j.status === 'awaiting_review' ? 'amber' : 'purple'}" style="width:38px;height:38px;border-radius:11px;flex-shrink:0;">${iconMap[j.status] || '🎬'}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="job-title">${j.title}</div>
+          <div class="job-meta" style="font-size:11px;color:var(--text3);display:flex;gap:10px;margin-top:3px;">
+            <span>${j.format || 'Short Form'}</span>
+            <span>${clips.length} clip${clips.length !== 1 ? 's' : ''}</span>
+            <span>Submitted ${formatDate(j.created_at)}</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+          <span class="badge ${badgeMap[j.status] || 'badge-gray'}">${labelMap[j.status] || j.status}</span>
+          <span class="expand-arrow" id="cjob-arrow-${j.id}">▾</span>
+        </div>
+      </div>
+      <div class="client-job-body" id="cjob-body-${j.id}" style="display:none;">
+        ${reviewSection}
+        ${clipsSection}
+        ${notesSection}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleClientJob(id) {
+  const body = document.getElementById('cjob-body-' + id);
+  const arrow = document.getElementById('cjob-arrow-' + id);
+  if (!body) return;
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  arrow.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+  arrow.style.transition = 'transform 0.25s cubic-bezier(0.34,1.4,0.64,1)';
 }
 
 async function loadClientDownloads() {
@@ -1764,6 +2496,14 @@ async function loadClientDownloads() {
   if (!email && !DEMO_MODE) return;
   const jobs = await getJobs({ status: 'delivered', client_email: email || DEMO_CLIENT_EMAIL });
   const list = document.getElementById('client-downloads-list');
+
+  const storageKey = `seen_deliveries_${email || 'demo'}`;
+  const seenCount = parseInt(localStorage.getItem(storageKey) || '0');
+  const badge = document.getElementById('notif-badge');
+  badge.style.display = jobs.length > seenCount ? 'inline-block' : 'none';
+  localStorage.setItem(storageKey, jobs.length);
+  badge.style.display = 'none';
+
   if (!jobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📥</div><p>No delivered clips yet — check back soon!</p></div>'; return; }
   list.innerHTML = jobs.map(j => `
     <div class="download-card">
@@ -1773,42 +2513,7 @@ async function loadClientDownloads() {
         <div class="download-meta">${j.format || 'Short Form'} · Delivered ${j.delivered_at ? formatDate(j.delivered_at) : ''}</div>
       </div>
       <a class="btn-download" href="${j.download_link}" target="_blank">⬇ Download</a>
-    </div>
-  `).join('');
-}
-
-async function loadClientHistory() {
-  const email = currentUser?.email;
-  if (!email && !DEMO_MODE) return;
-  const jobs = await getJobs({ client_email: email || DEMO_CLIENT_EMAIL });
-  const list = document.getElementById('client-history-list');
-  if (!jobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No requests yet.</p></div>'; return; }
-  list.innerHTML = jobs.map(j => {
-    const badgeMap = {
-      queued:          'badge-gray',
-      in_progress:     'badge-purple',
-      awaiting_review: 'badge-amber',
-      delivered:       'badge-teal'
-    };
-    const labelMap = {
-      queued:          'Requested',
-      in_progress:     'Currently Editing',
-      awaiting_review: 'Awaiting Review',
-      delivered:       'Delivered'
-    };
-    const reviewBtn = j.review_link ? `<a href="${j.review_link}" target="_blank" class="btn-download" style="background:var(--amber-dim);color:var(--amber);border-color:rgba(251,191,36,0.2);">👀 View edit</a>` : '';
-    const downloadBtn = j.download_link ? `<a href="${j.download_link}" target="_blank" class="btn-download">⬇ Download</a>` : '';
-    return `<div class="request-row">
-      <div class="request-info">
-        <div class="request-title">${j.title}</div>
-        <div class="request-meta">${j.format || 'Short Form'} · ${(j.clips||[]).filter(Boolean).length} clip(s) · ${j.deadline ? 'Due ' + formatDate(j.deadline) : 'No deadline'}</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-        ${reviewBtn}${downloadBtn}
-        <span class="badge ${badgeMap[j.status] || 'badge-gray'}">${labelMap[j.status] || j.status}</span>
-      </div>
-    </div>`;
-  }).join('');
+    </div>`).join('');
 }
 
 async function submitClientRequest() {
@@ -1823,7 +2528,7 @@ async function submitClientRequest() {
     deadline: document.getElementById('c-deadline').value || null,
     notes: document.getElementById('c-notes').value.trim(),
     status: 'queued',
-    client: currentUser?.user_metadata?.name || currentUser?.email?.split('@')[0] || 'Client',
+    client: currentUser?.user_metadata?.display_name || currentUser?.user_metadata?.name || currentUser?.email?.split('@')[0] || 'Client',
     client_email: currentUser?.email || DEMO_CLIENT_EMAIL,
   };
 
