@@ -1228,6 +1228,10 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
       <div id="login-alert" class="alert"></div>
       <div class="field-label">Your email</div>
       <input class="field-input" id="login-email" type="email" placeholder="you@email.com" autocomplete="email">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+        <input type="checkbox" id="client-stay-logged-in" style="width:16px;height:16px;accent-color:var(--purple);cursor:pointer;">
+        <label for="client-stay-logged-in" style="font-size:13px;color:var(--text2);cursor:pointer;">Stay logged in</label>
+      </div>
       <button class="btn-primary" id="login-btn" onclick="sendMagicLink()">
         <span id="login-btn-text">Send magic link</span>
       </button>
@@ -1243,6 +1247,10 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
       <input class="field-input" id="editor-email" type="email" placeholder="your@email.com">
       <div class="field-label">Password</div>
       <input class="field-input" id="editor-pass" type="password" placeholder="••••••••">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+        <input type="checkbox" id="editor-stay-logged-in" style="width:16px;height:16px;accent-color:var(--purple);cursor:pointer;">
+        <label for="editor-stay-logged-in" style="font-size:13px;color:var(--text2);cursor:pointer;">Stay logged in</label>
+      </div>
       <button class="btn-primary" id="editor-btn" onclick="editorLogin()">
         <span id="editor-btn-text">Sign in</span>
       </button>
@@ -1715,7 +1723,15 @@ async function sendMagicLink() {
   }
 
   setLoading('login-btn', 'login-btn-text', true, 'Sending...');
-  const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
+  const stayLoggedIn = document.getElementById('client-stay-logged-in')?.checked;
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: window.location.href,
+      shouldCreateUser: true,
+    }
+  });
+  if (stayLoggedIn) { try { await sb.auth.updateSession({ access_token: undefined, refresh_token: undefined }); } catch(e) {} }
   setLoading('login-btn', 'login-btn-text', false, 'Send magic link');
   if (error) { showAlert('login-alert', error.message, 'error'); return; }
   document.getElementById('sent-to-email').textContent = email;
@@ -1737,7 +1753,11 @@ async function editorLogin() {
   }
 
   setLoading('editor-btn', 'editor-btn-text', true, 'Signing in...');
-  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  const stayLoggedIn = document.getElementById('editor-stay-logged-in')?.checked;
+  const { data, error } = await sb.auth.signInWithPassword({
+    email, password: pass,
+    options: stayLoggedIn ? { persistSession: true } : {}
+  });
   setLoading('editor-btn', 'editor-btn-text', false, 'Sign in');
   if (error) { showAlert('editor-alert', error.message, 'error'); return; }
   if (data.user.email === CONFIG.editorEmail) {
@@ -1781,6 +1801,14 @@ function loginAsClient(user) {
   showScreen('client');
   checkNotificationBadge(user.email);
   loadClientData(user.email);
+
+  // Upsert into profiles so editor can see this client even with no jobs
+  if (!DEMO_MODE && sb && user.email) {
+    sb.from('profiles').upsert({
+      email: user.email,
+      display_name: name,
+    }, { onConflict: 'email', ignoreDuplicates: true }).then(() => {});
+  }
 }
 
 async function checkNotificationBadge(email) {
@@ -1904,17 +1932,39 @@ async function loadEditorData() {
 async function loadClientsPage() {
   const container = document.getElementById('clients-list');
   container.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><p>Loading...</p></div>';
+
   const active = await getJobs({ status: ['queued','in_progress','awaiting_review'] });
   const delivered = await getJobs({ status: 'delivered' });
-  const all = [...active, ...delivered];
-  if (!all.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><p>No clients yet.</p></div>'; return; }
+  const allJobs = [...active, ...delivered];
 
+  // Build client map from jobs
   const clientMap = {};
-  all.forEach(j => {
+  allJobs.forEach(j => {
     const key = j.client_email || j.client || 'unknown';
     if (!clientMap[key]) clientMap[key] = { name: j.client || 'Unknown', email: j.client_email || '', jobs: [] };
     clientMap[key].jobs.push(j);
   });
+
+  // Merge with profiles table — adds clients who logged in but have no jobs yet
+  if (!DEMO_MODE && sb) {
+    try {
+      const { data: profiles } = await sb.from('profiles').select('email, display_name, contact, avatar_url');
+      if (profiles) {
+        profiles.forEach(p => {
+          if (!clientMap[p.email]) clientMap[p.email] = { name: p.display_name || p.email.split('@')[0], email: p.email, jobs: [] };
+          // Enrich with profile data
+          if (p.display_name) clientMap[p.email].name = p.display_name;
+          if (p.contact) clientMap[p.email].contact = p.contact;
+          if (p.avatar_url) clientMap[p.email].avatar_url = p.avatar_url;
+        });
+      }
+    } catch(e) { console.warn('Could not load profiles:', e); }
+  }
+
+  if (!Object.keys(clientMap).length) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><p>No clients yet.</p></div>';
+    return;
+  }
 
   const clients = Object.values(clientMap).sort((a,b) => (a.name||'').localeCompare(b.name||''));
   container.innerHTML = clients.map(c => {
@@ -1922,13 +1972,16 @@ async function loadClientsPage() {
     const initials = (c.name||'?').substring(0,2).toUpperCase();
     const total = c.jobs.length;
     const del = c.jobs.filter(j=>j.status==='delivered').length;
+    const avatarHTML = c.avatar_url
+      ? `<img src="${c.avatar_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="${c.name}">`
+      : initials;
     return `
     <div style="background:var(--glass);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);box-shadow:var(--glass-shadow),inset 0 1px 0 rgba(255,255,255,.9);border-radius:var(--radius);overflow:hidden;margin-bottom:12px;">
       <div style="padding:18px 22px;display:flex;align-items:center;gap:16px;cursor:pointer;" onclick="toggleClientBanner('${id}','${c.email}')">
-        <div style="width:48px;height:48px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--pink),var(--purple));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#fff;box-shadow:0 3px 10px rgba(108,99,255,.22);">${initials}</div>
+        <div style="width:48px;height:48px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--pink),var(--purple));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#fff;box-shadow:0 3px 10px rgba(108,99,255,.22);overflow:hidden;">${avatarHTML}</div>
         <div style="flex:1;min-width:0;">
           <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px;">${c.name}</div>
-          <div style="font-size:12px;color:var(--text3);">${total} total job${total!==1?'s':''} · ${total-del} active · ${del} delivered</div>
+          <div style="font-size:12px;color:var(--text3);">${total ? `${total} job${total!==1?'s':''} · ${total-del} active · ${del} delivered` : 'No jobs yet'}</div>
         </div>
         <span id="cbanner-arrow-${id}" style="font-size:16px;color:var(--text3);transition:transform .25s cubic-bezier(.34,1.4,.64,1)">▾</span>
       </div>
