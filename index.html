@@ -2577,23 +2577,25 @@ function jobCardHTML(job, isActive) {
     </div>` : '';
 
   // ── Review link ──
+  const safeReviewLink = (job.review_link || '').replace(/"/g, '%22');
   const reviewHTML = job.review_link ? `
     <div class="job-expand-section" style="display:flex;align-items:center;justify-content:space-between;">
       <div>
         <div class="job-expand-label">Review link</div>
         <p style="font-size:12px;color:var(--text3);">Sent for client review</p>
       </div>
-      <a href="${job.review_link}" target="_blank" class="btn-expand-action" style="background:rgba(234,88,12,0.1);color:var(--orange);">👀 Open Replay</a>
+      <a href="${safeReviewLink}" target="_blank" class="btn-expand-action" style="background:rgba(234,88,12,0.1);color:var(--orange);">👀 Open Replay</a>
     </div>` : '';
 
   // ── Download link (delivered) ──
+  const safeDownloadLink = (job.download_link || '').replace(/"/g, '%22');
   const downloadHTML = job.download_link ? `
     <div class="job-expand-section" style="display:flex;align-items:center;justify-content:space-between;">
       <div>
         <div class="job-expand-label">Final download</div>
         <p style="font-size:12px;color:var(--text3);">Delivered to client</p>
       </div>
-      <a href="${job.download_link}" target="_blank" class="btn-expand-action" style="background:var(--teal-dim);color:var(--teal);">⬇ Open file</a>
+      <a href="${safeDownloadLink}" target="_blank" class="btn-expand-action" style="background:var(--teal-dim);color:var(--teal);">\u2b07 Open file</a>
     </div>` : '';
 
   // ── Status buttons (active jobs only) ──
