@@ -1619,6 +1619,7 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
     </div>
     <div class="topbar-nav">
       <div class="topbar-tab active" onclick="editorTab('queue', this)">Dashboard</div>
+      <div class="topbar-tab" onclick="editorTab('alljobs', this)">All Jobs</div>
       <div class="topbar-tab" onclick="editorTab('clients', this)">Clients</div>
     </div>
     <div class="topbar-right">
@@ -1670,6 +1671,41 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
       </div>
       <div class="job-list" id="editor-job-list">
         <div class="empty-state"><div class="empty-icon">📋</div><p>No active jobs. Add one above!</p></div>
+      </div>
+      <div id="dashboard-see-all" style="display:none;text-align:center;margin-top:16px;">
+        <button onclick="editorTab('alljobs', document.querySelector('.topbar-tab:nth-child(2)'))" style="background:var(--purple-dim);color:var(--purple);border:1px solid var(--purple-border);border-radius:20px;padding:9px 22px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">See all jobs →</button>
+      </div>
+    </div>
+
+    <!-- ALL JOBS TAB -->
+    <div id="editor-tab-alljobs" style="display:none;">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <h1 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.02em;margin-bottom:4px;">All Jobs</h1>
+          <p style="font-size:13px;color:var(--text3);" id="alljobs-subline">Loading...</p>
+        </div>
+        <button class="btn-accent" onclick="openNewJobModal()">✦ New job</button>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center;">
+        <select id="alljobs-filter-status" class="form-select" style="width:auto;padding:7px 14px;font-size:13px;" onchange="renderAllJobs()">
+          <option value="">All statuses</option>
+          <option value="queued">Requested</option>
+          <option value="cooking">Cooking</option>
+          <option value="in_progress">Currently Editing</option>
+          <option value="awaiting_review">Awaiting Review</option>
+        </select>
+        <select id="alljobs-filter-client" class="form-select" style="width:auto;padding:7px 14px;font-size:13px;" onchange="renderAllJobs()">
+          <option value="">All clients</option>
+        </select>
+        <select id="alljobs-sort" class="form-select" style="width:auto;padding:7px 14px;font-size:13px;" onchange="renderAllJobs()">
+          <option value="deadline">Sort: Deadline</option>
+          <option value="date">Sort: Newest</option>
+          <option value="status">Sort: Status</option>
+          <option value="client">Sort: Client</option>
+        </select>
+      </div>
+      <div class="job-list" id="alljobs-list">
+        <div class="empty-state"><div class="empty-icon">📋</div><p>Loading...</p></div>
       </div>
     </div>
 
@@ -1853,6 +1889,13 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
       </div>
       <div id="client-downloads-list">
         <div class="empty-state"><div class="empty-icon">📥</div><p>No delivered clips yet — check back soon!</p></div>
+      </div>
+      <div id="past-jobs-section" style="display:none;margin-top:32px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;">Past jobs</div>
+          <div style="flex:1;height:1px;background:rgba(0,0,0,0.07);"></div>
+        </div>
+        <div id="past-jobs-list"></div>
       </div>
     </div>
 
@@ -2358,30 +2401,33 @@ async function updateJob(id, updates) {
 // ══════════════════════════════════════
 function editorTab(tab, el) {
   document.querySelectorAll('.topbar-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
+  if (el) el.classList.add('active');
   document.getElementById('editor-tab-queue').style.display = tab === 'queue' ? 'block' : 'none';
+  document.getElementById('editor-tab-alljobs').style.display = tab === 'alljobs' ? 'block' : 'none';
   document.getElementById('editor-tab-clients').style.display = tab === 'clients' ? 'block' : 'none';
   // Sync mobile bottom bar
   ['queue','clients'].forEach(t => {
     const mt = document.getElementById('editor-mob-tab-' + t);
-    if (mt) mt.classList.toggle('active', t === tab);
+    if (mt) mt.classList.toggle('active', t === tab || (t === 'queue' && tab === 'alljobs'));
   });
   if (tab === 'clients') loadClientsPage();
+  if (tab === 'alljobs') loadAllJobs();
 }
 
 function editorTabMobile(tab) {
   document.getElementById('editor-tab-queue').style.display = tab === 'queue' ? 'block' : 'none';
+  document.getElementById('editor-tab-alljobs').style.display = tab === 'alljobs' ? 'block' : 'none';
   document.getElementById('editor-tab-clients').style.display = tab === 'clients' ? 'block' : 'none';
   ['queue','clients'].forEach(t => {
     const mt = document.getElementById('editor-mob-tab-' + t);
-    if (mt) mt.classList.toggle('active', t === tab);
+    if (mt) mt.classList.toggle('active', t === tab || (t === 'queue' && tab === 'alljobs'));
   });
-  // Sync desktop topbar tabs
   document.querySelectorAll('.topbar-tab').forEach(t => {
     const oc = t.getAttribute('onclick') || '';
     t.classList.toggle('active', oc.includes("'" + tab + "'"));
   });
   if (tab === 'clients') loadClientsPage();
+  if (tab === 'alljobs') loadAllJobs();
 }
 
 function openJobSheet(job) {
@@ -2456,6 +2502,7 @@ async function loadEditorData() {
   const cooking = await getJobs({ status: 'cooking' });
   const jobs = [...active, ...cooking];
   allJobs = jobs;
+  allJobsCache = jobs; // keep All Jobs tab in sync
 
   const delivered = await getJobs({ status: 'delivered' });
   const thisMonth = delivered.filter(j => {
@@ -2601,17 +2648,107 @@ function animateCount(el, target) {
 function renderEditorJobs(jobs) {
   const cookingJobs = jobs.filter(j => j.status === 'cooking');
   const activeJobs  = jobs.filter(j => j.status !== 'cooking');
-  jobs = activeJobs; // rest of function uses active only
+  jobs = activeJobs;
   const list = document.getElementById('editor-job-list');
-  if (!jobs.length && !cookingJobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No active jobs. Hit "✦ New job" to add one!</p></div>'; return; }
+  const seeAllBtn = document.getElementById('dashboard-see-all');
+
+  if (!jobs.length && !cookingJobs.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No active jobs. Hit "✦ New job" to add one!</p></div>';
+    if (seeAllBtn) seeAllBtn.style.display = 'none';
+    return;
+  }
+
   const sorted = [...jobs].sort((a, b) => {
     if (a.deadline && b.deadline) return new Date(a.deadline) - new Date(b.deadline);
     if (a.deadline) return -1; if (b.deadline) return 1; return 0;
   });
-  let html = sorted.map(j => jobCardHTML(j, true)).join('');
 
-  // Cooking section — separate, below active queue
-  if (cookingJobs.length) {
+  // Dashboard shows max 5 active jobs
+  const MAX = 5;
+  const preview = sorted.slice(0, MAX);
+  const hasMore = sorted.length > MAX || cookingJobs.length > 0;
+
+  let html = preview.map(j => jobCardHTML(j, true)).join('');
+
+  // Show cooking jobs on dashboard only if total active ≤ 5
+  if (sorted.length <= MAX && cookingJobs.length) {
+    html += `
+    <div style="margin-top:28px;margin-bottom:10px;display:flex;align-items:center;gap:10px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;">🍳 Cooking (${cookingJobs.length})</div>
+      <div style="flex:1;height:1px;background:rgba(0,0,0,0.07);"></div>
+      <div style="font-size:11px;color:var(--text3);">Not ready to edit yet</div>
+    </div>`;
+    html += cookingJobs.slice(0, MAX - sorted.length).map(j => jobCardHTML(j, true)).join('');
+  }
+
+  list.innerHTML = html;
+  list.querySelectorAll('.job-card-stagger').forEach((el, i) => {
+    el.style.animationDelay = `${i * 60}ms`;
+  });
+
+  // Show/update See all button
+  if (seeAllBtn) {
+    const total = jobs.length + cookingJobs.length;
+    seeAllBtn.style.display = hasMore ? 'block' : 'none';
+    const btn = seeAllBtn.querySelector('button');
+    if (btn) btn.textContent = `See all ${total} jobs →`;
+  }
+}
+
+let allJobsCache = [];
+
+async function loadAllJobs() {
+  const active = await getJobs({ status: ['queued', 'in_progress', 'awaiting_review', 'cooking'] });
+  allJobsCache = active;
+  allJobs = [...allJobs, ...active.filter(j => !allJobs.find(aj => aj.id === j.id))];
+
+  // Populate client filter dropdown
+  const clientSelect = document.getElementById('alljobs-filter-client');
+  if (clientSelect) {
+    const clients = [...new Set(active.map(j => j.client).filter(Boolean))].sort();
+    clientSelect.innerHTML = '<option value="">All clients</option>' +
+      clients.map(c => `<option value="${c}">${c}</option>`).join('');
+  }
+
+  renderAllJobs();
+}
+
+function renderAllJobs() {
+  const list = document.getElementById('alljobs-list');
+  const subline = document.getElementById('alljobs-subline');
+  const statusFilter = document.getElementById('alljobs-filter-status')?.value || '';
+  const clientFilter = document.getElementById('alljobs-filter-client')?.value || '';
+  const sort = document.getElementById('alljobs-sort')?.value || 'deadline';
+
+  let jobs = [...allJobsCache];
+  if (statusFilter) jobs = jobs.filter(j => j.status === statusFilter);
+  if (clientFilter) jobs = jobs.filter(j => j.client === clientFilter);
+
+  const statusOrder = { awaiting_review: 0, in_progress: 1, queued: 2, cooking: 3 };
+  jobs.sort((a, b) => {
+    if (sort === 'deadline') {
+      if (a.deadline && b.deadline) return new Date(a.deadline) - new Date(b.deadline);
+      if (a.deadline) return -1; if (b.deadline) return 1; return 0;
+    }
+    if (sort === 'date') return new Date(b.created_at) - new Date(a.created_at);
+    if (sort === 'status') return (statusOrder[a.status] ?? 9) - (statusOrder[b.status] ?? 9);
+    if (sort === 'client') return (a.client || '').localeCompare(b.client || '');
+    return 0;
+  });
+
+  if (subline) subline.textContent = jobs.length === 0 ? 'No jobs match your filters' : `${jobs.length} job${jobs.length !== 1 ? 's' : ''}`;
+
+  if (!jobs.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No jobs match your filters.</p></div>';
+    return;
+  }
+
+  // Separate cooking for the all jobs view too
+  const cookingJobs = jobs.filter(j => j.status === 'cooking');
+  const activeJobs = jobs.filter(j => j.status !== 'cooking');
+
+  let html = activeJobs.map(j => jobCardHTML(j, true)).join('');
+  if (cookingJobs.length && !statusFilter) {
     html += `
     <div style="margin-top:28px;margin-bottom:10px;display:flex;align-items:center;gap:10px;">
       <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;">🍳 Cooking (${cookingJobs.length})</div>
@@ -2619,9 +2756,11 @@ function renderEditorJobs(jobs) {
       <div style="font-size:11px;color:var(--text3);">Not ready to edit yet</div>
     </div>`;
     html += cookingJobs.map(j => jobCardHTML(j, true)).join('');
+  } else if (statusFilter === 'cooking') {
+    html = cookingJobs.map(j => jobCardHTML(j, true)).join('');
   }
 
-  list.innerHTML = html;
+  list.innerHTML = html || '<div class="empty-state"><div class="empty-icon">📋</div><p>No jobs match your filters.</p></div>';
   list.querySelectorAll('.job-card-stagger').forEach((el, i) => {
     el.style.animationDelay = `${i * 60}ms`;
   });
@@ -3268,28 +3407,91 @@ async function loadClientDownloads() {
   if (!email && !DEMO_MODE) return;
   const jobs = await getJobs({ status: 'delivered', client_email: email || DEMO_CLIENT_EMAIL });
   const list = document.getElementById('client-downloads-list');
+  const pastSection = document.getElementById('past-jobs-section');
+  const pastList = document.getElementById('past-jobs-list');
 
-  const storageKey = `seen_deliveries_${email || 'demo'}`;
-  const seenCount = parseInt(localStorage.getItem(storageKey) || '0');
+  // Track which job IDs the client has already downloaded
+  const seenKey = `downloaded_jobs_${email || 'demo'}`;
+  const seenIds = new Set(JSON.parse(localStorage.getItem(seenKey) || '[]'));
+
+  // Notification badge — based on total vs previously seen count
+  const countKey = `seen_deliveries_${email || 'demo'}`;
+  const seenCount = parseInt(localStorage.getItem(countKey) || '0');
   const badge = document.getElementById('notif-badge');
   const hasNew = jobs.length > seenCount;
-  badge.style.display = hasNew ? 'inline-block' : 'none';
-  localStorage.setItem(storageKey, jobs.length);
-  badge.style.display = 'none';
-  // Sync mobile notif dot
+  if (badge) badge.style.display = hasNew ? 'inline-block' : 'none';
+  localStorage.setItem(countKey, jobs.length);
+  if (badge) badge.style.display = 'none';
   const mobDot = document.getElementById('mob-notif-dot');
   if (mobDot) mobDot.classList.toggle('visible', hasNew);
 
-  if (!jobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📥</div><p>No delivered clips yet — check back soon!</p></div>'; return; }
-  list.innerHTML = jobs.map(j => `
-    <div class="download-card">
-      <div class="download-icon">✅</div>
-      <div class="download-info">
-        <div class="download-title">${j.title}</div>
-        <div class="download-meta">${j.format || 'Short Form'} · Delivered ${j.delivered_at ? formatDate(j.delivered_at) : ''}</div>
+  if (!jobs.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📥</div><p>No delivered clips yet — check back soon!</p></div>';
+    if (pastSection) pastSection.style.display = 'none';
+    return;
+  }
+
+  // Split into new (not yet downloaded) and past (already downloaded)
+  const newJobs  = jobs.filter(j => !seenIds.has(String(j.id)));
+  const pastJobs = jobs.filter(j =>  seenIds.has(String(j.id)));
+
+  // ── New downloads ──
+  if (!newJobs.length) {
+    list.innerHTML = '<div class="empty-state" style="padding:20px 0;"><div class="empty-icon" style="font-size:28px;">✅</div><p style="font-size:13px;color:var(--text3);">All caught up — check Past jobs below.</p></div>';
+  } else {
+    list.innerHTML = newJobs.map(j => `
+      <div class="download-card" id="dlcard-${j.id}">
+        <div class="download-icon">✅</div>
+        <div class="download-info">
+          <div class="download-title">${j.title}</div>
+          <div class="download-meta">${j.format || 'Short Form'} · Delivered ${j.delivered_at ? formatDate(j.delivered_at) : ''}</div>
+        </div>
+        <a class="btn-download" href="${(j.download_link||'').replace(/"/g,'%22')}" target="_blank"
+          onclick="markDownloadSeen(${j.id}, '${seenKey}')">⬇ Download</a>
+      </div>`).join('');
+  }
+
+  // ── Past jobs (month-grouped) ──
+  if (!pastJobs.length) {
+    if (pastSection) pastSection.style.display = 'none';
+    return;
+  }
+
+  // Group by month
+  const groups = {};
+  pastJobs.forEach(j => {
+    const d = j.delivered_at ? new Date(j.delivered_at) : new Date(j.created_at);
+    const key = d.toLocaleString('default', { month: 'long', year: 'numeric' });
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(j);
+  });
+
+  pastList.innerHTML = Object.entries(groups).map(([month, monthJobs]) => `
+    <div style="margin-bottom:20px;">
+      <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+        ${month}
+        <span style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:1px 8px;font-size:10px;">${monthJobs.length} clip${monthJobs.length !== 1 ? 's' : ''}</span>
       </div>
-      <a class="btn-download" href="${j.download_link}" target="_blank">⬇ Download</a>
+      ${monthJobs.map(j => `
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--glass);border:1px solid var(--glass-border);border-radius:12px;margin-bottom:8px;">
+          <div style="font-size:18px;flex-shrink:0;">🎞️</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${j.title}</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px;">${j.format || 'Short Form'} · ${j.delivered_at ? formatDate(j.delivered_at) : ''}</div>
+          </div>
+          <a href="${(j.download_link||'').replace(/"/g,'%22')}" target="_blank" style="font-size:11px;font-weight:600;color:var(--purple);white-space:nowrap;flex-shrink:0;">↗ Open</a>
+        </div>`).join('')}
     </div>`).join('');
+
+  if (pastSection) pastSection.style.display = 'block';
+}
+
+function markDownloadSeen(id, seenKey) {
+  const seenIds = new Set(JSON.parse(localStorage.getItem(seenKey) || '[]'));
+  seenIds.add(String(id));
+  localStorage.setItem(seenKey, JSON.stringify([...seenIds]));
+  // After a short delay, reload to move card to past jobs
+  setTimeout(() => loadClientDownloads(), 800);
 }
 
 async function submitClientRequest() {
