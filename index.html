@@ -1764,6 +1764,25 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
       <div class="form-label">Contact / social <span class="optional">optional</span></div>
       <input class="form-input" id="profile-contact" placeholder="e.g. @yourtwitch or Discord tag">
     </div>
+    <div style="margin-bottom:20px;">
+      <div style="background:rgba(88,101,242,0.07);border:1px solid rgba(88,101,242,0.18);border-radius:14px;padding:16px 18px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span style="font-size:20px;">&#x1f4ac;</span>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#1a1a2e;">Connect Discord</div>
+            <div style="font-size:11px;color:rgba(26,26,46,0.45);">Get pinged when your edit is ready</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:rgba(26,26,46,0.5);line-height:1.7;margin-bottom:12px;">
+          1. Open Discord &rarr; go to your server<br>
+          2. Pick a channel &rarr; <strong>Edit Channel</strong> &rarr; <strong>Integrations</strong><br>
+          3. Click <strong>Webhooks</strong> &rarr; <strong>New Webhook</strong> &rarr; <strong>Copy Webhook URL</strong><br>
+          4. Paste it below &mdash; totally optional!
+        </div>
+        <div class="form-label" style="margin-bottom:6px;">Webhook URL <span class="optional">optional</span></div>
+        <input class="form-input" id="profile-discord" placeholder="https://discord.com/api/webhooks/..." style="margin-bottom:0;font-size:12px;">
+      </div>
+    </div>
     <div class="modal-actions">
       <button class="btn-ghost" onclick="closeModal('modal-profile')">Cancel</button>
       <button class="btn-submit" id="profile-save-btn" onclick="saveProfile()">
@@ -2553,6 +2572,25 @@ function openReviewModal(id) {
   document.getElementById('modal-review').classList.add('open');
 }
 
+async function sendDiscordWebhook(clientEmail, payload) {
+  // Look up the client's webhook URL from their profile
+  let webhookUrl = null;
+  try {
+    if (!DEMO_MODE && sb) {
+      const { data } = await sb.from('profiles').select('discord_webhook').eq('email', clientEmail).single();
+      webhookUrl = data?.discord_webhook;
+    }
+  } catch(e) { console.warn('Discord webhook lookup failed', e); }
+  if (!webhookUrl || !webhookUrl.startsWith('https://discord.com/api/webhooks/')) return;
+  try {
+    await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  } catch(e) { console.warn('Discord webhook failed', e); }
+}
+
 async function sendReviewLink() {
   const link = document.getElementById('review-link').value.trim();
   const email = document.getElementById('review-email').value.trim();
@@ -2561,6 +2599,20 @@ async function sendReviewLink() {
   setLoading('review-btn', 'review-btn-text', true, 'Sending...');
   const job = allJobs.find(j => j.id == reviewJobId);
   await updateJob(reviewJobId, { status: 'awaiting_review', review_link: link });
+
+  // Discord notification
+  if (job?.client_email) {
+    await sendDiscordWebhook(job.client_email, {
+      embeds: [{
+        title: '\ud83d\udc40 Your edit is ready to review!',
+        description: `**${job?.title || 'Your clip'}** is ready for your feedback.`,
+        color: 0xd97706,
+        fields: [{ name: 'Next step', value: 'Head to your Keem Studio portal to watch and leave feedback on Replay.', inline: false }],
+        url: CONFIG.portalUrl,
+        footer: { text: 'Keem Studio' },
+      }]
+    });
+  }
 
   if (email && CONFIG.emailjsServiceId !== 'YOUR_EMAILJS_SERVICE_ID') {
     try {
@@ -2596,6 +2648,20 @@ async function deliverJob() {
   setLoading('deliver-btn', 'deliver-btn-text', true, 'Delivering...');
   const job = allJobs.find(j => j.id == deliverJobId);
   await updateJob(deliverJobId, { status: 'delivered', download_link: link, delivered_at: new Date().toISOString() });
+
+  // Discord notification
+  if (job?.client_email) {
+    await sendDiscordWebhook(job.client_email, {
+      embeds: [{
+        title: '\u2705 Your edit has been delivered!',
+        description: `**${job?.title || 'Your clip'}** is ready to download.`,
+        color: 0x00b4a6,
+        fields: [{ name: 'Next step', value: 'Head to your Keem Studio portal and check the Downloads tab.', inline: false }],
+        url: CONFIG.portalUrl,
+        footer: { text: 'Keem Studio' },
+      }]
+    });
+  }
 
   // Send email notification
   if (email && CONFIG.emailjsServiceId !== 'YOUR_EMAILJS_SERVICE_ID') {
@@ -2682,6 +2748,7 @@ function openProfileModal() {
   const contact = currentUser?.user_metadata?.contact || '';
   document.getElementById('profile-name').value = name;
   document.getElementById('profile-contact').value = contact;
+  document.getElementById('profile-discord').value = currentUser?.user_metadata?.discord_webhook || '';
   // Preview avatar
   const avatarUrl = currentUser?.user_metadata?.avatar_url;
   const preview = document.getElementById('profile-avatar-preview');
@@ -2712,12 +2779,15 @@ async function saveProfile() {
   const contact = document.getElementById('profile-contact').value.trim();
   if (!name) { showToast('Please enter a display name', 'error'); return; }
   setLoading('profile-save-btn', 'profile-save-text', true, 'Saving...');
-  const meta = { display_name: name, contact };
+  const discord_webhook = document.getElementById('profile-discord').value.trim();
+  const meta = { display_name: name, contact, discord_webhook };
   if (window._pendingAvatarUrl) meta.avatar_url = window._pendingAvatarUrl;
   if (!DEMO_MODE && sb) {
     await sb.auth.updateUser({ data: meta });
     // Also update client name in jobs
     await sb.from('jobs').update({ client: name }).eq('client_email', currentUser.email);
+    // Save discord_webhook to profiles table so editor can look it up
+    await sb.from('profiles').upsert({ email: currentUser.email, discord_webhook: discord_webhook || null }, { onConflict: 'email' });
   }
   // Update local user object
   if (!currentUser.user_metadata) currentUser.user_metadata = {};
