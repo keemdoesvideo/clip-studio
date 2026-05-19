@@ -11,7 +11,7 @@
 :root {
   /* Light base */
   --bg: #e8eaf0;
-  --bg2: rgba(255,255,255,0.22);
+  --bg2: rgba(255,255,255,0.55);
   --bg3: rgba(255,255,255,0.35);
   --bg4: rgba(255,255,255,0.2);
 
@@ -42,10 +42,10 @@
   --border2: rgba(0,0,0,0.12);
 
   /* Glass */
-  --glass: rgba(255,255,255,0.22);
-  --glass-border: rgba(255,255,255,0.55);
-  --glass-shadow: 0 8px 32px rgba(0,0,0,0.08), 0 1.5px 4px rgba(0,0,0,0.04);
-  --glass-blur: blur(20px) saturate(180%);
+  --glass: rgba(255,255,255,0.38);
+  --glass-border: rgba(255,255,255,0.68);
+  --glass-shadow: 0 8px 32px rgba(0,0,0,0.1), 0 1.5px 4px rgba(0,0,0,0.05);
+  --glass-blur: blur(28px) saturate(220%);
 
   --radius: 18px;
   --radius-sm: 12px;
@@ -67,7 +67,7 @@ body::after {
   content: '';
   position: fixed; inset: 0;
   background:
-    radial-gradient(ellipse at 20% 20%, rgba(108,99,255,0.28) 0%, transparent 55%),
+    radial-gradient(ellipse at 20% 20%, rgba(108,99,255,0.13) 0%, transparent 55%),
     radial-gradient(ellipse at 80% 10%, rgba(14,165,233,0.1) 0%, transparent 50%),
     radial-gradient(ellipse at 60% 80%, rgba(0,180,166,0.09) 0%, transparent 50%),
     radial-gradient(ellipse at 10% 80%, rgba(224,92,138,0.07) 0%, transparent 45%);
@@ -372,7 +372,7 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 .modal-backdrop.open { display: flex; }
 
 .modal {
-  background: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.75);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid rgba(255,255,255,0.9);
@@ -732,8 +732,8 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
   overflow: hidden;
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid rgba(255,255,255,0.55);
-  background: rgba(255,255,255,0.20);
+  border: 1px solid rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.45);
   box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.9);
   position: relative;
   opacity: 1;
@@ -748,8 +748,8 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
   opacity: 0;
 }
 .job-card-expanded.status-queued {
-  background: rgba(255,255,255,0.20);
-  border-color: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.45);
+  border-color: rgba(255,255,255,0.75);
 }
 .job-card-expanded.status-in_progress {
   background: rgba(255,237,213,0.55);
@@ -1204,9 +1204,99 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
   .topbar-nav { display: none; }
   .main-content, .client-body { padding: 20px 16px; }
   .client-hero { padding: 20px 16px 0; }
-  /* Reduce animations on mobile for performance */
   .stat-card, .job-card-stagger, .download-card { animation-duration: 0.25s; }
 }
+
+/* ════════════════════════════════════
+   MOBILE CLIENT PORTAL (≤600px)
+════════════════════════════════════ */
+@media (max-width: 600px) {
+  #screen-client .topbar { padding: 0 16px; height: 52px; }
+  #screen-client .topbar-logo-name { font-size: 14px; }
+  #screen-client .topbar-logo-icon { width: 28px; height: 28px; border-radius: 8px; }
+  #screen-client .topbar-logo-icon svg { width: 14px; height: 14px; }
+
+  .client-tabs { display: none; }
+
+  .client-hero { padding: 14px 16px 14px; }
+  .client-greeting { margin-bottom: 0; gap: 12px; }
+  .client-avatar-big { width: 42px; height: 42px; font-size: 15px; }
+  .client-hello { font-size: 17px; }
+  .client-sub { font-size: 12px; }
+
+  .client-body { padding: 16px 14px 90px; }
+
+  #client-stats-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-card { padding: 14px 14px; }
+  .stat-num { font-size: 24px; }
+  .stat-label { font-size: 10px; }
+  .stat-sub { font-size: 10px; }
+
+  .client-job-header { padding: 12px 14px; gap: 10px; }
+  .client-job-header .job-icon { width: 34px; height: 34px; border-radius: 10px; font-size: 16px; }
+  .job-title { font-size: 13px; }
+  .client-job-header .job-meta { font-size: 10px; gap: 6px; }
+  .client-job-header .badge { font-size: 10px; padding: 3px 9px; }
+  .client-job-header .expand-arrow { font-size: 13px; }
+  .client-job-body { padding: 12px 14px 14px; }
+
+  .download-card { flex-wrap: wrap; gap: 10px; padding: 14px; }
+  .download-info { min-width: 0; flex: 1 1 100%; order: 2; }
+  .download-icon { order: 1; }
+  .btn-download { order: 3; width: 100%; justify-content: center; padding: 10px; border-radius: 12px; }
+
+  .toast { bottom: 80px; right: 14px; left: 14px; max-width: none; }
+
+  #profile-menu { right: 0; min-width: 160px; }
+
+  .modal-backdrop { padding: 12px; align-items: flex-end; }
+  .modal { border-radius: 20px 20px 16px 16px; padding: 24px 20px; max-height: 85vh; }
+
+  #mobile-bottom-bar { display: flex; }
+}
+
+/* Bottom tab bar */
+#mobile-bottom-bar {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 72px;
+  background: rgba(255,255,255,0.78);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border-top: 1px solid rgba(255,255,255,0.82);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+  z-index: 150;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.mob-tab {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; cursor: pointer; padding: 8px 0 6px;
+  -webkit-tap-highlight-color: transparent;
+  position: relative; transition: opacity 0.15s;
+}
+.mob-tab:active { opacity: 0.7; }
+.mob-tab-icon {
+  width: 26px; height: 26px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
+  transition: background 0.2s, transform 0.2s cubic-bezier(0.34,1.6,0.64,1);
+}
+.mob-tab.active .mob-tab-icon { background: var(--purple-dim); transform: scale(1.1); }
+.mob-tab-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.02em;
+  color: var(--text3); transition: color 0.15s;
+}
+.mob-tab.active .mob-tab-label { color: var(--purple); }
+.mob-tab-notif {
+  position: absolute; top: 6px; right: calc(50% - 22px);
+  width: 7px; height: 7px;
+  background: var(--pink); border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.9);
+  display: none;
+}
+.mob-tab-notif.visible { display: block; }
 </style>
 </head>
 <body>
@@ -1491,6 +1581,24 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
     </div>
 
   </div>
+
+  <!-- ════════ MOBILE BOTTOM TAB BAR ════════ -->
+  <div id="mobile-bottom-bar">
+    <div class="mob-tab active" id="mob-tab-overview" onclick="clientTab('overview', null)">
+      <div class="mob-tab-icon">⊞</div>
+      <span class="mob-tab-label">Overview</span>
+    </div>
+    <div class="mob-tab" id="mob-tab-jobs" onclick="clientTab('jobs', null)">
+      <div class="mob-tab-icon">🎬</div>
+      <span class="mob-tab-label">Jobs</span>
+    </div>
+    <div class="mob-tab" id="mob-tab-downloads" onclick="clientTab('downloads', null)">
+      <div class="mob-tab-notif" id="mob-notif-dot"></div>
+      <div class="mob-tab-icon">⬇</div>
+      <span class="mob-tab-label">Downloads</span>
+    </div>
+  </div>
+
 </div>
 
 <!-- ════════ MODAL: PROFILE ════════ -->
@@ -2409,11 +2517,28 @@ async function saveProfile() {
 // CLIENT PORTAL
 // ══════════════════════════════════════
 function clientTab(tab, el) {
+  // Sync desktop hero tabs
   document.querySelectorAll('.client-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
+  if (el) {
+    el.classList.add('active');
+  } else {
+    document.querySelectorAll('.client-tab').forEach(t => {
+      const oc = t.getAttribute('onclick') || '';
+      if (oc.includes("'" + tab + "'")) t.classList.add('active');
+    });
+  }
+
+  // Show/hide content panels
   ['overview','request','jobs','downloads'].forEach(t => {
     document.getElementById('client-tab-' + t).style.display = t === tab ? 'block' : 'none';
   });
+
+  // Sync mobile bottom bar
+  ['overview','jobs','downloads'].forEach(t => {
+    const mobTab = document.getElementById('mob-tab-' + t);
+    if (mobTab) mobTab.classList.toggle('active', t === tab);
+  });
+
   if (tab === 'overview') loadClientOverview();
   if (tab === 'jobs') loadClientJobs();
   if (tab === 'downloads') loadClientDownloads();
@@ -2555,9 +2680,13 @@ async function loadClientDownloads() {
   const storageKey = `seen_deliveries_${email || 'demo'}`;
   const seenCount = parseInt(localStorage.getItem(storageKey) || '0');
   const badge = document.getElementById('notif-badge');
-  badge.style.display = jobs.length > seenCount ? 'inline-block' : 'none';
+  const hasNew = jobs.length > seenCount;
+  badge.style.display = hasNew ? 'inline-block' : 'none';
   localStorage.setItem(storageKey, jobs.length);
   badge.style.display = 'none';
+  // Sync mobile notif dot
+  const mobDot = document.getElementById('mob-notif-dot');
+  if (mobDot) mobDot.classList.toggle('visible', hasNew);
 
   if (!jobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📥</div><p>No delivered clips yet — check back soon!</p></div>'; return; }
   list.innerHTML = jobs.map(j => `
