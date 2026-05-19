@@ -976,6 +976,7 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 .btn-expand-full.amber { background: rgba(234,88,12,0.08); color: var(--orange); border-color: rgba(234,88,12,0.18); }
 .btn-expand-full.danger { background: transparent; color: var(--text3); border-color: transparent; }
 .btn-expand-full.danger:hover { background: var(--pink-dim); color: var(--pink); border-color: rgba(224,92,138,0.2); transform: none; }
+.btn-expand-full.purple { background: var(--purple-dim); color: var(--purple); border-color: var(--purple-border); }
 
 /* Clip buttons */
 .clip-btn {
@@ -1960,6 +1961,52 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
   </div>
 </div>
 
+<!-- ════════ MODAL: EDIT JOB ════════ -->
+<div class="modal-backdrop" id="modal-edit-job">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Edit job</div>
+      <div class="modal-close" onclick="closeModal('modal-edit-job')">×</div>
+    </div>
+    <div class="form-group">
+      <div class="form-label">Client name *</div>
+      <input class="form-input" id="e-client">
+    </div>
+    <div class="form-group">
+      <div class="form-label">Edit title *</div>
+      <input class="form-input" id="e-title">
+    </div>
+    <div class="form-row-2">
+      <div class="form-group" style="margin-bottom:0;">
+        <div class="form-label">Format</div>
+        <select class="form-select" id="e-format">
+          <option value="Short Form">Short Form</option>
+          <option value="Long Form">Long Form</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <div class="form-label">Deadline <span class="optional">optional</span></div>
+        <input class="form-input" id="e-deadline" type="date">
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:18px;">
+      <div class="form-label">Clip links</div>
+      <div class="clip-links-wrapper" id="e-links-wrapper"></div>
+      <button class="add-clip-btn" onclick="addEditClipLink()">＋ Add clip link</button>
+    </div>
+    <div class="form-group">
+      <div class="form-label">Notes <span class="optional">optional</span></div>
+      <textarea class="form-textarea" id="e-notes" placeholder="Any notes about this job..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('modal-edit-job')">Cancel</button>
+      <button class="btn-submit" id="e-submit-btn" onclick="saveEditJob()">
+        <span id="e-submit-text">Save changes</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ════════ MODAL: SEND REVIEW LINK ════════ -->
 <div class="modal-backdrop" id="modal-review">
   <div class="modal" style="max-width:480px;">
@@ -2614,9 +2661,11 @@ function jobCardHTML(job, isActive) {
     <div class="job-expand-actions">
       ${job.status === 'awaiting_review' ? `<button class="btn-expand-full amber" onclick="openReviewModal(${job.id})">🔗 Send / update review link</button>` : ''}
       <button class="btn-expand-full teal" onclick="openDeliverModal(${job.id})">⬇ Paste final link &amp; deliver</button>
+      <button class="btn-expand-full purple" onclick="openEditJobModal(${job.id})">✏️ Edit job</button>
       <button class="btn-expand-full danger" onclick="deleteJob(${job.id})">🗑 Delete job</button>
     </div>` : `
     <div class="job-expand-actions">
+      <button class="btn-expand-full purple" onclick="openEditJobModal(${job.id})">✏️ Edit job</button>
       <button class="btn-expand-full danger" onclick="deleteJob(${job.id})">🗑 Delete job</button>
     </div>`;
 
@@ -2861,6 +2910,61 @@ function addEditorClipLink() {
   div.className = 'clip-link-row';
   div.innerHTML = `<span class="clip-link-num">${num}</span><input class="clip-link-input"><button class="clip-link-remove" onclick="removeClipLink(this)">×</button>`;
   wrapper.appendChild(div);
+}
+
+let editJobId = null;
+
+function openEditJobModal(id) {
+  const job = allJobs.find(j => j.id == id);
+  if (!job) return;
+  editJobId = id;
+
+  document.getElementById('e-title').value = job.title || '';
+  document.getElementById('e-client').value = job.client || '';
+  document.getElementById('e-deadline').value = job.deadline || '';
+  document.getElementById('e-notes').value = job.notes || '';
+  document.getElementById('e-format').value = job.format || 'Short Form';
+
+  // Populate clip links
+  const wrapper = document.getElementById('e-links-wrapper');
+  const clips = (job.clips || []).filter(Boolean);
+  wrapper.innerHTML = clips.length
+    ? clips.map((c, i) => `<div class="clip-link-row"><span class="clip-link-num">${i+1}</span><input class="clip-link-input" value="${c.replace(/"/g,'&quot;')}"><button class="clip-link-remove" onclick="removeClipLink(this)">×</button></div>`).join('')
+    : `<div class="clip-link-row"><span class="clip-link-num">1</span><input class="clip-link-input"><button class="clip-link-remove" onclick="removeClipLink(this)">×</button></div>`;
+
+  document.getElementById('modal-edit-job').classList.add('open');
+}
+
+function addEditClipLink() {
+  const wrapper = document.getElementById('e-links-wrapper');
+  const num = wrapper.querySelectorAll('.clip-link-row').length + 1;
+  const div = document.createElement('div');
+  div.className = 'clip-link-row';
+  div.innerHTML = `<span class="clip-link-num">${num}</span><input class="clip-link-input"><button class="clip-link-remove" onclick="removeClipLink(this)">×</button>`;
+  wrapper.appendChild(div);
+}
+
+async function saveEditJob() {
+  const title = document.getElementById('e-title').value.trim();
+  const client = document.getElementById('e-client').value.trim();
+  if (!title || !client) { showToast('Title and client name are required', 'error'); return; }
+
+  const clips = [...document.querySelectorAll('#e-links-wrapper .clip-link-input')].map(i => i.value.trim()).filter(Boolean);
+  const updates = {
+    title,
+    client,
+    format: document.getElementById('e-format').value,
+    deadline: document.getElementById('e-deadline').value || null,
+    notes: document.getElementById('e-notes').value.trim(),
+    clips,
+  };
+
+  setLoading('e-submit-btn', 'e-submit-text', true, 'Saving...');
+  await updateJob(editJobId, updates);
+  setLoading('e-submit-btn', 'e-submit-text', false, 'Save changes');
+  closeModal('modal-edit-job');
+  showToast('Job updated!', 'success');
+  loadEditorData();
 }
 
 // ══════════════════════════════════════
