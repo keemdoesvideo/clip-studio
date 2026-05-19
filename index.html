@@ -3,7 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clip Studio</title>
+<title>Keem Studio</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6c63ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Keem Studio">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1309,7 +1315,7 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
       <div class="login-logo-icon">
         <svg viewBox="0 0 24 24"><path d="M4 4l4 4-4 4 4 4-4 4h16V4H4z"/></svg>
       </div>
-      <div class="logo-text">Clip Studio</div>
+      <div class="logo-text">Keem Studio</div>
     </div>
 
     <div id="login-form-view">
@@ -1365,7 +1371,7 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
       <div class="topbar-logo-icon">
         <svg viewBox="0 0 24 24"><path d="M4 4l4 4-4 4 4 4-4 4h16V4H4z"/></svg>
       </div>
-      <span class="topbar-logo-name">Clip Studio</span>
+      <span class="topbar-logo-name">Keem Studio</span>
     </div>
     <div class="topbar-nav">
       <div class="topbar-tab active" onclick="editorTab('queue', this)">Dashboard</div>
@@ -1438,7 +1444,7 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
       <div class="topbar-logo-icon">
         <svg viewBox="0 0 24 24"><path d="M4 4l4 4-4 4 4 4-4 4h16V4H4z"/></svg>
       </div>
-      <span class="topbar-logo-name">Clip Studio</span>
+      <span class="topbar-logo-name">Keem Studio</span>
     </div>
     <div class="topbar-right">
       <!-- Profile dropdown -->
@@ -2808,6 +2814,15 @@ if ('YOUR_EMAILJS_PUBLIC_KEY' !== 'YOUR_EMAILJS_PUBLIC_KEY') {
   const s = document.createElement('script');
   s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
   document.head.appendChild(s);
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/clip-studio/service-worker.js')
+      .then(r => console.log('Keem Studio SW registered', r.scope))
+      .catch(e => console.warn('SW registration failed', e));
+  });
 }
 </script>
 </body>
