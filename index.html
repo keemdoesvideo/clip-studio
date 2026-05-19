@@ -2183,6 +2183,7 @@ try {
 let currentUser = null;
 let isEditor = false;
 let allJobs = [];
+let allJobsCache = [];
 let deliverJobId = null;
 
 // ══════════════════════════════════════
@@ -2694,8 +2695,6 @@ function renderEditorJobs(jobs) {
     if (btn) btn.textContent = `See all ${total} jobs →`;
   }
 }
-
-let allJobsCache = [];
 
 async function loadAllJobs() {
   const active = await getJobs({ status: ['queued', 'in_progress', 'awaiting_review', 'cooking'] });
