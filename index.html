@@ -1261,6 +1261,117 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
   #mobile-bottom-bar { display: flex; }
 }
 
+/* MOBILE EDITOR <=600px */
+@media (max-width: 600px) {
+  #screen-editor .topbar { padding: 0 16px; height: 52px; }
+  #screen-editor .topbar-logo-name { font-size: 14px; }
+  #screen-editor .topbar-logo-icon { width: 28px; height: 28px; border-radius: 8px; }
+  #screen-editor .topbar-logo-icon svg { width: 14px; height: 14px; }
+  #screen-editor .topbar-nav { display: none; }
+  #screen-editor .btn-logout { display: none; }
+  #screen-editor .main-content { padding: 16px 14px 90px; }
+  #screen-editor .stats-row { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  #screen-editor .stat-card { padding: 14px; }
+  #screen-editor .stat-num { font-size: 24px; }
+  #screen-editor .stat-label { font-size: 10px; }
+  #screen-editor .stat-sub { font-size: 10px; }
+  #screen-editor h1 { font-size: 19px !important; }
+  #editor-subline { font-size: 12px; }
+  #screen-editor .btn-accent { display: none; }
+  #screen-editor .job-card-header { padding: 12px 14px; gap: 10px; }
+  #screen-editor .job-icon { width: 34px; height: 34px; border-radius: 10px; font-size: 16px; }
+  #screen-editor .job-title { font-size: 13px; }
+  #screen-editor .job-pills { gap: 5px; }
+  #screen-editor .job-pill { font-size: 10px; padding: 2px 7px; }
+  #screen-editor .badge { font-size: 10px; padding: 3px 9px; }
+  #editor-mobile-bottom-bar { display: flex; }
+  #job-detail-sheet { display: flex; }
+}
+
+/* Job detail sheet */
+#job-detail-sheet {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 300;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.job-sheet-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(26,26,46,0.35);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.job-sheet-panel {
+  position: relative; z-index: 1;
+  background: rgba(240,241,248,0.97);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border-radius: 24px 24px 0 0;
+  border-top: 1px solid rgba(255,255,255,0.85);
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.12);
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 0 0 env(safe-area-inset-bottom, 16px);
+  animation: sheetUp 0.35s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.job-sheet-handle {
+  width: 36px; height: 4px;
+  background: rgba(26,26,46,0.18);
+  border-radius: 2px;
+  margin: 12px auto 0;
+}
+.job-sheet-header {
+  padding: 16px 18px 14px;
+  display: flex; align-items: flex-start; justify-content: space-between;
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+}
+.job-sheet-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px; font-weight: 700; color: var(--text);
+  flex: 1; margin-right: 12px; line-height: 1.3;
+}
+.job-sheet-close {
+  width: 28px; height: 28px;
+  background: rgba(0,0,0,0.07); border: none; border-radius: 50%;
+  color: var(--text3); font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.job-sheet-body { padding: 14px 18px 20px; }
+.job-sheet-section { margin-bottom: 18px; }
+.job-sheet-section-label {
+  font-size: 10px; font-weight: 700; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 8px;
+}
+.job-sheet-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.06);
+  font-size: 13px;
+}
+.job-sheet-row:last-child { border-bottom: none; }
+.job-sheet-row-label { color: var(--text3); font-size: 12px; }
+.job-sheet-row-val { color: var(--text); font-weight: 500; text-align: right; }
+
+/* Editor mobile bottom bar */
+#editor-mobile-bottom-bar {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 72px;
+  background: rgba(255,255,255,0.78);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border-top: 1px solid rgba(255,255,255,0.82);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+  z-index: 150;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 /* Bottom tab bar */
 #mobile-bottom-bar {
   display: none;
@@ -1435,6 +1546,32 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
       <div id="clients-list"><div class="empty-state"><div class="empty-icon">👥</div><p>No clients yet.</p></div></div>
     </div>
   </div>
+
+  <!-- EDITOR MOBILE BOTTOM BAR -->
+  <div id="editor-mobile-bottom-bar">
+    <div class="mob-tab active" id="editor-mob-tab-queue" onclick="editorTabMobile('queue')">
+      <div class="mob-tab-icon">🎬</div>
+      <span class="mob-tab-label">Jobs</span>
+    </div>
+    <div class="mob-tab" id="editor-mob-tab-clients" onclick="editorTabMobile('clients')">
+      <div class="mob-tab-icon">👥</div>
+      <span class="mob-tab-label">Clients</span>
+    </div>
+  </div>
+
+  <!-- JOB DETAIL SHEET (mobile) -->
+  <div id="job-detail-sheet">
+    <div class="job-sheet-backdrop" onclick="closeJobSheet()"></div>
+    <div class="job-sheet-panel">
+      <div class="job-sheet-handle"></div>
+      <div class="job-sheet-header">
+        <div class="job-sheet-title" id="sheet-title">Job details</div>
+        <button class="job-sheet-close" onclick="closeJobSheet()">&#x2715;</button>
+      </div>
+      <div class="job-sheet-body" id="sheet-body"></div>
+    </div>
+  </div>
+
 </div>
 
 <!-- ════════ CLIENT PORTAL ════════ -->
@@ -2006,7 +2143,86 @@ function editorTab(tab, el) {
   el.classList.add('active');
   document.getElementById('editor-tab-queue').style.display = tab === 'queue' ? 'block' : 'none';
   document.getElementById('editor-tab-clients').style.display = tab === 'clients' ? 'block' : 'none';
+  // Sync mobile bottom bar
+  ['queue','clients'].forEach(t => {
+    const mt = document.getElementById('editor-mob-tab-' + t);
+    if (mt) mt.classList.toggle('active', t === tab);
+  });
   if (tab === 'clients') loadClientsPage();
+}
+
+function editorTabMobile(tab) {
+  document.getElementById('editor-tab-queue').style.display = tab === 'queue' ? 'block' : 'none';
+  document.getElementById('editor-tab-clients').style.display = tab === 'clients' ? 'block' : 'none';
+  ['queue','clients'].forEach(t => {
+    const mt = document.getElementById('editor-mob-tab-' + t);
+    if (mt) mt.classList.toggle('active', t === tab);
+  });
+  // Sync desktop topbar tabs
+  document.querySelectorAll('.topbar-tab').forEach(t => {
+    const oc = t.getAttribute('onclick') || '';
+    t.classList.toggle('active', oc.includes("'" + tab + "'"));
+  });
+  if (tab === 'clients') loadClientsPage();
+}
+
+function openJobSheet(job) {
+  const isUrgent = job.deadline && ((new Date(job.deadline) - new Date()) / (1000*60*60*24)) <= 3 && job.status !== 'delivered';
+  const clips = (job.clips || []).filter(c => c);
+  const statusLabels = { queued: 'Requested', in_progress: 'Currently Editing', awaiting_review: 'Awaiting Review', delivered: 'Delivered' };
+  const statusBadges = { queued: 'badge-gray', in_progress: 'badge-purple', awaiting_review: 'badge-amber', delivered: 'badge-teal' };
+
+  document.getElementById('sheet-title').textContent = job.title;
+
+  const clipsHTML = clips.length
+    ? clips.map((c, i) => `<a href="${c}" target="_blank" class="clip-btn" style="margin-bottom:4px;">Clip ${i+1}</a>`).join(' ')
+    : '<span style="font-size:12px;color:var(--text3);">No clip links</span>';
+
+  document.getElementById('sheet-body').innerHTML = `
+    <div class="job-sheet-section">
+      <div class="job-sheet-row">
+        <span class="job-sheet-row-label">Client</span>
+        <span class="job-sheet-row-val">${job.client}</span>
+      </div>
+      <div class="job-sheet-row">
+        <span class="job-sheet-row-label">Format</span>
+        <span class="job-sheet-row-val">${job.format || 'Short Form'}</span>
+      </div>
+      <div class="job-sheet-row">
+        <span class="job-sheet-row-label">Status</span>
+        <span class="badge ${statusBadges[job.status] || 'badge-gray'}">${statusLabels[job.status] || job.status}</span>
+      </div>
+      ${job.deadline ? `<div class="job-sheet-row">
+        <span class="job-sheet-row-label">Deadline</span>
+        <span class="job-sheet-row-val ${isUrgent ? 'pill-urgent' : ''}">${formatDate(job.deadline)}${isUrgent ? ' \u26a0\ufe0f' : ''}</span>
+      </div>` : ''}
+      <div class="job-sheet-row">
+        <span class="job-sheet-row-label">Submitted</span>
+        <span class="job-sheet-row-val">${formatDate(job.created_at)}</span>
+      </div>
+    </div>
+    <div class="job-sheet-section">
+      <div class="job-sheet-section-label">Clips (${clips.length})</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">${clipsHTML}</div>
+    </div>
+    ${job.notes ? `<div class="job-sheet-section">
+      <div class="job-sheet-section-label">Notes</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.6;margin:0;">${job.notes}</p>
+    </div>` : ''}
+    ${job.review_link ? `<div class="job-sheet-section">
+      <div class="job-sheet-section-label">Review link</div>
+      <a href="${job.review_link}" target="_blank" class="btn-review-link" style="display:inline-flex;margin-top:4px;">Open Replay</a>
+    </div>` : ''}
+  `;
+
+  const sheet = document.getElementById('job-detail-sheet');
+  sheet.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeJobSheet() {
+  document.getElementById('job-detail-sheet').style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 async function loadEditorData() {
@@ -2291,6 +2507,12 @@ async function changeStatus(id, newStatus) {
 }
 
 function toggleJobCard(id) {
+  // On mobile, open the detail sheet instead of expanding inline
+  if (window.innerWidth <= 600) {
+    const job = allJobs.find(j => j.id == id);
+    if (job) openJobSheet(job);
+    return;
+  }
   const body = document.getElementById('jobbody-' + id);
   const card = document.getElementById('jobcard-' + id);
   const arrow = card.querySelector('.expand-arrow');
@@ -2299,7 +2521,7 @@ function toggleJobCard(id) {
   if (!isOpen) {
     body.style.display = 'block';
     body.style.animation = 'none';
-    void body.offsetWidth; // force reflow
+    void body.offsetWidth;
     body.style.animation = 'accordionOpen 0.3s cubic-bezier(0.22, 1, 0.36, 1) both';
     arrow.style.transform = 'rotate(180deg)';
   } else {
