@@ -794,7 +794,7 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
   border-radius: var(--radius); overflow: hidden; margin-bottom: 10px;
   transition: border-color 0.2s, background 0.2s;
 }
-.client-job-card.s-awaiting_review { border-color: rgba(14,165,233,0.22); background: rgba(224,242,254,0.5); }
+.client-job-card.s-awaiting_review { border-color: rgba(217,119,6,0.22); background: rgba(255,243,220,0.5); }
 .client-job-card.s-in_progress { border-color: rgba(108,99,255,0.18); background: rgba(235,233,255,0.45); }
 .client-job-card.s-delivered { border-color: rgba(0,180,166,0.18); background: rgba(209,250,229,0.45); }
 .client-job-card.s-queued { border-color: rgba(0,0,0,0.08); }
@@ -866,24 +866,27 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
   background: rgba(255,255,255,0.45);
   border-color: rgba(255,255,255,0.75);
 }
+/* in_progress = purple to match badge */
 .job-card-expanded.status-in_progress {
-  background: rgba(255,237,213,0.55);
-  border-color: rgba(234,88,12,0.18);
-  box-shadow: var(--glass-shadow), 0 0 0 1px rgba(234,88,12,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+  background: rgba(237,236,255,0.55);
+  border-color: rgba(108,99,255,0.18);
+  box-shadow: var(--glass-shadow), 0 0 0 1px rgba(108,99,255,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
 }
 .job-card-expanded.status-in_progress::before {
-  background: linear-gradient(135deg, rgba(234,88,12,0.05) 0%, transparent 60%);
+  background: linear-gradient(135deg, rgba(108,99,255,0.06) 0%, transparent 60%);
   opacity: 1;
 }
+/* awaiting_review = amber to match badge */
 .job-card-expanded.status-awaiting_review {
-  background: rgba(224,242,254,0.55);
-  border-color: rgba(14,165,233,0.18);
-  box-shadow: var(--glass-shadow), 0 0 0 1px rgba(14,165,233,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+  background: rgba(255,243,220,0.55);
+  border-color: rgba(217,119,6,0.2);
+  box-shadow: var(--glass-shadow), 0 0 0 1px rgba(217,119,6,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
 }
 .job-card-expanded.status-awaiting_review::before {
-  background: linear-gradient(135deg, rgba(14,165,233,0.06) 0%, transparent 60%);
+  background: linear-gradient(135deg, rgba(217,119,6,0.06) 0%, transparent 60%);
   opacity: 1;
 }
+/* delivered = teal/green */
 .job-card-expanded.status-delivered {
   background: rgba(209,250,229,0.55);
   border-color: rgba(5,150,105,0.18);
@@ -893,10 +896,14 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
   background: linear-gradient(135deg, rgba(5,150,105,0.05) 0%, transparent 60%);
   opacity: 1;
 }
+/* urgent = pulsing border only, does NOT override status colour */
 .job-card-expanded.urgent {
-  background: rgba(255,228,230,0.55) !important;
-  border-color: rgba(224,92,138,0.22) !important;
-  box-shadow: var(--glass-shadow), 0 0 0 1px rgba(224,92,138,0.1) !important;
+  border-color: rgba(224,92,138,0.4) !important;
+  animation: urgentPulse 2s ease-in-out infinite;
+}
+@keyframes urgentPulse {
+  0%, 100% { box-shadow: var(--glass-shadow), 0 0 0 2px rgba(224,92,138,0.15); }
+  50%       { box-shadow: var(--glass-shadow), 0 0 0 3px rgba(224,92,138,0.32); }
 }
 
 .job-card-header {
@@ -2342,8 +2349,11 @@ function openJobSheet(job) {
       </div>
       ${job.deadline ? `<div class="job-sheet-row">
         <span class="job-sheet-row-label">Deadline</span>
-        <span class="job-sheet-row-val ${isUrgent ? 'pill-urgent' : ''}">${formatDate(job.deadline)}${isUrgent ? ' \u26a0\ufe0f' : ''}</span>
-      </div>` : ''}
+        <span class="job-sheet-row-val" style="${isUrgent ? 'color:var(--pink);font-weight:700;' : ''}">${formatDate(job.deadline)}${isUrgent ? ' \u26a0\ufe0f' : ''}</span>
+      </div>
+      ${isUrgent ? `<div style="margin:8px 0 4px;background:rgba(224,92,138,0.1);border:1px solid rgba(224,92,138,0.22);border-radius:10px;padding:9px 12px;font-size:12px;color:var(--pink);font-weight:600;display:flex;align-items:center;gap:6px;">
+        <span>\u26a0\ufe0f</span><span>Due soon \u2014 deadline within 3 days</span>
+      </div>` : ''}` : ''}
       <div class="job-sheet-row">
         <span class="job-sheet-row-label">Submitted</span>
         <span class="job-sheet-row-val">${formatDate(job.created_at)}</span>
