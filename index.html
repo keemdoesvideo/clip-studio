@@ -438,6 +438,7 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 .job-icon.teal { background: rgba(0,180,166,0.12); }
 .job-icon.pink { background: rgba(224,92,138,0.12); }
 .job-icon.amber { background: rgba(217,119,6,0.12); }
+.job-icon.yellow { background: rgba(234,179,8,0.12); }
 
 .job-info { flex: 1; min-width: 0; }
 .job-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -456,6 +457,7 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 .badge-pink { background: var(--pink-dim); color: var(--pink); border-color: rgba(224,92,138,0.18); }
 .badge-amber { background: var(--amber-dim); color: var(--amber); border-color: rgba(217,119,6,0.18); }
 .badge-gray { background: rgba(0,0,0,0.06); color: var(--text3); border-color: rgba(0,0,0,0.08); }
+.badge-yellow { background: rgba(234,179,8,0.1); color: #92670a; border-color: rgba(234,179,8,0.22); }
 
 .icon-btn {
   width: 34px; height: 34px;
@@ -866,6 +868,19 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
   background: rgba(255,255,255,0.45);
   border-color: rgba(255,255,255,0.75);
 }
+.job-card-expanded.status-cooking {
+  background: rgba(254,249,220,0.55);
+  border-color: rgba(234,179,8,0.22);
+  box-shadow: var(--glass-shadow), 0 0 0 1px rgba(234,179,8,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+}
+.job-card-expanded.status-cooking::before {
+  background: linear-gradient(135deg, rgba(234,179,8,0.06) 0%, transparent 60%);
+  opacity: 1;
+}
+.client-job-card.s-cooking {
+  border-color: rgba(234,179,8,0.22);
+  background: rgba(254,249,220,0.5);
+}
 /* in_progress = purple to match badge */
 .job-card-expanded.status-in_progress {
   background: rgba(237,236,255,0.55);
@@ -960,6 +975,7 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 .active-pill { background: rgba(0,0,0,0.08); color: var(--text); border-color: rgba(0,0,0,0.12); }
 .active-pill-purple { background: var(--purple-dim); color: var(--purple); border-color: rgba(108,99,255,0.22); }
 .active-pill-amber { background: rgba(234,88,12,0.1); color: var(--orange); border-color: rgba(234,88,12,0.2); }
+.active-pill-yellow { background: rgba(234,179,8,0.12); color: #92670a; border-color: rgba(234,179,8,0.28); }
 
 /* Full-width action buttons inside expanded */
 .job-expand-actions { display: flex; flex-direction: column; gap: 8px; padding-top: 14px; }
@@ -2436,7 +2452,9 @@ async function loadEditorData() {
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
   document.getElementById('editor-greeting').textContent = greeting;
 
-  const jobs = await getJobs({ status: ['queued', 'in_progress', 'awaiting_review'] });
+  const active = await getJobs({ status: ['queued', 'in_progress', 'awaiting_review'] });
+  const cooking = await getJobs({ status: 'cooking' });
+  const jobs = [...active, ...cooking];
   allJobs = jobs;
 
   const delivered = await getJobs({ status: 'delivered' });
@@ -2581,14 +2599,29 @@ function animateCount(el, target) {
 }
 
 function renderEditorJobs(jobs) {
+  const cookingJobs = jobs.filter(j => j.status === 'cooking');
+  const activeJobs  = jobs.filter(j => j.status !== 'cooking');
+  jobs = activeJobs; // rest of function uses active only
   const list = document.getElementById('editor-job-list');
-  if (!jobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No active jobs. Hit "✦ New job" to add one!</p></div>'; return; }
+  if (!jobs.length && !cookingJobs.length) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No active jobs. Hit "✦ New job" to add one!</p></div>'; return; }
   const sorted = [...jobs].sort((a, b) => {
     if (a.deadline && b.deadline) return new Date(a.deadline) - new Date(b.deadline);
     if (a.deadline) return -1; if (b.deadline) return 1; return 0;
   });
-  list.innerHTML = sorted.map(j => jobCardHTML(j, true)).join('');
-  // Apply stagger delays after render
+  let html = sorted.map(j => jobCardHTML(j, true)).join('');
+
+  // Cooking section — separate, below active queue
+  if (cookingJobs.length) {
+    html += `
+    <div style="margin-top:28px;margin-bottom:10px;display:flex;align-items:center;gap:10px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;">🍳 Cooking (${cookingJobs.length})</div>
+      <div style="flex:1;height:1px;background:rgba(0,0,0,0.07);"></div>
+      <div style="font-size:11px;color:var(--text3);">Not ready to edit yet</div>
+    </div>`;
+    html += cookingJobs.map(j => jobCardHTML(j, true)).join('');
+  }
+
+  list.innerHTML = html;
   list.querySelectorAll('.job-card-stagger').forEach((el, i) => {
     el.style.animationDelay = `${i * 60}ms`;
   });
@@ -2603,13 +2636,14 @@ function jobCardHTML(job, isActive) {
 
   const statusInfo = {
     queued:          { badge: 'badge-gray',   label: 'Requested' },
+    cooking:         { badge: 'badge-yellow', label: '🔥 Cooking' },
     in_progress:     { badge: 'badge-purple', label: 'Currently Editing' },
     awaiting_review: { badge: 'badge-amber',  label: 'Awaiting Review' },
     delivered:       { badge: 'badge-teal',   label: 'Delivered' },
   }[job.status] || { badge: 'badge-gray', label: job.status };
 
-  const iconClass = isUrgent ? 'pink' : job.status === 'delivered' ? 'teal' : job.status === 'awaiting_review' ? 'amber' : 'purple';
-  const iconEmoji = isUrgent ? '🔥' : job.status === 'delivered' ? '✅' : job.status === 'awaiting_review' ? '👀' : '🎬';
+  const iconClass = isUrgent ? 'pink' : job.status === 'delivered' ? 'teal' : job.status === 'awaiting_review' ? 'amber' : job.status === 'cooking' ? 'yellow' : 'purple';
+  const iconEmoji = isUrgent ? '🔥' : job.status === 'delivered' ? '✅' : job.status === 'awaiting_review' ? '👀' : job.status === 'cooking' ? '🍳' : '🎬';
 
   // ── Clip buttons ──
   const clipsHTML = clips.length ? `<div style="display:flex;gap:8px;flex-wrap:wrap;">` +
@@ -2651,6 +2685,7 @@ function jobCardHTML(job, isActive) {
       <div class="job-expand-label">Update status</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
         <button class="status-pill ${job.status==='queued'?'active-pill':''}" onclick="changeStatus(${job.id},'queued')">Requested</button>
+        <button class="status-pill ${job.status==='cooking'?'active-pill active-pill-yellow':''}" onclick="changeStatus(${job.id},'cooking')">🍳 Cooking</button>
         <button class="status-pill ${job.status==='in_progress'?'active-pill active-pill-purple':''}" onclick="changeStatus(${job.id},'in_progress')">✏️ Currently Editing</button>
         <button class="status-pill ${job.status==='awaiting_review'?'active-pill active-pill-amber':''}" onclick="changeStatus(${job.id},'awaiting_review')">👀 Awaiting Review</button>
       </div>
@@ -3154,9 +3189,9 @@ async function loadClientJobs() {
     return new Date(b.created_at) - new Date(a.created_at);
   });
 
-  const labelMap = { queued:'Requested', in_progress:'Currently Editing', awaiting_review:'Awaiting Review' };
-  const badgeMap = { queued:'badge-gray', in_progress:'badge-purple', awaiting_review:'badge-amber' };
-  const iconMap  = { queued:'🎬', in_progress:'✏️', awaiting_review:'👀' };
+  const labelMap = { queued:'Requested', cooking:'🔥 Cooking', in_progress:'Currently Editing', awaiting_review:'Awaiting Review' };
+  const badgeMap = { queued:'badge-gray', cooking:'badge-yellow', in_progress:'badge-purple', awaiting_review:'badge-amber' };
+  const iconMap  = { queued:'🎬', cooking:'🍳', in_progress:'✏️', awaiting_review:'👀' };
 
   list.innerHTML = sorted.map(j => {
     const clips = (j.clips || []).filter(c => c);
@@ -3178,6 +3213,13 @@ async function loadClientJobs() {
         <p style="font-size:13px;color:var(--text2);line-height:1.55;">${j.notes}</p>
       </div>` : '';
 
+    const cookingSection = j.status === 'cooking' ? `
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(0,0,0,0.06);">
+        <div style="font-size:11px;font-weight:600;color:#92670a;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Still building this one</div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:12px;">This job is marked as cooking — Karim won't start editing until you mark it as ready.</p>
+        <button onclick="markJobReady(${j.id})" style="background:rgba(234,179,8,0.12);color:#92670a;border:1px solid rgba(234,179,8,0.28);border-radius:20px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">✅ Mark as ready</button>
+      </div>` : '';
+
     return `
     <div class="client-job-card s-${j.status}" id="cjob-${j.id}">
       <div class="client-job-header" onclick="toggleClientJob(${j.id})">
@@ -3196,6 +3238,7 @@ async function loadClientJobs() {
         </div>
       </div>
       <div class="client-job-body" id="cjob-body-${j.id}" style="display:none;">
+        ${cookingSection}
         ${reviewSection}
         ${clipsSection}
         ${notesSection}
@@ -3212,6 +3255,12 @@ function toggleClientJob(id) {
   body.style.display = open ? 'none' : 'block';
   arrow.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
   arrow.style.transition = 'transform 0.25s cubic-bezier(0.34,1.4,0.64,1)';
+}
+
+async function markJobReady(id) {
+  await updateJob(id, { status: 'queued' });
+  showToast('Job marked as ready! Karim will see it in the queue.', 'success');
+  loadClientJobs();
 }
 
 async function loadClientDownloads() {
