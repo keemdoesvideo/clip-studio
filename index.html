@@ -88,7 +88,19 @@ body.dark {
   --glass-border: rgba(255,255,255,0.1);
   --glass-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 1.5px 4px rgba(0,0,0,0.25);
 }
-body.dark::after { display: none; }
+body.dark::before {
+  background:
+    radial-gradient(ellipse at 10% 10%, rgba(240,200,74,0.1) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 15%, rgba(139,92,246,0.08) 0%, transparent 40%),
+    radial-gradient(ellipse at 30% 75%, rgba(0,180,166,0.06) 0%, transparent 40%),
+    radial-gradient(ellipse at 80% 80%, rgba(224,92,138,0.05) 0%, transparent 38%);
+}
+body.dark .stats-wrap, body.dark .stats-row {
+  background: rgba(26,26,26,0.7);
+  border-color: rgba(255,255,255,0.08);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+body.dark .stat-card + .stat-card { border-color: rgba(255,255,255,0.06); }
 body.dark .field-input,
 body.dark .form-input,
 body.dark .form-select,
@@ -165,7 +177,21 @@ body {
   color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
+  position: relative;
 }
+/* Colour blobs - give glass something to refract */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse at 10% 10%, rgba(232,184,75,0.18) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 15%, rgba(139,92,246,0.1) 0%, transparent 40%),
+    radial-gradient(ellipse at 30% 75%, rgba(0,180,166,0.08) 0%, transparent 40%),
+    radial-gradient(ellipse at 80% 80%, rgba(224,92,138,0.07) 0%, transparent 38%);
+  pointer-events: none;
+  z-index: 0;
+}
+.screen, .screen > * { position: relative; z-index: 1; }
 
 /* ── Animated gradient background (liquid feel) ── */
 body::after { display: none; }
@@ -353,30 +379,41 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 /* ════════════════════════════════════
    STATS ROW
 ════════════════════════════════════ */
-.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 32px; }
-.stat-card {
-  background: var(--glass);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  margin-bottom: 28px;
   border-radius: var(--radius);
-  box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.9);
-  padding: 20px;
-  position: relative; overflow: hidden;
+  overflow: hidden;
+  background: rgba(255,255,255,0.48);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border: 1px solid rgba(255,255,255,0.82);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1), inset 0 1px 3px rgba(255,255,255,0.95);
 }
+.stat-card {
+  padding: 20px 18px;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card + .stat-card { border-left: 1px solid rgba(255,255,255,0.55); }
 .stat-card::after {
   content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 3px;
   background: var(--accent, var(--purple));
-  opacity: 0.7;
-  border-radius: 3px 3px 0 0;
+  border-radius: 0;
 }
-.stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; font-weight: 600; }
-.stat-num { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; margin-bottom: 4px; }
-.stat-sub { font-size: 11px; color: var(--text3); }
-.stat-card.urgent { --accent: var(--pink); }
-.stat-card.delivered { --accent: var(--teal); }
-.stat-card.queue { --accent: var(--amber); }
+.stat-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 10px; font-weight: 700; }
+.stat-num { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: var(--accent-text, var(--text)); line-height: 1; margin-bottom: 10px; letter-spacing: -0.03em; }
+.stat-bar-track { height: 4px; background: rgba(0,0,0,0.08); border-radius: 4px; overflow: hidden; margin-bottom: 7px; }
+.stat-bar-fill { height: 100%; border-radius: 4px; background: var(--accent, var(--purple)); }
+.stat-sub { font-size: 10px; color: var(--text3); font-weight: 500; }
+.stat-card.urgent { --accent: var(--pink); --accent-text: var(--pink); }
+.stat-card.delivered { --accent: var(--teal); --accent-text: var(--teal); }
+.stat-card.queue { --accent: var(--amber); --accent-text: var(--amber); }
+.stat-card.progress { --accent: #8b5cf6; --accent-text: #6d28d9; }
+.stat-card.alltime { --accent: var(--pink); --accent-text: var(--pink); }
 
 /* ════════════════════════════════════
    SECTION HEADERS
@@ -385,19 +422,20 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 .section-title { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; }
 
 .btn-accent {
-  background: var(--purple);
-  color: #fff;
+  background: #e8b84b;
+  color: #6b4900;
   border: none;
-  border-radius: 20px;
-  padding: 8px 18px;
-  font-size: 13px; font-weight: 500;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 13px; font-weight: 800;
   cursor: pointer;
   display: flex; align-items: center; gap: 6px;
-  transition: all 0.2s;
+  transition: all 0.15s;
   font-family: 'DM Sans', sans-serif;
-  box-shadow: 0 4px 12px rgba(108,99,255,0.35);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+  letter-spacing: 0.01em;
 }
-.btn-accent:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(108,99,255,0.4); }
+.btn-accent:hover { transform: translateY(-1px); box-shadow: 0 5px 12px rgba(0,0,0,0.22); }
 
 /* ════════════════════════════════════
    JOB CARDS (legacy, kept for fallback)
@@ -822,11 +860,11 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 .job-card-expanded {
   border-radius: var(--radius);
   overflow: hidden;
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid rgba(255,255,255,0.75);
-  background: rgba(255,255,255,0.45);
-  box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.9);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.58);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07), inset 0 1px 2px rgba(255,255,255,0.95);
   position: relative;
   opacity: 1;
   transition: box-shadow 0.2s ease, border-color 0.25s ease, background 0.25s ease;
@@ -1378,7 +1416,8 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
   #screen-editor .topbar-nav { display: none; }
   #screen-editor .btn-logout { display: none; }
   #screen-editor .main-content { padding: 16px 14px 90px; }
-  #screen-editor .stats-row { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  #screen-editor .stats-row { grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 20px; border-radius: 16px; }
+  #screen-editor .stat-card + .stat-card { border-left: none; border-top: 1px solid rgba(255,255,255,0.55); }
   #screen-editor .stat-card { padding: 14px; }
   #screen-editor .stat-num { font-size: 24px; }
   #screen-editor .stat-label { font-size: 10px; }
@@ -1608,47 +1647,68 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
 
   <div class="main-content">
     <div id="editor-tab-queue">
-      <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:28px;">
-        <div>
-          <h1 style="font-family:'Syne',sans-serif; font-size:24px; font-weight:700; letter-spacing:-0.02em; margin-bottom:4px;" id="editor-greeting">Good morning</h1>
-          <p style="font-size:13px; color:var(--text3);" id="editor-subline">Loading your queue...</p>
+      <!-- Greeting -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#e8b84b,#f5d478);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#6b4900;flex-shrink:0;box-shadow:0 0 0 3px rgba(232,184,75,0.3),0 4px 12px rgba(232,184,75,0.2);">K</div>
+          <div>
+            <h1 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.02em;margin-bottom:3px;" id="editor-greeting">Good morning</h1>
+            <p style="font-size:12px;color:var(--text3);" id="editor-subline">Loading your queue...</p>
+            <div id="attention-pill" style="display:none;margin-top:8px;"></div>
+          </div>
         </div>
-        <button class="btn-accent" onclick="openNewJobModal()">
-          ✦ New job
-        </button>
+        <button class="btn-accent" onclick="openNewJobModal()">✦ New job</button>
       </div>
 
+      <!-- Stats — 5 connected glass panel -->
       <div class="stats-row">
         <div class="stat-card queue">
           <div class="stat-label">In queue</div>
           <div class="stat-num" id="stat-queue">—</div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" id="stat-queue-bar" style="width:0%"></div></div>
           <div class="stat-sub">Awaiting edit</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card progress">
           <div class="stat-label">In progress</div>
           <div class="stat-num" id="stat-progress">—</div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" id="stat-progress-bar" style="width:0%;background:#8b5cf6"></div></div>
           <div class="stat-sub">Being worked on</div>
+        </div>
+        <div class="stat-card" style="--accent:#00b4a6;--accent-text:#0d7377;">
+          <div class="stat-label">Awaiting review</div>
+          <div class="stat-num" id="stat-review">—</div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" id="stat-review-bar" style="width:0%;background:#00b4a6"></div></div>
+          <div class="stat-sub">Client reviewing</div>
         </div>
         <div class="stat-card delivered">
           <div class="stat-label">Delivered this month</div>
           <div class="stat-num" id="stat-delivered">—</div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" id="stat-delivered-bar" style="width:0%"></div></div>
           <div class="stat-sub" id="stat-month">—</div>
         </div>
-        <div class="stat-card urgent">
-          <div class="stat-label">Due within 3 days</div>
-          <div class="stat-num" id="stat-urgent">—</div>
-          <div class="stat-sub">Check deadlines</div>
+        <div class="stat-card alltime">
+          <div class="stat-label">All time delivered</div>
+          <div class="stat-num" id="stat-alltime">—</div>
+          <div class="stat-bar-track"><div class="stat-bar-fill" id="stat-alltime-bar" style="width:0%"></div></div>
+          <div class="stat-sub">Total clips</div>
         </div>
       </div>
 
+      <!-- Due This Week -->
+      <div id="due-this-week-section" style="display:none;margin-bottom:24px;">
+        <div class="section-title" style="margin-bottom:12px;">Due this week</div>
+        <div id="due-this-week-scroll" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;"></div>
+      </div>
+
+      <!-- Newest Jobs -->
       <div class="section-header">
-        <div class="section-title">Active jobs</div>
+        <div class="section-title">Newest jobs</div>
       </div>
       <div class="job-list" id="editor-job-list">
         <div class="empty-state"><div class="empty-icon">📋</div><p>No active jobs. Add one above!</p></div>
       </div>
       <div id="dashboard-see-all" style="display:none;text-align:center;margin-top:16px;">
-        <button onclick="editorTab('alljobs', document.querySelector('.topbar-tab:nth-child(2)'))" style="background:var(--purple-dim);color:var(--purple);border:1px solid var(--purple-border);border-radius:20px;padding:9px 22px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">See all jobs →</button>
+        <button onclick="editorTab('alljobs', document.querySelector('.topbar-tab:nth-child(2)'))" style="background:rgba(232,184,75,0.15);color:#6b4900;border:1px solid rgba(232,184,75,0.3);border-radius:20px;padding:9px 22px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">See all jobs →</button>
       </div>
     </div>
 
@@ -2489,19 +2549,77 @@ async function loadEditorData() {
   });
 
   const urgent = jobs.filter(j => {
-    if (!j.deadline) return false;
+    if (!j.deadline || j.status === 'delivered') return false;
     const diff = (new Date(j.deadline) - now) / (1000 * 60 * 60 * 24);
     return diff <= 3 && diff >= 0;
   });
 
-  animateCount(document.getElementById('stat-queue'), jobs.filter(j => j.status === 'queued').length);
-  animateCount(document.getElementById('stat-progress'), jobs.filter(j => j.status === 'in_progress' || j.status === 'awaiting_review').length);
+  const awaitingReview = jobs.filter(j => j.status === 'awaiting_review');
+  const needAttention = urgent.length + awaitingReview.length;
+
+  // Stat counts
+  const queueCount = jobs.filter(j => j.status === 'queued').length;
+  const progressCount = jobs.filter(j => j.status === 'in_progress').length;
+  const reviewCount = awaitingReview.length;
+  const allTimeCount = delivered.length;
+  const maxStat = Math.max(queueCount + progressCount + reviewCount, 1);
+
+  animateCount(document.getElementById('stat-queue'), queueCount);
+  animateCount(document.getElementById('stat-progress'), progressCount);
+  animateCount(document.getElementById('stat-review'), reviewCount);
   animateCount(document.getElementById('stat-delivered'), thisMonth.length);
+  animateCount(document.getElementById('stat-alltime'), allTimeCount);
   document.getElementById('stat-month').textContent = now.toLocaleString('default', { month: 'long' });
-  animateCount(document.getElementById('stat-urgent'), urgent.length);
+
+  // Progress bars
+  const setBar = (id, val, max) => { const el = document.getElementById(id); if(el) el.style.width = Math.min(100, Math.round((val/max)*100)) + '%'; };
+  setBar('stat-queue-bar', queueCount, maxStat);
+  setBar('stat-progress-bar', progressCount, maxStat);
+  setBar('stat-review-bar', reviewCount, maxStat);
+  setBar('stat-delivered-bar', thisMonth.length, Math.max(thisMonth.length, 5));
+  setBar('stat-alltime-bar', Math.min(allTimeCount, 100), 100);
+
+  // Attention pill
+  const pill = document.getElementById('attention-pill');
+  if (pill) {
+    if (needAttention > 0) {
+      pill.style.display = 'inline-flex';
+      pill.innerHTML = `<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(220,80,60,0.1);color:#c0392b;border:1px solid rgba(192,57,43,0.18);border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;">⚠ ${needAttention} job${needAttention > 1 ? 's' : ''} need${needAttention === 1 ? 's' : ''} your attention</span>`;
+    } else {
+      pill.style.display = 'none';
+    }
+  }
 
   const subline = jobs.length === 0 ? 'Queue is clear — nice work!' : `${jobs.length} job${jobs.length > 1 ? 's' : ''} in the queue`;
   document.getElementById('editor-subline').textContent = subline;
+
+  // Due this week section
+  const sevenDays = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const dueThisWeek = jobs.filter(j => j.deadline && new Date(j.deadline) <= sevenDays && new Date(j.deadline) >= now)
+    .sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+
+  const dueSection = document.getElementById('due-this-week-section');
+  const dueScroll = document.getElementById('due-this-week-scroll');
+  if (dueThisWeek.length && dueSection && dueScroll) {
+    const statusColors = { in_progress: '#e8b84b', awaiting_review: '#00b4a6', queued: 'rgba(0,0,0,0.15)', cooking: '#f59e0b' };
+    const statusLabels = { in_progress: 'Editing', awaiting_review: 'In review', queued: 'Queued', cooking: 'Cooking' };
+    const badgeColors = { in_progress: 'background:#fef3d0;color:#7a5500', awaiting_review: 'background:#e0f7f5;color:#005a54', queued: 'background:rgba(0,0,0,0.07);color:rgba(17,17,17,0.5)', cooking: 'background:rgba(245,158,11,0.1);color:#92400e' };
+    const isUrgentFn = j => (new Date(j.deadline) - now) / (1000*60*60*24) <= 3;
+    dueScroll.innerHTML = dueThisWeek.map(j => {
+      const urgent = isUrgentFn(j);
+      const barColor = urgent ? '#e05c8a' : (statusColors[j.status] || 'rgba(0,0,0,0.15)');
+      const badge = urgent ? 'background:#fce7f0;color:#9b1f5a' : (badgeColors[j.status] || '');
+      const label = urgent ? 'Urgent' : (statusLabels[j.status] || j.status);
+      return `<div style="flex-shrink:0;background:rgba(255,255,255,0.58);backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,0.85);border-radius:16px;padding:13px 15px;min-width:168px;position:relative;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.07);">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${barColor}"></div>
+        <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px;">${j.title}</div>
+        <div style="font-size:11px;color:var(--text3);display:flex;align-items:center;gap:6px;">📅 ${formatDate(j.deadline)} <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;${badge}">${label}</span></div>
+      </div>`;
+    }).join('');
+    dueSection.style.display = 'block';
+  } else if (dueSection) {
+    dueSection.style.display = 'none';
+  }
 
   renderEditorJobs(jobs);
 }
@@ -2635,10 +2753,7 @@ function renderEditorJobs(jobs) {
     return;
   }
 
-  const sorted = [...jobs].sort((a, b) => {
-    if (a.deadline && b.deadline) return new Date(a.deadline) - new Date(b.deadline);
-    if (a.deadline) return -1; if (b.deadline) return 1; return 0;
-  });
+  const sorted = [...jobs].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   // Dashboard shows max 5 active jobs
   const MAX = 5;
