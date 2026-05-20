@@ -1693,6 +1693,7 @@ h1, h2, h3, .logo-text { font-family: 'Syne', sans-serif; }
           <option value="cooking">Cooking</option>
           <option value="in_progress">Currently Editing</option>
           <option value="awaiting_review">Awaiting Review</option>
+          <option value="__other">Unknown / Other</option>
         </select>
         <select id="alljobs-filter-client" class="form-select" style="width:auto;padding:7px 14px;font-size:13px;" onchange="renderAllJobs()">
           <option value="">All clients</option>
@@ -2503,7 +2504,7 @@ async function loadEditorData() {
   const cooking = await getJobs({ status: 'cooking' });
   const jobs = [...active, ...cooking];
   allJobs = jobs;
-  allJobsCache = jobs; // keep All Jobs tab in sync
+  allJobsCache = jobs;
 
   const delivered = await getJobs({ status: 'delivered' });
   const thisMonth = delivered.filter(j => {
@@ -2697,9 +2698,16 @@ function renderEditorJobs(jobs) {
 }
 
 async function loadAllJobs() {
-  const active = await getJobs({ status: ['queued', 'in_progress', 'awaiting_review', 'cooking'] });
+  // Fetch all non-delivered jobs — including any orphaned/legacy statuses
+  let active;
+  if (DEMO_MODE) {
+    active = await getJobs({ status: ['queued', 'in_progress', 'awaiting_review', 'cooking'] });
+  } else {
+    const { data } = await sb.from('jobs').select('*').neq('status', 'delivered').order('created_at', { ascending: false });
+    active = data || [];
+  }
   allJobsCache = active;
-  allJobs = [...allJobs, ...active.filter(j => !allJobs.find(aj => aj.id === j.id))];
+  allJobs = active;
 
   // Populate client filter dropdown
   const clientSelect = document.getElementById('alljobs-filter-client');
@@ -2719,8 +2727,13 @@ function renderAllJobs() {
   const clientFilter = document.getElementById('alljobs-filter-client')?.value || '';
   const sort = document.getElementById('alljobs-sort')?.value || 'deadline';
 
+  const knownStatuses = ['queued', 'cooking', 'in_progress', 'awaiting_review', 'delivered'];
   let jobs = [...allJobsCache];
-  if (statusFilter) jobs = jobs.filter(j => j.status === statusFilter);
+  if (statusFilter === '__other') {
+    jobs = jobs.filter(j => !knownStatuses.includes(j.status));
+  } else if (statusFilter) {
+    jobs = jobs.filter(j => j.status === statusFilter);
+  }
   if (clientFilter) jobs = jobs.filter(j => j.client === clientFilter);
 
   const statusOrder = { awaiting_review: 0, in_progress: 1, queued: 2, cooking: 3 };
