@@ -2200,17 +2200,82 @@ function applyTheme(dark) {
   document.body.classList.toggle('dark', dark);
   const btn = document.getElementById('theme-toggle');
   if (btn) btn.innerHTML = dark ? '&#9728;&#65039;' : '&#127769;';
+  updateStars(dark);
 }
 function toggleTheme() {
   const isDark = document.body.classList.toggle('dark');
   localStorage.setItem('ks-theme', isDark ? 'dark' : 'light');
   const btn = document.getElementById('theme-toggle');
   if (btn) btn.innerHTML = isDark ? '&#9728;&#65039;' : '&#127769;';
+  updateStars(isDark);
 }
 // Apply saved theme immediately
 (function() {
   const saved = localStorage.getItem('ks-theme');
   if (saved === 'dark') applyTheme(true);
+})();
+
+// ── Twinkling stars ──────────────────────────────────────────
+(function() {
+  const canvas = document.createElement('canvas');
+  canvas.id = 'stars-canvas';
+  canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0;transition:opacity 1.2s ease;';
+  document.body.prepend(canvas);
+
+  const ctx = canvas.getContext('2d');
+  let stars = [], raf, W, H;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    buildStars();
+  }
+
+  function buildStars() {
+    const count = Math.floor((W * H) / 5000); // density
+    stars = Array.from({ length: count }, () => ({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.2 + 0.3,           // radius 0.3–1.5px
+      base: Math.random() * 0.5 + 0.2,         // base opacity 0.2–0.7
+      speed: Math.random() * 0.6 + 0.2,        // twinkle speed
+      phase: Math.random() * Math.PI * 2,      // offset so they don't sync
+      gold: Math.random() < 0.06,              // ~6% are gold-tinted
+    }));
+  }
+
+  function draw(ts) {
+    ctx.clearRect(0, 0, W, H);
+    const t = ts / 1000;
+    for (const s of stars) {
+      const alpha = s.base + Math.sin(t * s.speed + s.phase) * (s.base * 0.7);
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = s.gold
+        ? `rgba(240,200,74,${alpha})`
+        : `rgba(255,255,255,${alpha})`;
+      ctx.fill();
+    }
+    raf = requestAnimationFrame(draw);
+  }
+
+  function start() {
+    if (raf) return;
+    resize();
+    raf = requestAnimationFrame(draw);
+    canvas.style.opacity = '1';
+  }
+
+  function stop() {
+    canvas.style.opacity = '0';
+    if (raf) { cancelAnimationFrame(raf); raf = null; }
+  }
+
+  window.updateStars = function(isDark) { isDark ? start() : stop(); };
+  window.addEventListener('resize', () => { if (raf) resize(); });
+
+  // If already dark on load, start immediately
+  if (document.body.classList.contains('dark')) start();
 })();
 
 // CONFIG — Fill these in before deploying
