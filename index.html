@@ -1445,7 +1445,6 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
   #screen-editor .job-pills { gap: 5px; }
   #screen-editor .job-pill { font-size: 10px; padding: 2px 7px; }
   #screen-editor .badge { font-size: 10px; padding: 3px 9px; }
-  #editor-mobile-bottom-bar { display: flex; }
   #job-detail-sheet { display: flex; }
 }
 
@@ -1531,6 +1530,9 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
   box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
   z-index: 150;
   padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (max-width: 600px) {
+  #editor-mobile-bottom-bar.screen-active { display: flex; }
 }
 
 /* Bottom tab bar */
@@ -1766,22 +1768,6 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
     </div>
   </div>
 
-  <!-- EDITOR MOBILE BOTTOM BAR -->
-  <div id="editor-mobile-bottom-bar">
-    <div class="mob-tab active" id="editor-mob-tab-queue" onclick="editorTabMobile('queue')">
-      <div class="mob-tab-icon">🏠</div>
-      <span class="mob-tab-label">Dashboard</span>
-    </div>
-    <div class="mob-tab" id="editor-mob-tab-alljobs" onclick="editorTabMobile('alljobs')">
-      <div class="mob-tab-icon">🎬</div>
-      <span class="mob-tab-label">All Jobs</span>
-    </div>
-    <div class="mob-tab" id="editor-mob-tab-clients" onclick="editorTabMobile('clients')">
-      <div class="mob-tab-icon">👥</div>
-      <span class="mob-tab-label">Clients</span>
-    </div>
-  </div>
-
   <!-- JOB DETAIL SHEET (mobile) -->
   <div id="job-detail-sheet">
     <div class="job-sheet-backdrop" onclick="closeJobSheet()"></div>
@@ -1795,6 +1781,22 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
     </div>
   </div>
 
+</div>
+
+<!-- ════════ EDITOR MOBILE BOTTOM BAR (outside screen so fixed works) ════════ -->
+<div id="editor-mobile-bottom-bar">
+  <div class="mob-tab active" id="editor-mob-tab-queue" onclick="editorTabMobile('queue')">
+    <div class="mob-tab-icon">🏠</div>
+    <span class="mob-tab-label">Dashboard</span>
+  </div>
+  <div class="mob-tab" id="editor-mob-tab-alljobs" onclick="editorTabMobile('alljobs')">
+    <div class="mob-tab-icon">🎬</div>
+    <span class="mob-tab-label">All Jobs</span>
+  </div>
+  <div class="mob-tab" id="editor-mob-tab-clients" onclick="editorTabMobile('clients')">
+    <div class="mob-tab-icon">👥</div>
+    <span class="mob-tab-label">Clients</span>
+  </div>
 </div>
 
 <!-- ════════ CLIENT PORTAL ════════ -->
@@ -2262,6 +2264,9 @@ const DEMO_CLIENT_EMAIL = 'ailinicia@email.com';
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
+  // Show editor bottom bar only on editor screen (media query handles <=600px)
+  const bar = document.getElementById('editor-mobile-bottom-bar');
+  if (bar) bar.classList.toggle('screen-active', id === 'editor');
 }
 
 function showEditorLogin() {
