@@ -1269,85 +1269,8 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
   position: relative; z-index: 1;
 }
 @keyframes accordionOpen {
-  0%   { opacity: 0; transform: translateY(-10px) scaleY(0.92); }
-  60%  { opacity: 1; transform: translateY(2px) scaleY(1.01); }
-  100% { opacity: 1; transform: translateY(0) scaleY(1); }
-}
-@keyframes accordionClose {
-  0%   { opacity: 1; transform: translateY(0) scaleY(1); }
-  100% { opacity: 0; transform: translateY(-8px) scaleY(0.94); }
-}
-
-/* ── Stat bar animated fill ── */
-.stat-bar-fill {
-  transition: width 0.8s cubic-bezier(0.34, 1.2, 0.64, 1) !important;
-}
-
-/* ── Button press scale (all interactive buttons) ── */
-.btn-accent:active,
-.btn-primary:active,
-.btn-submit:active,
-.btn-deliver:active,
-.btn-ghost:active,
-.btn-expand-full:active,
-.btn-expand-action:active,
-.btn-download:active,
-.btn-review-link:active { transform: scale(0.96) !important; transition: transform 0.08s ease !important; }
-
-/* ── Awaiting review shimmer on card header ── */
-@keyframes reviewShimmer {
-  0%   { box-shadow: inset 3px 0 0 rgba(251,191,36,0.5); }
-  50%  { box-shadow: inset 3px 0 0 rgba(251,191,36,1), 0 0 12px rgba(251,191,36,0.25); }
-  100% { box-shadow: inset 3px 0 0 rgba(251,191,36,0.5); }
-}
-.job-card-expanded.status-awaiting_review {
-  animation: reviewShimmer 2.4s ease-in-out infinite;
-}
-
-/* ── Status pill flash on update ── */
-@keyframes pillFlash {
-  0%   { transform: scale(1); }
-  30%  { transform: scale(1.18); filter: brightness(1.3); }
-  100% { transform: scale(1); filter: brightness(1); }
-}
-.pill-flash { animation: pillFlash 0.45s cubic-bezier(0.34, 1.6, 0.64, 1) both; }
-
-/* ── Confetti particle ── */
-@keyframes confettiFall {
-  0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
-  100% { transform: translateY(120px) rotate(720deg) scale(0.3); opacity: 0; }
-}
-.confetti-dot {
-  position: fixed;
-  width: 7px; height: 7px;
-  border-radius: 2px;
-  pointer-events: none;
-  z-index: 9999;
-  animation: confettiFall 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-}
-
-/* ── Sliding gold indicator on mobile bottom tabs ── */
-#editor-mobile-bottom-bar,
-#mobile-bottom-bar { position: relative; }
-
-.mob-tab-slider {
-  position: absolute;
-  top: 0; height: 2.5px;
-  background: var(--purple);
-  border-radius: 0 0 3px 3px;
-  transition: left 0.35s cubic-bezier(0.34, 1.4, 0.64, 1), width 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
-  pointer-events: none;
-}
-
-/* ── Tab icon bounce on activation ── */
-@keyframes tabIconBounce {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(1.3) translateY(-3px); }
-  70%  { transform: scale(0.95) translateY(1px); }
-  100% { transform: scale(1.1) translateY(0); }
-}
-.mob-tab.active .mob-tab-icon {
-  animation: tabIconBounce 0.4s cubic-bezier(0.34, 1.6, 0.64, 1) both;
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Form fields — subtle fade in stagger inside modals */
@@ -1506,9 +1429,6 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
   #screen-editor .main-content { padding: 16px 14px 90px; }
   #screen-editor .stats-row { grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 20px; border-radius: 16px; }
   #screen-editor .stat-card + .stat-card { border-left: none; border-top: 1px solid rgba(255,255,255,0.55); }
-  #screen-editor .stats-row .stat-card:nth-child(2) { border-left: 1px solid rgba(255,255,255,0.55); border-top: none; }
-  #screen-editor .stats-row .stat-card:nth-child(4) { border-left: 1px solid rgba(255,255,255,0.55); }
-  #screen-editor .stat-card.alltime { display: none; }
   #screen-editor .stat-card { padding: 14px; }
   #screen-editor .stat-num { font-size: 24px; }
   #screen-editor .stat-label { font-size: 10px; }
@@ -1522,6 +1442,7 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
   #screen-editor .job-pills { gap: 5px; }
   #screen-editor .job-pill { font-size: 10px; padding: 2px 7px; }
   #screen-editor .badge { font-size: 10px; padding: 3px 9px; }
+  #editor-mobile-bottom-bar { display: flex; }
   #job-detail-sheet { display: flex; }
 }
 
@@ -1607,9 +1528,6 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
   box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
   z-index: 150;
   padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-@media (max-width: 600px) {
-  #editor-mobile-bottom-bar.screen-active { display: flex; }
 }
 
 /* Bottom tab bar */
@@ -1845,6 +1763,18 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
     </div>
   </div>
 
+  <!-- EDITOR MOBILE BOTTOM BAR -->
+  <div id="editor-mobile-bottom-bar">
+    <div class="mob-tab active" id="editor-mob-tab-queue" onclick="editorTabMobile('queue')">
+      <div class="mob-tab-icon">🎬</div>
+      <span class="mob-tab-label">Jobs</span>
+    </div>
+    <div class="mob-tab" id="editor-mob-tab-clients" onclick="editorTabMobile('clients')">
+      <div class="mob-tab-icon">👥</div>
+      <span class="mob-tab-label">Clients</span>
+    </div>
+  </div>
+
   <!-- JOB DETAIL SHEET (mobile) -->
   <div id="job-detail-sheet">
     <div class="job-sheet-backdrop" onclick="closeJobSheet()"></div>
@@ -1858,22 +1788,6 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
     </div>
   </div>
 
-</div>
-
-<!-- ════════ EDITOR MOBILE BOTTOM BAR (outside screen so fixed works) ════════ -->
-<div id="editor-mobile-bottom-bar">
-  <div class="mob-tab active" id="editor-mob-tab-queue" onclick="editorTabMobile('queue')">
-    <div class="mob-tab-icon">🏠</div>
-    <span class="mob-tab-label">Dashboard</span>
-  </div>
-  <div class="mob-tab" id="editor-mob-tab-alljobs" onclick="editorTabMobile('alljobs')">
-    <div class="mob-tab-icon">🎬</div>
-    <span class="mob-tab-label">All Jobs</span>
-  </div>
-  <div class="mob-tab" id="editor-mob-tab-clients" onclick="editorTabMobile('clients')">
-    <div class="mob-tab-icon">👥</div>
-    <span class="mob-tab-label">Clients</span>
-  </div>
 </div>
 
 <!-- ════════ CLIENT PORTAL ════════ -->
@@ -2277,82 +2191,17 @@ function applyTheme(dark) {
   document.body.classList.toggle('dark', dark);
   const btn = document.getElementById('theme-toggle');
   if (btn) btn.innerHTML = dark ? '&#9728;&#65039;' : '&#127769;';
-  updateStars(dark);
 }
 function toggleTheme() {
   const isDark = document.body.classList.toggle('dark');
   localStorage.setItem('ks-theme', isDark ? 'dark' : 'light');
   const btn = document.getElementById('theme-toggle');
   if (btn) btn.innerHTML = isDark ? '&#9728;&#65039;' : '&#127769;';
-  updateStars(isDark);
 }
 // Apply saved theme immediately
 (function() {
   const saved = localStorage.getItem('ks-theme');
   if (saved === 'dark') applyTheme(true);
-})();
-
-// ── Twinkling stars ──────────────────────────────────────────
-(function() {
-  const canvas = document.createElement('canvas');
-  canvas.id = 'stars-canvas';
-  canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0;transition:opacity 1.2s ease;';
-  document.body.prepend(canvas);
-
-  const ctx = canvas.getContext('2d');
-  let stars = [], raf, W, H;
-
-  function resize() {
-    W = canvas.width  = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-    buildStars();
-  }
-
-  function buildStars() {
-    const count = Math.floor((W * H) / 5000); // density
-    stars = Array.from({ length: count }, () => ({
-      x: Math.random() * W,
-      y: Math.random() * H,
-      r: Math.random() * 1.2 + 0.3,           // radius 0.3–1.5px
-      base: Math.random() * 0.5 + 0.2,         // base opacity 0.2–0.7
-      speed: Math.random() * 0.6 + 0.2,        // twinkle speed
-      phase: Math.random() * Math.PI * 2,      // offset so they don't sync
-      gold: Math.random() < 0.06,              // ~6% are gold-tinted
-    }));
-  }
-
-  function draw(ts) {
-    ctx.clearRect(0, 0, W, H);
-    const t = ts / 1000;
-    for (const s of stars) {
-      const alpha = s.base + Math.sin(t * s.speed + s.phase) * (s.base * 0.7);
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fillStyle = s.gold
-        ? `rgba(240,200,74,${alpha})`
-        : `rgba(255,255,255,${alpha})`;
-      ctx.fill();
-    }
-    raf = requestAnimationFrame(draw);
-  }
-
-  function start() {
-    if (raf) return;
-    resize();
-    raf = requestAnimationFrame(draw);
-    canvas.style.opacity = '1';
-  }
-
-  function stop() {
-    canvas.style.opacity = '0';
-    if (raf) { cancelAnimationFrame(raf); raf = null; }
-  }
-
-  window.updateStars = function(isDark) { isDark ? start() : stop(); };
-  window.addEventListener('resize', () => { if (raf) resize(); });
-
-  // If already dark on load, start immediately
-  if (document.body.classList.contains('dark')) start();
 })();
 
 // CONFIG — Fill these in before deploying
@@ -2406,9 +2255,6 @@ const DEMO_CLIENT_EMAIL = 'ailinicia@email.com';
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
-  // Show editor bottom bar only on editor screen (media query handles <=600px)
-  const bar = document.getElementById('editor-mobile-bottom-bar');
-  if (bar) bar.classList.toggle('screen-active', id === 'editor');
 }
 
 function showEditorLogin() {
@@ -2490,8 +2336,6 @@ function loginAsEditor(user) {
   document.getElementById('editor-name-display').textContent = name;
   showScreen('editor');
   loadEditorData();
-  // Init mobile tab slider position
-  requestAnimationFrame(() => updateTabSlider('editor-mobile-bottom-bar', 'editor-mob-tab-queue'));
 }
 
 function loginAsClient(user) {
@@ -2517,7 +2361,6 @@ function loginAsClient(user) {
   showScreen('client');
   checkNotificationBadge(user.email);
   loadClientData(user.email);
-  requestAnimationFrame(() => updateTabSlider('mobile-bottom-bar', 'mob-tab-overview'));
 
   // Upsert into profiles so editor can see this client even with no jobs
   if (!DEMO_MODE && sb && user.email) {
@@ -2611,9 +2454,9 @@ function editorTab(tab, el) {
   document.getElementById('editor-tab-alljobs').style.display = tab === 'alljobs' ? 'block' : 'none';
   document.getElementById('editor-tab-clients').style.display = tab === 'clients' ? 'block' : 'none';
   // Sync mobile bottom bar
-  ['queue','alljobs','clients'].forEach(t => {
+  ['queue','clients'].forEach(t => {
     const mt = document.getElementById('editor-mob-tab-' + t);
-    if (mt) mt.classList.toggle('active', t === tab);
+    if (mt) mt.classList.toggle('active', t === tab || (t === 'queue' && tab === 'alljobs'));
   });
   if (tab === 'clients') loadClientsPage();
   if (tab === 'alljobs') loadAllJobs();
@@ -2623,15 +2466,14 @@ function editorTabMobile(tab) {
   document.getElementById('editor-tab-queue').style.display = tab === 'queue' ? 'block' : 'none';
   document.getElementById('editor-tab-alljobs').style.display = tab === 'alljobs' ? 'block' : 'none';
   document.getElementById('editor-tab-clients').style.display = tab === 'clients' ? 'block' : 'none';
-  ['queue','alljobs','clients'].forEach(t => {
+  ['queue','clients'].forEach(t => {
     const mt = document.getElementById('editor-mob-tab-' + t);
-    if (mt) mt.classList.toggle('active', t === tab);
+    if (mt) mt.classList.toggle('active', t === tab || (t === 'queue' && tab === 'alljobs'));
   });
   document.querySelectorAll('.topbar-tab').forEach(t => {
     const oc = t.getAttribute('onclick') || '';
     t.classList.toggle('active', oc.includes("'" + tab + "'"));
   });
-  updateTabSlider('editor-mobile-bottom-bar', 'editor-mob-tab-' + tab);
   if (tab === 'clients') loadClientsPage();
   if (tab === 'alljobs') loadAllJobs();
 }
@@ -2892,62 +2734,21 @@ async function toggleClientBanner(id, email) {
 }
 
 // Count-up animation for stat numbers
-// ── Sliding tab indicator ────────────────────────────────────
-function updateTabSlider(barId, activeTabId) {
-  const bar = document.getElementById(barId);
-  const activeTab = document.getElementById(activeTabId);
-  if (!bar || !activeTab) return;
-  let slider = bar.querySelector('.mob-tab-slider');
-  if (!slider) {
-    slider = document.createElement('div');
-    slider.className = 'mob-tab-slider';
-    bar.appendChild(slider);
-  }
-  const barRect = bar.getBoundingClientRect();
-  const tabRect = activeTab.getBoundingClientRect();
-  slider.style.left  = (tabRect.left - barRect.left) + 'px';
-  slider.style.width = tabRect.width + 'px';
-}
-
-// ── Confetti burst on deliver ────────────────────────────────
-function confettiBurst(x, y) {
-  const colours = ['#e8b84b','#f0c84a','#00b4a6','#e05c8a','#8b5cf6','#fff'];
-  for (let i = 0; i < 28; i++) {
-    const dot = document.createElement('div');
-    dot.className = 'confetti-dot';
-    dot.style.left = (x + (Math.random() - 0.5) * 120) + 'px';
-    dot.style.top  = (y + (Math.random() - 0.5) * 40)  + 'px';
-    dot.style.background = colours[Math.floor(Math.random() * colours.length)];
-    dot.style.animationDelay = (Math.random() * 0.2) + 's';
-    dot.style.animationDuration = (0.7 + Math.random() * 0.4) + 's';
-    dot.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-    document.body.appendChild(dot);
-    dot.addEventListener('animationend', () => dot.remove());
-  }
-}
-
-// ── Flash a pill when status changes ────────────────────────
-function flashPill(el) {
-  if (!el) return;
-  el.classList.remove('pill-flash');
-  void el.offsetWidth;
-  el.classList.add('pill-flash');
-  el.addEventListener('animationend', () => el.classList.remove('pill-flash'), { once: true });
-}
-
 function animateCount(el, target) {
   if (target === '—' || isNaN(target)) { el.textContent = target; return; }
   const num = parseInt(target);
   if (num === 0) { el.textContent = 0; return; }
-  const duration = 750;
-  const start = performance.now();
-  const easeOut = t => 1 - Math.pow(1 - t, 3);
-  function tick(now) {
-    const t = Math.min((now - start) / duration, 1);
-    el.textContent = Math.round(easeOut(t) * num);
-    if (t < 1) requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
+  const duration = 600;
+  const steps = 20;
+  const increment = num / steps;
+  let current = 0; let step = 0;
+  const timer = setInterval(() => {
+    step++;
+    current = Math.min(Math.round(increment * step), num);
+    el.textContent = current;
+    if (step >= steps) clearInterval(timer);
+
+  }, duration / steps);
 }
 
 function renderEditorJobs(jobs) {
@@ -3197,14 +2998,17 @@ async function changeStatus(id, newStatus) {
   const card = document.getElementById('jobcard-' + id);
   if (card) {
     card.className = card.className.replace(/status-\w+/g, '') + ` status-${newStatus}`;
-    // Flash the active status pill
-    const activePill = card.querySelector('.active-pill');
-    flashPill(activePill);
   }
   loadEditorData();
 }
 
 function toggleJobCard(id) {
+  // On mobile, open the detail sheet instead of expanding inline
+  if (window.innerWidth <= 600) {
+    const job = allJobs.find(j => j.id == id);
+    if (job) openJobSheet(job);
+    return;
+  }
   const body = document.getElementById('jobbody-' + id);
   const card = document.getElementById('jobcard-' + id);
   const arrow = card.querySelector('.expand-arrow');
@@ -3214,18 +3018,14 @@ function toggleJobCard(id) {
     body.style.display = 'block';
     body.style.animation = 'none';
     void body.offsetWidth;
-    body.style.animation = 'accordionOpen 0.45s cubic-bezier(0.34, 1.3, 0.64, 1) both';
+    body.style.animation = 'accordionOpen 0.3s cubic-bezier(0.22, 1, 0.36, 1) both';
     arrow.style.transform = 'rotate(180deg)';
   } else {
-    body.style.animation = 'none';
-    void body.offsetWidth;
-    body.style.animation = 'accordionClose 0.25s cubic-bezier(0.4, 0, 0.2, 1) both';
-    body.addEventListener('animationend', () => { body.style.display = 'none'; }, { once: true });
+    body.style.display = 'none';
     arrow.style.transform = 'rotate(0deg)';
   }
-  arrow.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.4, 0.64, 1)';
+  arrow.style.transition = 'transform 0.25s cubic-bezier(0.34, 1.4, 0.64, 1)';
 }
-
 
 async function deleteJob(id) {
   if (!confirm('Are you sure you want to delete this job? This cannot be undone.')) return;
@@ -3354,8 +3154,6 @@ async function deliverJob() {
 
   setLoading('deliver-btn', 'deliver-btn-text', false, '✓ Mark delivered & notify');
   closeModal('modal-deliver');
-  // 🎉 Confetti burst from centre of screen
-  confettiBurst(window.innerWidth / 2, window.innerHeight / 3);
   showToast('Delivered! Client notified.', 'success');
   loadEditorData();
 }
@@ -3574,7 +3372,6 @@ function clientTab(tab, el) {
   if (tab === 'overview') loadClientOverview();
   if (tab === 'jobs') loadClientJobs();
   if (tab === 'downloads') loadClientDownloads();
-  updateTabSlider('mobile-bottom-bar', 'mob-tab-' + tab);
 }
 
 async function loadClientData(email) {
