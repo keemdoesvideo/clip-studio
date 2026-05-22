@@ -2738,17 +2738,15 @@ function animateCount(el, target) {
   if (target === '—' || isNaN(target)) { el.textContent = target; return; }
   const num = parseInt(target);
   if (num === 0) { el.textContent = 0; return; }
-  const duration = 600;
-  const steps = 20;
-  const increment = num / steps;
-  let current = 0; let step = 0;
-  const timer = setInterval(() => {
-    step++;
-    current = Math.min(Math.round(increment * step), num);
-    el.textContent = current;
-    if (step >= steps) clearInterval(timer);
-
-  }, duration / steps);
+  const duration = 750;
+  const start = performance.now();
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  function tick(now) {
+    const t = Math.min((now - start) / duration, 1);
+    el.textContent = Math.round(easeOut(t) * num);
+    if (t < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
 }
 
 function renderEditorJobs(jobs) {
