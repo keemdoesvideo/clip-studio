@@ -353,6 +353,220 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
 .topbar-tab:hover { color: var(--text); background: rgba(0,0,0,0.05); }
 .topbar-tab.active { color: var(--purple); background: var(--purple-dim); font-weight: 500; }
 
+/* ════════════════════════════════════
+   CHAT / IM SYSTEM
+════════════════════════════════════ */
+/* Editor — chat inbox sidebar layout */
+#editor-tab-messages {
+  display: none;
+  height: calc(100vh - 130px);
+  gap: 0;
+}
+#editor-tab-messages.chat-open { display: flex; }
+
+.chat-inbox {
+  width: 260px; flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  border-radius: 16px 0 0 16px;
+  overflow: hidden;
+}
+.chat-inbox-header {
+  padding: 16px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px; font-weight: 700;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.chat-inbox-list { flex: 1; overflow-y: auto; }
+.chat-inbox-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+  position: relative;
+}
+.chat-inbox-item:hover { background: var(--purple-dim); }
+.chat-inbox-item.active { background: var(--purple-dim); border-right: 2px solid var(--purple); }
+.chat-inbox-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--purple), #f5d478);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #6b4900; flex-shrink: 0;
+}
+.chat-inbox-info { flex: 1; min-width: 0; }
+.chat-inbox-name { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-inbox-preview { font-size: 11px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+.chat-inbox-unread {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--purple); color: #6b4900;
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Chat window */
+.chat-window {
+  flex: 1; display: flex; flex-direction: column;
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  border-radius: 0 16px 16px 0;
+  overflow: hidden;
+}
+.chat-window-empty {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: var(--text3); gap: 10px;
+}
+.chat-window-empty .empty-icon { font-size: 36px; }
+.chat-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0;
+}
+.chat-header-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--purple), #f5d478);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #6b4900;
+}
+.chat-header-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.chat-header-status { font-size: 11px; color: var(--teal); margin-top: 1px; }
+
+/* Messages area */
+.chat-messages {
+  flex: 1; overflow-y: auto;
+  padding: 16px;
+  display: flex; flex-direction: column; gap: 4px;
+  scroll-behavior: smooth;
+}
+.chat-msg {
+  display: flex; flex-direction: column;
+  max-width: 72%;
+  animation: msgIn 0.2s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.chat-msg.mine { align-self: flex-end; align-items: flex-end; }
+.chat-msg.theirs { align-self: flex-start; align-items: flex-start; }
+
+.chat-bubble {
+  padding: 8px 12px;
+  border-radius: 16px;
+  font-size: 13px; line-height: 1.45;
+  word-break: break-word;
+  position: relative;
+}
+.chat-msg.mine .chat-bubble {
+  background: var(--purple);
+  color: #5a3a00;
+  border-bottom-right-radius: 4px;
+}
+.chat-msg.theirs .chat-bubble {
+  background: var(--bg2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+.chat-time {
+  font-size: 10px; color: var(--text3);
+  margin-top: 3px; padding: 0 4px;
+  opacity: 0; transition: opacity 0.15s;
+}
+.chat-msg:hover .chat-time { opacity: 1; }
+
+/* Group consecutive messages */
+.chat-msg.mine + .chat-msg.mine .chat-bubble { border-top-right-radius: 4px; }
+.chat-msg.theirs + .chat-msg.theirs .chat-bubble { border-top-left-radius: 4px; }
+
+/* Date divider */
+.chat-date-divider {
+  text-align: center; font-size: 11px; color: var(--text3);
+  margin: 10px 0; position: relative;
+}
+.chat-date-divider::before {
+  content: ''; position: absolute;
+  top: 50%; left: 0; right: 0; height: 1px;
+  background: var(--border);
+}
+.chat-date-divider span {
+  position: relative; background: var(--bg);
+  padding: 0 10px;
+}
+body.dark .chat-date-divider span { background: var(--bg); }
+
+/* Composer */
+.chat-composer {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  display: flex; gap: 8px; align-items: flex-end;
+  flex-shrink: 0;
+}
+.chat-input {
+  flex: 1; resize: none; max-height: 100px;
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 9px 14px;
+  font-size: 13px; font-family: 'DM Sans', sans-serif;
+  color: var(--text); background: var(--bg2);
+  outline: none; line-height: 1.4;
+  transition: border-color 0.15s;
+}
+.chat-input:focus { border-color: var(--purple); }
+.chat-send-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--purple); border: none;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(232,184,75,0.4);
+}
+.chat-send-btn:hover { transform: scale(1.08); }
+.chat-send-btn:active { transform: scale(0.93); }
+
+/* Client chat — full panel */
+#client-tab-messages {
+  display: none;
+  flex-direction: column;
+  height: calc(100vh - 200px);
+  min-height: 400px;
+}
+#client-tab-messages.chat-open { display: flex; }
+#client-tab-messages .chat-window {
+  flex: 1; border-radius: 16px;
+}
+
+/* Unread badge on nav tabs */
+.tab-unread-dot {
+  display: inline-block;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--pink);
+  margin-left: 5px; vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* Mobile chat tweaks */
+@media (max-width: 600px) {
+  #editor-tab-messages { height: calc(100vh - 160px); flex-direction: column; }
+  .chat-inbox { width: 100%; border-right: none; border-radius: 12px; max-height: 200px; }
+  .chat-window { border-radius: 12px; margin-top: 10px; }
+  #client-tab-messages { height: calc(100vh - 180px); }
+}
+
+body.dark .chat-inbox,
+body.dark .chat-window { background: rgba(26,26,26,0.85); }
+body.dark .chat-msg.theirs .chat-bubble { background: rgba(40,40,40,0.9); border-color: rgba(255,255,255,0.08); }
+body.dark .chat-input { background: rgba(30,30,30,0.9); border-color: rgba(255,255,255,0.1); color: var(--text); }
+body.dark .chat-inbox-item:hover,
+body.dark .chat-inbox-item.active { background: rgba(232,184,75,0.08); }
+
+
+
 .topbar-right { display: flex; align-items: center; gap: 10px; }
 .user-chip {
   display: flex; align-items: center; gap: 8px;
@@ -1681,6 +1895,7 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
       <div class="topbar-tab active" onclick="editorTab('queue', this)">Dashboard</div>
       <div class="topbar-tab" onclick="editorTab('alljobs', this)">All Jobs</div>
       <div class="topbar-tab" onclick="editorTab('clients', this)">Clients</div>
+      <div class="topbar-tab" onclick="editorTab('messages', this)" id="editor-msg-tab">Messages</div>
     </div>
     <div class="topbar-right">
       <div class="user-chip">
@@ -1796,6 +2011,38 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
       <p style="font-size:13px;color:var(--text3);margin-bottom:24px;">Click a client to see their full job history.</p>
       <div id="clients-list"><div class="empty-state"><div class="empty-icon">👥</div><p>No clients yet.</p></div></div>
     </div>
+
+    <!-- MESSAGES TAB -->
+    <div id="editor-tab-messages" class="chat-open">
+      <!-- Inbox sidebar -->
+      <div class="chat-inbox">
+        <div class="chat-inbox-header">💬 Messages</div>
+        <div class="chat-inbox-list" id="editor-inbox-list">
+          <div style="padding:20px;text-align:center;color:var(--text3);font-size:13px;">No conversations yet</div>
+        </div>
+      </div>
+      <!-- Chat window -->
+      <div class="chat-window" id="editor-chat-window">
+        <div class="chat-window-empty" id="editor-chat-empty">
+          <div class="empty-icon">💬</div>
+          <p style="font-size:13px;color:var(--text3);">Select a client to start chatting</p>
+        </div>
+        <div id="editor-chat-active" style="display:none;flex-direction:column;height:100%;">
+          <div class="chat-header">
+            <div class="chat-header-avatar" id="editor-chat-avatar">?</div>
+            <div>
+              <div class="chat-header-name" id="editor-chat-name">Client</div>
+              <div class="chat-header-status">Active now</div>
+            </div>
+          </div>
+          <div class="chat-messages" id="editor-chat-messages"></div>
+          <div class="chat-composer">
+            <textarea class="chat-input" id="editor-chat-input" placeholder="Message…" rows="1" onkeydown="editorChatKeydown(event)"></textarea>
+            <button class="chat-send-btn" onclick="editorSendMessage()">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- JOB DETAIL SHEET (mobile) -->
@@ -1826,6 +2073,11 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
   <div class="mob-tab" id="editor-mob-tab-clients" onclick="editorTabMobile('clients')">
     <div class="mob-tab-icon">👥</div>
     <span class="mob-tab-label">Clients</span>
+  </div>
+  <div class="mob-tab" id="editor-mob-tab-messages" onclick="editorTabMobile('messages')">
+    <div class="mob-tab-notif" id="editor-mob-msg-dot"></div>
+    <div class="mob-tab-icon">💬</div>
+    <span class="mob-tab-label">Messages</span>
   </div>
 </div>
 
@@ -1867,7 +2119,10 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
         <div class="client-tab" onclick="clientTab('request', this)">Request a clip</div>
         <div class="client-tab" onclick="clientTab('jobs', this)">My jobs</div>
         <div class="client-tab" onclick="clientTab('downloads', this)" id="downloads-tab">
-          Downloads <span class="notif-badge" id="notif-badge" style="display:none;">●</span>
+          Downloads <span class="tab-unread-dot" id="downloads-notif-dot" style="display:none;"></span>
+        </div>
+        <div class="client-tab" onclick="clientTab('messages', this)" id="client-msg-tab">
+          Messages <span class="tab-unread-dot" id="client-msg-dot" style="display:none;"></span>
         </div>
       </div>
     </div>
@@ -1985,6 +2240,24 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
       </div>
     </div>
 
+    <!-- MESSAGES TAB -->
+    <div id="client-tab-messages" class="chat-open">
+      <div class="chat-window" style="border-radius:16px;">
+        <div class="chat-header">
+          <div class="chat-header-avatar">K</div>
+          <div>
+            <div class="chat-header-name">Keem Studio</div>
+            <div class="chat-header-status">Your editor</div>
+          </div>
+        </div>
+        <div class="chat-messages" id="client-chat-messages"></div>
+        <div class="chat-composer">
+          <textarea class="chat-input" id="client-chat-input" placeholder="Message your editor…" rows="1" onkeydown="clientChatKeydown(event)"></textarea>
+          <button class="chat-send-btn" onclick="clientSendMessage()">➤</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ════════ MOBILE BOTTOM TAB BAR ════════ -->
@@ -2001,6 +2274,11 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
       <div class="mob-tab-notif" id="mob-notif-dot"></div>
       <div class="mob-tab-icon">⬇</div>
       <span class="mob-tab-label">Downloads</span>
+    </div>
+    <div class="mob-tab" id="mob-tab-messages" onclick="clientTab('messages', null)">
+      <div class="mob-tab-notif" id="mob-msg-dot"></div>
+      <div class="mob-tab-icon">💬</div>
+      <span class="mob-tab-label">Messages</span>
     </div>
   </div>
 
@@ -2403,6 +2681,7 @@ function loginAsClient(user) {
   showScreen('client');
   checkNotificationBadge(user.email);
   loadClientData(user.email);
+  checkClientMsgBadge();
   requestAnimationFrame(() => updateTabSlider('mobile-bottom-bar', 'mob-tab-overview'));
 
   // Upsert into profiles so editor can see this client even with no jobs
@@ -2493,23 +2772,26 @@ async function updateJob(id, updates) {
 function editorTab(tab, el) {
   document.querySelectorAll('.topbar-tab').forEach(t => t.classList.remove('active'));
   if (el) el.classList.add('active');
-  document.getElementById('editor-tab-queue').style.display = tab === 'queue' ? 'block' : 'none';
-  document.getElementById('editor-tab-alljobs').style.display = tab === 'alljobs' ? 'block' : 'none';
-  document.getElementById('editor-tab-clients').style.display = tab === 'clients' ? 'block' : 'none';
+  ['queue','alljobs','clients','messages'].forEach(t => {
+    const panel = document.getElementById('editor-tab-' + t);
+    if (panel) panel.style.display = t === tab ? (t === 'messages' ? 'flex' : 'block') : 'none';
+  });
   // Sync mobile bottom bar
-  ['queue','alljobs','clients'].forEach(t => {
+  ['queue','alljobs','clients','messages'].forEach(t => {
     const mt = document.getElementById('editor-mob-tab-' + t);
     if (mt) mt.classList.toggle('active', t === tab);
   });
   if (tab === 'clients') loadClientsPage();
   if (tab === 'alljobs') loadAllJobs();
+  if (tab === 'messages') loadEditorInbox();
 }
 
 function editorTabMobile(tab) {
-  document.getElementById('editor-tab-queue').style.display = tab === 'queue' ? 'block' : 'none';
-  document.getElementById('editor-tab-alljobs').style.display = tab === 'alljobs' ? 'block' : 'none';
-  document.getElementById('editor-tab-clients').style.display = tab === 'clients' ? 'block' : 'none';
-  ['queue','alljobs','clients'].forEach(t => {
+  ['queue','alljobs','clients','messages'].forEach(t => {
+    const panel = document.getElementById('editor-tab-' + t);
+    if (panel) panel.style.display = t === tab ? (t === 'messages' ? 'flex' : 'block') : 'none';
+  });
+  ['queue','alljobs','clients','messages'].forEach(t => {
     const mt = document.getElementById('editor-mob-tab-' + t);
     if (mt) mt.classList.toggle('active', t === tab);
   });
@@ -2589,6 +2871,9 @@ async function loadEditorData() {
   const hour = now.getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
   document.getElementById('editor-greeting').textContent = greeting;
+
+  // Check for unread messages badge
+  loadEditorInbox();
 
   const active = await getJobs({ status: ['queued', 'in_progress', 'awaiting_review'] });
   const cooking = await getJobs({ status: 'cooking' });
@@ -3415,12 +3700,13 @@ function clientTab(tab, el) {
   }
 
   // Show/hide content panels
-  ['overview','request','jobs','downloads'].forEach(t => {
-    document.getElementById('client-tab-' + t).style.display = t === tab ? 'block' : 'none';
+  ['overview','request','jobs','downloads','messages'].forEach(t => {
+    const panel = document.getElementById('client-tab-' + t);
+    if (panel) panel.style.display = t === tab ? (t === 'messages' ? 'flex' : 'block') : 'none';
   });
 
   // Sync mobile bottom bar
-  ['overview','jobs','downloads'].forEach(t => {
+  ['overview','jobs','downloads','messages'].forEach(t => {
     const mobTab = document.getElementById('mob-tab-' + t);
     if (mobTab) mobTab.classList.toggle('active', t === tab);
   });
@@ -3428,6 +3714,7 @@ function clientTab(tab, el) {
   if (tab === 'overview') loadClientOverview();
   if (tab === 'jobs') loadClientJobs();
   if (tab === 'downloads') loadClientDownloads();
+  if (tab === 'messages') { loadClientMessages(); clearClientMsgBadge(); }
   updateTabSlider('mobile-bottom-bar', 'mob-tab-' + tab);
 }
 
@@ -3764,6 +4051,253 @@ if (DEMO_MODE) {
     showToast('Demo mode — enter any email to try the client portal, or use editor@clipstudio.com for the editor dashboard', 'success');
   }, 500);
 }
+
+// ══════════════════════════════════════
+// CHAT / IM SYSTEM
+// ══════════════════════════════════════
+let activeChatClientEmail = null;
+let editorMsgSubscription = null;
+let clientMsgSubscription = null;
+
+function formatChatTime(ts) {
+  const d = new Date(ts);
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+function formatChatDate(ts) {
+  const d = new Date(ts);
+  const today = new Date();
+  const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+  if (d.toDateString() === today.toDateString()) return 'Today';
+  if (d.toDateString() === yesterday.toDateString()) return 'Yesterday';
+  return d.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' });
+}
+
+function renderChatMessages(messages, containerId, myEmail) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  if (!messages.length) {
+    container.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:13px;padding:24px;">No messages yet — say hello! 👋</div>';
+    return;
+  }
+  let html = '';
+  let lastDate = '';
+  messages.forEach(msg => {
+    const dateStr = formatChatDate(msg.created_at);
+    if (dateStr !== lastDate) {
+      html += `<div class="chat-date-divider"><span>${dateStr}</span></div>`;
+      lastDate = dateStr;
+    }
+    const mine = msg.sender_email === myEmail;
+    html += `<div class="chat-msg ${mine ? 'mine' : 'theirs'}">
+      <div class="chat-bubble">${escapeHtml(msg.body)}</div>
+      <div class="chat-time">${formatChatTime(msg.created_at)}</div>
+    </div>`;
+  });
+  container.innerHTML = html;
+  container.scrollTop = container.scrollHeight;
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+// ── EDITOR SIDE ──────────────────────────────────────────────
+async function loadEditorInbox() {
+  if (DEMO_MODE || !sb) return;
+  const { data: convos } = await sb.from('messages')
+    .select('sender_email, sender_role, body, created_at, read_by_editor')
+    .order('created_at', { ascending: false });
+  if (!convos) return;
+
+  // Group by client email
+  const byClient = {};
+  convos.forEach(m => {
+    const clientEmail = m.sender_role === 'client' ? m.sender_email : null;
+    if (!clientEmail) {
+      // find the client from the other side — for editor-sent, we stored nothing; skip
+      return;
+    }
+    if (!byClient[clientEmail]) byClient[clientEmail] = { latest: m, unread: 0 };
+    if (!m.read_by_editor && m.sender_role === 'client') byClient[clientEmail].unread++;
+  });
+
+  // Better: get distinct conversations by pairing
+  const { data: all } = await sb.from('messages')
+    .select('*').order('created_at', { ascending: false });
+  if (!all) return;
+
+  const clients = {};
+  all.forEach(m => {
+    const email = m.sender_role === 'client' ? m.sender_email : null;
+    if (!email) return;
+    if (!clients[email]) clients[email] = { latest: m, unread: 0 };
+    if (!m.read_by_editor && m.sender_role === 'client') clients[email].unread++;
+  });
+
+  const list = document.getElementById('editor-inbox-list');
+  if (!Object.keys(clients).length) {
+    list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px;">No conversations yet</div>';
+    return;
+  }
+  list.innerHTML = Object.entries(clients).map(([email, data]) => {
+    const initials = email.slice(0, 2).toUpperCase();
+    const preview = data.latest.body.slice(0, 40) + (data.latest.body.length > 40 ? '…' : '');
+    const isActive = email === activeChatClientEmail;
+    return `<div class="chat-inbox-item ${isActive ? 'active' : ''}" onclick="editorOpenChat('${email}')">
+      <div class="chat-inbox-avatar">${initials}</div>
+      <div class="chat-inbox-info">
+        <div class="chat-inbox-name">${email}</div>
+        <div class="chat-inbox-preview">${escapeHtml(preview)}</div>
+      </div>
+      ${data.unread ? `<div class="chat-inbox-unread">${data.unread}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  // Update topbar unread badge
+  const totalUnread = Object.values(clients).reduce((s, c) => s + c.unread, 0);
+  const msgTab = document.getElementById('editor-msg-tab');
+  if (msgTab) {
+    const dot = msgTab.querySelector('.tab-unread-dot') || (() => {
+      const d = document.createElement('span'); d.className = 'tab-unread-dot'; msgTab.appendChild(d); return d;
+    })();
+    dot.style.display = totalUnread ? 'inline-block' : 'none';
+  }
+  const mobDot = document.getElementById('editor-mob-msg-dot');
+  if (mobDot) mobDot.style.display = totalUnread ? 'block' : 'none';
+}
+
+async function editorOpenChat(clientEmail) {
+  activeChatClientEmail = clientEmail;
+  const window2 = document.getElementById('editor-chat-window');
+  document.getElementById('editor-chat-empty').style.display = 'none';
+  const active = document.getElementById('editor-chat-active');
+  active.style.display = 'flex';
+  document.getElementById('editor-chat-avatar').textContent = clientEmail.slice(0,2).toUpperCase();
+  document.getElementById('editor-chat-name').textContent = clientEmail;
+
+  // Mark active in inbox
+  document.querySelectorAll('.chat-inbox-item').forEach(el => {
+    el.classList.toggle('active', el.onclick?.toString().includes(clientEmail));
+  });
+
+  await editorLoadMessages(clientEmail);
+
+  // Mark as read
+  if (!DEMO_MODE && sb) {
+    await sb.from('messages').update({ read_by_editor: true })
+      .eq('sender_email', clientEmail).eq('sender_role', 'client');
+    loadEditorInbox();
+  }
+
+  // Realtime subscription
+  if (editorMsgSubscription) sb.removeChannel(editorMsgSubscription);
+  editorMsgSubscription = sb.channel('editor-chat-' + clientEmail)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+      const m = payload.new;
+      if (m.sender_email === clientEmail || (m.sender_email === CONFIG.editorEmail && m.sender_role === 'editor')) {
+        editorLoadMessages(clientEmail);
+        loadEditorInbox();
+      }
+    }).subscribe();
+}
+
+async function editorLoadMessages(clientEmail) {
+  if (!sb) return;
+  const { data } = await sb.from('messages')
+    .select('*')
+    .or(`and(sender_email.eq.${clientEmail},sender_role.eq.client),and(sender_email.eq.${CONFIG.editorEmail},sender_role.eq.editor)`)
+    .order('created_at', { ascending: true });
+  renderChatMessages(data || [], 'editor-chat-messages', CONFIG.editorEmail);
+}
+
+async function editorSendMessage() {
+  if (!activeChatClientEmail || !sb) return;
+  const input = document.getElementById('editor-chat-input');
+  const body = input.value.trim();
+  if (!body) return;
+  input.value = '';
+  input.style.height = 'auto';
+  await sb.from('messages').insert({
+    sender_email: CONFIG.editorEmail,
+    sender_role: 'editor',
+    body,
+    read_by_client: false,
+    read_by_editor: true
+  });
+  editorLoadMessages(activeChatClientEmail);
+}
+
+function editorChatKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); editorSendMessage(); }
+}
+
+// ── CLIENT SIDE ──────────────────────────────────────────────
+async function loadClientMessages() {
+  if (!currentUser || !sb) return;
+  const { data } = await sb.from('messages')
+    .select('*')
+    .or(`and(sender_email.eq.${currentUser.email},sender_role.eq.client),and(sender_email.eq.${CONFIG.editorEmail},sender_role.eq.editor)`)
+    .order('created_at', { ascending: true });
+  renderChatMessages(data || [], 'client-chat-messages', currentUser.email);
+
+  // Mark read
+  await sb.from('messages').update({ read_by_client: true })
+    .eq('sender_role', 'editor').eq('read_by_client', false);
+
+  // Realtime
+  if (clientMsgSubscription) sb.removeChannel(clientMsgSubscription);
+  clientMsgSubscription = sb.channel('client-chat-' + currentUser.email)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => {
+      loadClientMessages();
+    }).subscribe();
+}
+
+async function clientSendMessage() {
+  if (!currentUser || !sb) return;
+  const input = document.getElementById('client-chat-input');
+  const body = input.value.trim();
+  if (!body) return;
+  input.value = '';
+  await sb.from('messages').insert({
+    sender_email: currentUser.email,
+    sender_role: 'client',
+    body,
+    read_by_editor: false,
+    read_by_client: true
+  });
+  loadClientMessages();
+}
+
+function clientChatKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); clientSendMessage(); }
+}
+
+function clearClientMsgBadge() {
+  const dot = document.getElementById('client-msg-dot');
+  if (dot) dot.style.display = 'none';
+  const mobDot = document.getElementById('mob-msg-dot');
+  if (mobDot) mobDot.style.display = 'none';
+}
+
+async function checkClientMsgBadge() {
+  if (!currentUser || !sb) return;
+  const { count } = await sb.from('messages')
+    .select('id', { count: 'exact', head: true })
+    .eq('sender_role', 'editor')
+    .eq('read_by_client', false);
+  const dot = document.getElementById('client-msg-dot');
+  if (dot) dot.style.display = count ? 'block' : 'none';
+  const mobDot = document.getElementById('mob-msg-dot');
+  if (mobDot) mobDot.style.display = count ? 'block' : 'none';
+}
+
+// Auto-size chat textarea
+document.addEventListener('input', e => {
+  if (e.target.classList.contains('chat-input')) {
+    e.target.style.height = 'auto';
+    e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px';
+  }
+});
 </script>
 
 <!-- EmailJS (load only when configured) -->
