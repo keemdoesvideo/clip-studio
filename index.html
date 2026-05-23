@@ -291,8 +291,21 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
   box-shadow: 0 4px 14px rgba(108,99,255,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
 }
 .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(108,99,255,0.45); }
-.btn-primary:active { transform: scale(0.98); }
+.btn-primary:active { transform: scale(0.97); }
 .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* ── Press-down scale on all interactive buttons ── */
+.btn-accent:active,
+.btn-submit:active,
+.btn-deliver:active,
+.btn-ghost:active,
+.btn-expand-full:active,
+.btn-expand-action:active,
+.btn-download:active,
+.btn-review-link:active {
+  transform: scale(0.96) !important;
+  transition: transform 0.07s ease !important;
+}
 
 .login-divider { text-align: center; margin: 20px 0; font-size: 12px; color: var(--text3); }
 .login-switch { text-align: center; font-size: 13px; color: var(--text2); margin-top: 20px; }
@@ -1184,16 +1197,17 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
 
 /* Job cards — stagger slide up */
 @keyframes cardIn {
-  from { opacity: 0; transform: translateY(18px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  0%   { opacity: 0; transform: translateY(22px) scale(0.97); }
+  60%  { opacity: 1; transform: translateY(-3px) scale(1.005); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 .job-card-stagger {
-  animation: cardIn 0.4s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+  animation: cardIn 0.5s cubic-bezier(0.34, 1.4, 0.64, 1) both;
 }
 
 /* Download cards — same as job cards */
 .download-card {
-  animation: cardIn 0.4s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+  animation: cardIn 0.5s cubic-bezier(0.34, 1.4, 0.64, 1) both;
 }
 
 /* Request card (client form) — fades in with scale */
@@ -1429,9 +1443,6 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
   #screen-editor .main-content { padding: 16px 14px 90px; }
   #screen-editor .stats-row { grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 20px; border-radius: 16px; }
   #screen-editor .stat-card + .stat-card { border-left: none; border-top: 1px solid rgba(255,255,255,0.55); }
-  #screen-editor .stats-row .stat-card:nth-child(2) { border-left: 1px solid rgba(255,255,255,0.55); border-top: none; }
-  #screen-editor .stats-row .stat-card:nth-child(4) { border-left: 1px solid rgba(255,255,255,0.55); }
-  #screen-editor .stat-card.alltime { display: none; }
   #screen-editor .stat-card { padding: 14px; }
   #screen-editor .stat-num { font-size: 24px; }
   #screen-editor .stat-label { font-size: 10px; }
@@ -1445,6 +1456,7 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
   #screen-editor .job-pills { gap: 5px; }
   #screen-editor .job-pill { font-size: 10px; padding: 2px 7px; }
   #screen-editor .badge { font-size: 10px; padding: 3px 9px; }
+  #editor-mobile-bottom-bar { display: flex; }
   #job-detail-sheet { display: flex; }
 }
 
@@ -1531,9 +1543,6 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
   z-index: 150;
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
-@media (max-width: 600px) {
-  #editor-mobile-bottom-bar.screen-active { display: flex; }
-}
 
 /* Bottom tab bar */
 #mobile-bottom-bar {
@@ -1577,6 +1586,18 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
   display: none;
 }
 .mob-tab-notif.visible { display: block; }
+
+/* Sliding gold indicator */
+.mob-tab-slider {
+  position: absolute;
+  top: 0; height: 2.5px;
+  background: var(--gold);
+  border-radius: 0 0 3px 3px;
+  transition: left 0.35s cubic-bezier(0.34, 1.4, 0.64, 1),
+              width 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+  pointer-events: none;
+  z-index: 1;
+}
 </style>
 </head>
 <body>
@@ -1768,6 +1789,18 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
     </div>
   </div>
 
+  <!-- EDITOR MOBILE BOTTOM BAR -->
+  <div id="editor-mobile-bottom-bar">
+    <div class="mob-tab active" id="editor-mob-tab-queue" onclick="editorTabMobile('queue')">
+      <div class="mob-tab-icon">🎬</div>
+      <span class="mob-tab-label">Jobs</span>
+    </div>
+    <div class="mob-tab" id="editor-mob-tab-clients" onclick="editorTabMobile('clients')">
+      <div class="mob-tab-icon">👥</div>
+      <span class="mob-tab-label">Clients</span>
+    </div>
+  </div>
+
   <!-- JOB DETAIL SHEET (mobile) -->
   <div id="job-detail-sheet">
     <div class="job-sheet-backdrop" onclick="closeJobSheet()"></div>
@@ -1781,22 +1814,6 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
     </div>
   </div>
 
-</div>
-
-<!-- ════════ EDITOR MOBILE BOTTOM BAR (outside screen so fixed works) ════════ -->
-<div id="editor-mobile-bottom-bar">
-  <div class="mob-tab active" id="editor-mob-tab-queue" onclick="editorTabMobile('queue')">
-    <div class="mob-tab-icon">🏠</div>
-    <span class="mob-tab-label">Dashboard</span>
-  </div>
-  <div class="mob-tab" id="editor-mob-tab-alljobs" onclick="editorTabMobile('alljobs')">
-    <div class="mob-tab-icon">🎬</div>
-    <span class="mob-tab-label">All Jobs</span>
-  </div>
-  <div class="mob-tab" id="editor-mob-tab-clients" onclick="editorTabMobile('clients')">
-    <div class="mob-tab-icon">👥</div>
-    <span class="mob-tab-label">Clients</span>
-  </div>
 </div>
 
 <!-- ════════ CLIENT PORTAL ════════ -->
@@ -2264,9 +2281,6 @@ const DEMO_CLIENT_EMAIL = 'ailinicia@email.com';
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
-  // Show editor bottom bar only on editor screen (media query handles <=600px)
-  const bar = document.getElementById('editor-mobile-bottom-bar');
-  if (bar) bar.classList.toggle('screen-active', id === 'editor');
 }
 
 function showEditorLogin() {
@@ -2348,6 +2362,7 @@ function loginAsEditor(user) {
   document.getElementById('editor-name-display').textContent = name;
   showScreen('editor');
   loadEditorData();
+  requestAnimationFrame(() => updateTabSlider('editor-mobile-bottom-bar', 'editor-mob-tab-queue'));
 }
 
 function loginAsClient(user) {
@@ -2373,6 +2388,7 @@ function loginAsClient(user) {
   showScreen('client');
   checkNotificationBadge(user.email);
   loadClientData(user.email);
+  requestAnimationFrame(() => updateTabSlider('mobile-bottom-bar', 'mob-tab-overview'));
 
   // Upsert into profiles so editor can see this client even with no jobs
   if (!DEMO_MODE && sb && user.email) {
@@ -2466,9 +2482,9 @@ function editorTab(tab, el) {
   document.getElementById('editor-tab-alljobs').style.display = tab === 'alljobs' ? 'block' : 'none';
   document.getElementById('editor-tab-clients').style.display = tab === 'clients' ? 'block' : 'none';
   // Sync mobile bottom bar
-  ['queue','alljobs','clients'].forEach(t => {
+  ['queue','clients'].forEach(t => {
     const mt = document.getElementById('editor-mob-tab-' + t);
-    if (mt) mt.classList.toggle('active', t === tab);
+    if (mt) mt.classList.toggle('active', t === tab || (t === 'queue' && tab === 'alljobs'));
   });
   if (tab === 'clients') loadClientsPage();
   if (tab === 'alljobs') loadAllJobs();
@@ -2478,14 +2494,15 @@ function editorTabMobile(tab) {
   document.getElementById('editor-tab-queue').style.display = tab === 'queue' ? 'block' : 'none';
   document.getElementById('editor-tab-alljobs').style.display = tab === 'alljobs' ? 'block' : 'none';
   document.getElementById('editor-tab-clients').style.display = tab === 'clients' ? 'block' : 'none';
-  ['queue','alljobs','clients'].forEach(t => {
+  ['queue','clients'].forEach(t => {
     const mt = document.getElementById('editor-mob-tab-' + t);
-    if (mt) mt.classList.toggle('active', t === tab);
+    if (mt) mt.classList.toggle('active', t === tab || (t === 'queue' && tab === 'alljobs'));
   });
   document.querySelectorAll('.topbar-tab').forEach(t => {
     const oc = t.getAttribute('onclick') || '';
     t.classList.toggle('active', oc.includes("'" + tab + "'"));
   });
+  updateTabSlider('editor-mobile-bottom-bar', 'editor-mob-tab-' + (tab === 'alljobs' ? 'queue' : tab));
   if (tab === 'clients') loadClientsPage();
   if (tab === 'alljobs') loadAllJobs();
 }
@@ -2746,21 +2763,36 @@ async function toggleClientBanner(id, email) {
 }
 
 // Count-up animation for stat numbers
+// ── Sliding tab indicator ─────────────────────────────────────
+function updateTabSlider(barId, activeTabId) {
+  const bar = document.getElementById(barId);
+  const activeTab = document.getElementById(activeTabId);
+  if (!bar || !activeTab) return;
+  let slider = bar.querySelector('.mob-tab-slider');
+  if (!slider) {
+    slider = document.createElement('div');
+    slider.className = 'mob-tab-slider';
+    bar.appendChild(slider);
+  }
+  const barRect = bar.getBoundingClientRect();
+  const tabRect = activeTab.getBoundingClientRect();
+  slider.style.left  = (tabRect.left - barRect.left) + 'px';
+  slider.style.width = tabRect.width + 'px';
+}
+
 function animateCount(el, target) {
   if (target === '—' || isNaN(target)) { el.textContent = target; return; }
   const num = parseInt(target);
   if (num === 0) { el.textContent = 0; return; }
-  const duration = 600;
-  const steps = 20;
-  const increment = num / steps;
-  let current = 0; let step = 0;
-  const timer = setInterval(() => {
-    step++;
-    current = Math.min(Math.round(increment * step), num);
-    el.textContent = current;
-    if (step >= steps) clearInterval(timer);
-
-  }, duration / steps);
+  const duration = 750;
+  const start = performance.now();
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  function tick(now) {
+    const t = Math.min((now - start) / duration, 1);
+    el.textContent = Math.round(easeOut(t) * num);
+    if (t < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
 }
 
 function renderEditorJobs(jobs) {
@@ -2798,7 +2830,7 @@ function renderEditorJobs(jobs) {
 
   list.innerHTML = html;
   list.querySelectorAll('.job-card-stagger').forEach((el, i) => {
-    el.style.animationDelay = `${i * 60}ms`;
+    el.style.animationDelay = `${i * 45}ms`;
   });
 
   // Show/update See all button
@@ -2887,7 +2919,7 @@ function renderAllJobs() {
 
   list.innerHTML = html || '<div class="empty-state"><div class="empty-icon">📋</div><p>No jobs match your filters.</p></div>';
   list.querySelectorAll('.job-card-stagger').forEach((el, i) => {
-    el.style.animationDelay = `${i * 60}ms`;
+    el.style.animationDelay = `${i * 45}ms`;
   });
 }
 
@@ -3015,6 +3047,12 @@ async function changeStatus(id, newStatus) {
 }
 
 function toggleJobCard(id) {
+  // On mobile, open the detail sheet instead of expanding inline
+  if (window.innerWidth <= 600) {
+    const job = allJobs.find(j => j.id == id);
+    if (job) openJobSheet(job);
+    return;
+  }
   const body = document.getElementById('jobbody-' + id);
   const card = document.getElementById('jobcard-' + id);
   const arrow = card.querySelector('.expand-arrow');
@@ -3378,6 +3416,7 @@ function clientTab(tab, el) {
   if (tab === 'overview') loadClientOverview();
   if (tab === 'jobs') loadClientJobs();
   if (tab === 'downloads') loadClientDownloads();
+  updateTabSlider('mobile-bottom-bar', 'mob-tab-' + tab);
 }
 
 async function loadClientData(email) {
