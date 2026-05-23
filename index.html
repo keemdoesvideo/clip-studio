@@ -1919,14 +1919,13 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
   display: none;
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  background: rgba(255,255,255,0.88);
+  background: rgba(255,255,255,0.92);
   backdrop-filter: blur(28px) saturate(200%);
   -webkit-backdrop-filter: blur(28px) saturate(200%);
   border-top: 1px solid rgba(0,0,0,0.07);
-  box-shadow: 0 -1px 0 rgba(0,0,0,0.04);
   z-index: 150;
-  padding-top: 8px;
-  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  padding-top: 10px;
+  padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
   align-items: flex-start;
 }
 
@@ -1935,20 +1934,19 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
   display: none;
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  background: rgba(255,255,255,0.88);
+  background: rgba(255,255,255,0.92);
   backdrop-filter: blur(28px) saturate(200%);
   -webkit-backdrop-filter: blur(28px) saturate(200%);
   border-top: 1px solid rgba(0,0,0,0.07);
-  box-shadow: 0 -1px 0 rgba(0,0,0,0.04);
   z-index: 150;
-  padding-top: 8px;
-  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  padding-top: 10px;
+  padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
   align-items: flex-start;
 }
 
 body.dark #editor-mobile-bottom-bar,
 body.dark #mobile-bottom-bar {
-  background: rgba(14,14,14,0.92);
+  background: rgba(14,14,14,0.95);
   border-top-color: rgba(255,255,255,0.06);
 }
 
@@ -2760,7 +2758,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         <div class="settings-section">
           <div class="settings-row">
             <div><div class="settings-row-label">Change password</div><div class="settings-row-sub">Send a reset link to your email</div></div>
-            <button class="btn-ghost" style="font-size:11px;padding:4px 10px;flex-shrink:0;border-radius:8px;" onclick="sendPasswordReset()">Send link</button>
+            <button class="btn-ghost" style="font-size:11px;padding:5px 12px;flex-shrink:0;border-radius:8px;width:fit-content;" onclick="sendPasswordReset()">Send link</button>
           </div>
         </div>
       </div>
@@ -2781,7 +2779,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
               <div class="settings-row-label">Discord</div>
               <div class="settings-row-sub" id="editor-discord-sub">Not connected</div>
             </div>
-            <button class="btn-ghost" style="font-size:11px;padding:4px 10px;flex-shrink:0;border-radius:8px;" onclick="connectDiscord('editor')">Connect</button>
+            <button class="btn-ghost" style="font-size:11px;padding:5px 12px;flex-shrink:0;border-radius:8px;width:fit-content;" onclick="connectDiscord('editor')">Connect</button>
           </div>
         </div>
       </div>
@@ -2937,7 +2935,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         <div class="settings-section">
           <div class="settings-row">
             <div><div class="settings-row-label">Change password</div><div class="settings-row-sub">Send a reset link to your email</div></div>
-            <button class="btn-ghost" style="font-size:11px;padding:4px 10px;flex-shrink:0;border-radius:8px;" onclick="sendPasswordReset()">Send link</button>
+            <button class="btn-ghost" style="font-size:11px;padding:5px 12px;flex-shrink:0;border-radius:8px;width:fit-content;" onclick="sendPasswordReset()">Send link</button>
           </div>
         </div>
       </div>
@@ -2958,7 +2956,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
               <div class="settings-row-label">Discord</div>
               <div class="settings-row-sub" id="client-discord-sub">Not connected</div>
             </div>
-            <button class="btn-ghost" style="font-size:11px;padding:4px 10px;flex-shrink:0;border-radius:8px;" onclick="connectDiscord('client')">Connect</button>
+            <button class="btn-ghost" style="font-size:11px;padding:5px 12px;flex-shrink:0;border-radius:8px;width:fit-content;" onclick="connectDiscord('client')">Connect</button>
           </div>
         </div>
       </div>
@@ -3713,6 +3711,7 @@ async function loadClientsPage() {
       const { data: profiles } = await sb.from('profiles').select('email, display_name, contact, avatar_url');
       if (profiles) {
         profiles.forEach(p => {
+          if (p.email === CONFIG.editorEmail) return; // never show editor as a client
           if (!clientMap[p.email]) clientMap[p.email] = { name: p.display_name || p.email.split('@')[0], email: p.email, jobs: [] };
           // Enrich with profile data
           if (p.display_name) clientMap[p.email].name = p.display_name;
@@ -3890,7 +3889,7 @@ async function loadEditorProfile() {
   if (DEMO_MODE || !sb) return;
   const { data } = await sb.from('profiles').select('*').eq('email', CONFIG.editorEmail).single();
   if (!data) return;
-  document.getElementById('ep-name').value = data.name || '';
+  document.getElementById('ep-name').value = data.display_name || '';
   document.getElementById('ep-bio').value = data.bio || '';
   document.getElementById('ep-contact').value = data.contact || '';
   document.getElementById('ep-instagram').value = data.instagram || '';
@@ -3907,7 +3906,7 @@ async function loadClientProfile() {
   if (!currentUser || !sb) return;
   const { data } = await sb.from('profiles').select('*').eq('email', currentUser.email).single();
   if (!data) return;
-  document.getElementById('cp-name').value = data.name || '';
+  document.getElementById('cp-name').value = data.display_name || '';
   document.getElementById('cp-bio').value = data.bio || '';
   document.getElementById('cp-contact').value = data.contact || '';
   document.getElementById('cp-instagram').value = data.instagram || '';
@@ -3927,7 +3926,7 @@ async function saveDrawerProfile(side) {
   if (!email) return;
   const payload = {
     email,
-    name: document.getElementById(prefix + '-name').value.trim(),
+    display_name: document.getElementById(prefix + '-name').value.trim(),
     bio: document.getElementById(prefix + '-bio').value.trim(),
     contact: document.getElementById(prefix + '-contact').value.trim(),
     instagram: document.getElementById(prefix + '-instagram').value.trim(),
@@ -3946,8 +3945,8 @@ async function saveDrawerProfile(side) {
     }
   }
   showToast('Profile saved! ✓', 'success');
-  if (payload.name) {
-    document.getElementById('drawer-' + side + '-name').textContent = payload.name;
+  if (payload.display_name) {
+    document.getElementById('drawer-' + side + '-name').textContent = payload.display_name;
   }
 }
 
