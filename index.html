@@ -1448,6 +1448,9 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
   #screen-editor .main-content { padding: 16px 14px 90px; }
   #screen-editor .stats-row { grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 20px; border-radius: 16px; }
   #screen-editor .stat-card + .stat-card { border-left: none; border-top: 1px solid rgba(255,255,255,0.55); }
+  #screen-editor .stats-row .stat-card:nth-child(2) { border-left: 1px solid rgba(255,255,255,0.55); border-top: none; }
+  #screen-editor .stats-row .stat-card:nth-child(4) { border-left: 1px solid rgba(255,255,255,0.55); }
+  #screen-editor .stat-card.alltime { display: none; }
   #screen-editor .stat-card { padding: 14px; }
   #screen-editor .stat-num { font-size: 24px; }
   #screen-editor .stat-label { font-size: 10px; }
@@ -1461,7 +1464,7 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
   #screen-editor .job-pills { gap: 5px; }
   #screen-editor .job-pill { font-size: 10px; padding: 2px 7px; }
   #screen-editor .badge { font-size: 10px; padding: 3px 9px; }
-  #editor-mobile-bottom-bar { display: flex; }
+  #editor-mobile-bottom-bar.screen-active { display: flex; }
   #job-detail-sheet { display: flex; }
 }
 
@@ -1794,18 +1797,6 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
     </div>
   </div>
 
-  <!-- EDITOR MOBILE BOTTOM BAR -->
-  <div id="editor-mobile-bottom-bar">
-    <div class="mob-tab active" id="editor-mob-tab-queue" onclick="editorTabMobile('queue')">
-      <div class="mob-tab-icon">🎬</div>
-      <span class="mob-tab-label">Jobs</span>
-    </div>
-    <div class="mob-tab" id="editor-mob-tab-clients" onclick="editorTabMobile('clients')">
-      <div class="mob-tab-icon">👥</div>
-      <span class="mob-tab-label">Clients</span>
-    </div>
-  </div>
-
   <!-- JOB DETAIL SHEET (mobile) -->
   <div id="job-detail-sheet">
     <div class="job-sheet-backdrop" onclick="closeJobSheet()"></div>
@@ -1819,6 +1810,22 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
     </div>
   </div>
 
+</div>
+
+<!-- ════════ EDITOR MOBILE BOTTOM BAR ════════ -->
+<div id="editor-mobile-bottom-bar">
+  <div class="mob-tab active" id="editor-mob-tab-queue" onclick="editorTabMobile('queue')">
+    <div class="mob-tab-icon">🏠</div>
+    <span class="mob-tab-label">Dashboard</span>
+  </div>
+  <div class="mob-tab" id="editor-mob-tab-alljobs" onclick="editorTabMobile('alljobs')">
+    <div class="mob-tab-icon">🎬</div>
+    <span class="mob-tab-label">All Jobs</span>
+  </div>
+  <div class="mob-tab" id="editor-mob-tab-clients" onclick="editorTabMobile('clients')">
+    <div class="mob-tab-icon">👥</div>
+    <span class="mob-tab-label">Clients</span>
+  </div>
 </div>
 
 <!-- ════════ CLIENT PORTAL ════════ -->
@@ -2286,6 +2293,8 @@ const DEMO_CLIENT_EMAIL = 'ailinicia@email.com';
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
+  const bar = document.getElementById('editor-mobile-bottom-bar');
+  if (bar) bar.classList.toggle('screen-active', id === 'editor');
 }
 
 function showEditorLogin() {
@@ -2487,9 +2496,9 @@ function editorTab(tab, el) {
   document.getElementById('editor-tab-alljobs').style.display = tab === 'alljobs' ? 'block' : 'none';
   document.getElementById('editor-tab-clients').style.display = tab === 'clients' ? 'block' : 'none';
   // Sync mobile bottom bar
-  ['queue','clients'].forEach(t => {
+  ['queue','alljobs','clients'].forEach(t => {
     const mt = document.getElementById('editor-mob-tab-' + t);
-    if (mt) mt.classList.toggle('active', t === tab || (t === 'queue' && tab === 'alljobs'));
+    if (mt) mt.classList.toggle('active', t === tab);
   });
   if (tab === 'clients') loadClientsPage();
   if (tab === 'alljobs') loadAllJobs();
@@ -2499,15 +2508,15 @@ function editorTabMobile(tab) {
   document.getElementById('editor-tab-queue').style.display = tab === 'queue' ? 'block' : 'none';
   document.getElementById('editor-tab-alljobs').style.display = tab === 'alljobs' ? 'block' : 'none';
   document.getElementById('editor-tab-clients').style.display = tab === 'clients' ? 'block' : 'none';
-  ['queue','clients'].forEach(t => {
+  ['queue','alljobs','clients'].forEach(t => {
     const mt = document.getElementById('editor-mob-tab-' + t);
-    if (mt) mt.classList.toggle('active', t === tab || (t === 'queue' && tab === 'alljobs'));
+    if (mt) mt.classList.toggle('active', t === tab);
   });
   document.querySelectorAll('.topbar-tab').forEach(t => {
     const oc = t.getAttribute('onclick') || '';
     t.classList.toggle('active', oc.includes("'" + tab + "'"));
   });
-  updateTabSlider('editor-mobile-bottom-bar', 'editor-mob-tab-' + (tab === 'alljobs' ? 'queue' : tab));
+  updateTabSlider('editor-mobile-bottom-bar', 'editor-mob-tab-' + tab);
   if (tab === 'clients') loadClientsPage();
   if (tab === 'alljobs') loadAllJobs();
 }
@@ -3052,12 +3061,6 @@ async function changeStatus(id, newStatus) {
 }
 
 function toggleJobCard(id) {
-  // On mobile, open the detail sheet instead of expanding inline
-  if (window.innerWidth <= 600) {
-    const job = allJobs.find(j => j.id == id);
-    if (job) openJobSheet(job);
-    return;
-  }
   const body = document.getElementById('jobbody-' + id);
   const card = document.getElementById('jobcard-' + id);
   const arrow = card.querySelector('.expand-arrow');
