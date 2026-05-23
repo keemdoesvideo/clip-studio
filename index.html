@@ -563,6 +563,170 @@ body.dark .chat-input { background: rgba(30,30,30,0.9); border-color: rgba(255,2
 body.dark .chat-inbox-item:hover,
 body.dark .chat-inbox-item.active { background: rgba(232,184,75,0.08); }
 
+/* ════════════════════════════════════
+   CLIENT ASSETS SYSTEM
+════════════════════════════════════ */
+/* Assets button on client card */
+.client-assets-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 16px; flex-shrink: 0;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  position: relative;
+}
+.client-assets-btn:hover { transform: scale(1.12); box-shadow: 0 4px 14px rgba(232,184,75,0.3); }
+.client-assets-btn:active { transform: scale(0.94); }
+.client-assets-btn .assets-count {
+  position: absolute; top: -3px; right: -3px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--purple); color: #6b4900;
+  font-size: 9px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid var(--bg);
+}
+
+/* Asset viewer overlay */
+#asset-viewer {
+  display: none;
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  align-items: flex-start; justify-content: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+#asset-viewer.open { display: flex; }
+
+.asset-panel {
+  background: var(--bg);
+  border-radius: 20px;
+  width: 100%; max-width: 780px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+  overflow: hidden;
+  animation: cardIn 0.35s cubic-bezier(0.34,1.3,0.64,1) both;
+}
+.asset-panel-header {
+  padding: 20px 24px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.asset-panel-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: linear-gradient(135deg, #e8b84b, #f5d478);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px; font-weight: 700; color: #6b4900;
+}
+.asset-panel-title { flex: 1; }
+.asset-panel-title h2 { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; margin: 0 0 2px; }
+.asset-panel-title p { font-size: 12px; color: var(--text3); margin: 0; }
+.asset-panel-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: none; background: rgba(0,0,0,0.06);
+  cursor: pointer; font-size: 16px; color: var(--text2);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.asset-panel-close:hover { background: rgba(0,0,0,0.12); }
+
+/* Folder tabs */
+.asset-folders {
+  display: flex; gap: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  overflow-x: auto;
+}
+.asset-folder-tab {
+  padding: 12px 16px;
+  font-size: 12px; font-weight: 600;
+  color: var(--text3); cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+  display: flex; align-items: center; gap: 6px;
+}
+.asset-folder-tab:hover { color: var(--text); }
+.asset-folder-tab.active { color: var(--purple); border-bottom-color: var(--purple); }
+.asset-folder-tab .folder-count {
+  background: rgba(0,0,0,0.06); border-radius: 20px;
+  padding: 1px 6px; font-size: 10px;
+}
+.asset-folder-tab.active .folder-count { background: var(--purple-dim); color: var(--purple); }
+
+/* Asset grid */
+.asset-grid {
+  padding: 20px 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  min-height: 120px;
+}
+.asset-item {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  animation: cardIn 0.3s cubic-bezier(0.34,1.3,0.64,1) both;
+}
+.asset-item:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+.asset-icon { font-size: 28px; }
+.asset-name {
+  font-size: 11px; color: var(--text2); text-align: center;
+  word-break: break-all; line-height: 1.3;
+  max-width: 100%; overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.asset-size { font-size: 10px; color: var(--text3); }
+.asset-empty {
+  grid-column: 1/-1; text-align: center;
+  padding: 40px 20px; color: var(--text3); font-size: 13px;
+}
+
+/* Drop zone on client portal */
+.asset-dropzone {
+  border: 2px dashed var(--border2);
+  border-radius: 16px;
+  padding: 32px 20px;
+  text-align: center;
+  transition: border-color 0.2s, background 0.2s;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+.asset-dropzone.dragover {
+  border-color: var(--purple);
+  background: var(--purple-dim);
+}
+.asset-dropzone-icon { font-size: 32px; margin-bottom: 8px; }
+.asset-dropzone p { font-size: 13px; color: var(--text2); margin: 0 0 6px; }
+.asset-dropzone small { font-size: 11px; color: var(--text3); }
+.asset-upload-progress {
+  margin-top: 12px; display: none;
+}
+.asset-upload-bar {
+  height: 4px; background: var(--border);
+  border-radius: 2px; overflow: hidden; margin-bottom: 6px;
+}
+.asset-upload-bar-fill {
+  height: 100%; background: var(--purple);
+  border-radius: 2px; width: 0%;
+  transition: width 0.3s;
+}
+.asset-upload-label { font-size: 11px; color: var(--text3); }
+
+body.dark .asset-panel { background: #111; }
+body.dark .asset-item { background: rgba(30,30,30,0.9); }
+body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); }
+
+
+
 
 
 .topbar-right { display: flex; align-items: center; gap: 10px; }
@@ -2122,6 +2286,7 @@ body.dark .chat-inbox-item.active { background: rgba(232,184,75,0.08); }
         <div class="client-tab" onclick="clientTab('messages', this)" id="client-msg-tab">
           Messages <span class="tab-unread-dot" id="client-msg-dot" style="display:none;"></span>
         </div>
+        <div class="client-tab" onclick="clientTab('assets', this)">📁 Files</div>
       </div>
     </div>
   </div>
@@ -2256,6 +2421,25 @@ body.dark .chat-inbox-item.active { background: rgba(232,184,75,0.08); }
       </div>
     </div>
 
+    <!-- ASSETS TAB -->
+    <div id="client-tab-assets" style="display:none;">
+      <h2 style="font-family:'Poppins',sans-serif;font-size:18px;font-weight:700;margin-bottom:6px;">Send files to Keem</h2>
+      <p style="font-size:13px;color:var(--text3);margin-bottom:20px;">Drop footage, music, logos or references — they'll be organised automatically.</p>
+
+      <div class="asset-dropzone" id="client-dropzone" onclick="document.getElementById('asset-file-input').click()">
+        <div class="asset-dropzone-icon">📁</div>
+        <p>Drop files here or tap to browse</p>
+        <small>Video, audio, images, documents — any file type accepted</small>
+        <div class="asset-upload-progress" id="asset-upload-progress">
+          <div class="asset-upload-bar"><div class="asset-upload-bar-fill" id="asset-bar-fill"></div></div>
+          <div class="asset-upload-label" id="asset-upload-label">Uploading…</div>
+        </div>
+      </div>
+      <input type="file" id="asset-file-input" multiple style="display:none;" onchange="handleAssetFiles(this.files)">
+
+      <div id="client-assets-list" style="margin-top:8px;"></div>
+    </div>
+
   </div>
 
   <!-- ════════ MOBILE BOTTOM TAB BAR ════════ -->
@@ -2278,8 +2462,30 @@ body.dark .chat-inbox-item.active { background: rgba(232,184,75,0.08); }
       <div class="mob-tab-icon">💬</div>
       <span class="mob-tab-label">Messages</span>
     </div>
+    <div class="mob-tab" id="mob-tab-assets" onclick="clientTab('assets', null)">
+      <div class="mob-tab-icon">📁</div>
+      <span class="mob-tab-label">Files</span>
+    </div>
   </div>
 
+</div>
+
+<!-- ════════ ASSET VIEWER (editor) ════════ -->
+<div id="asset-viewer" onclick="closeAssetViewer(event)">
+  <div class="asset-panel">
+    <div class="asset-panel-header">
+      <div class="asset-panel-avatar" id="av-avatar">?</div>
+      <div class="asset-panel-title">
+        <h2 id="av-name">Client Files</h2>
+        <p id="av-email"></p>
+      </div>
+      <button class="asset-panel-close" onclick="document.getElementById('asset-viewer').classList.remove('open')">×</button>
+    </div>
+    <div class="asset-folders" id="av-folders"></div>
+    <div class="asset-grid" id="av-grid">
+      <div class="asset-empty">Loading files…</div>
+    </div>
+  </div>
 </div>
 
 <!-- ════════ MODAL: PROFILE ════════ -->
@@ -3000,8 +3206,7 @@ async function loadClientsPage() {
   }
 
   const clients = Object.values(clientMap).sort((a,b) => (a.name||'').localeCompare(b.name||''));
-  container.innerHTML = clients.map(c => {
-    const id = (c.email || c.name).replace(/[^a-z0-9]/gi,'_');
+  container.innerHTML = clients.map(c => {    const id = (c.email || c.name).replace(/[^a-z0-9]/gi,'_');
     const initials = (c.name||'?').substring(0,2).toUpperCase();
     const total = c.jobs.length;
     const del = c.jobs.filter(j=>j.status==='delivered').length;
@@ -3016,6 +3221,9 @@ async function loadClientsPage() {
           <div style="font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px;">${c.name}</div>
           <div style="font-size:12px;color:var(--text3);">${total ? `${total} job${total!==1?'s':''} · ${total-del} active · ${del} delivered` : 'No jobs yet'}</div>
         </div>
+        <button class="client-assets-btn" id="assets-btn-${id}" onclick="event.stopPropagation();openAssetViewer('${c.email}','${c.name}')" title="View client files">
+          📁
+        </button>
         <span id="cbanner-arrow-${id}" style="font-size:16px;color:var(--text3);transition:transform .25s cubic-bezier(.34,1.4,.64,1)">▾</span>
       </div>
       <div id="cbanner-body-${id}" style="display:none;border-top:1px solid rgba(0,0,0,.06);padding:0 22px 20px;">
@@ -3023,6 +3231,8 @@ async function loadClientsPage() {
       </div>
     </div>`;
   }).join('');
+  // Load asset counts for badges
+  loadAllAssetCounts();
 }
 
 async function toggleClientBanner(id, email) {
@@ -3698,13 +3908,13 @@ function clientTab(tab, el) {
   }
 
   // Show/hide content panels
-  ['overview','request','jobs','downloads','messages'].forEach(t => {
+  ['overview','request','jobs','downloads','messages','assets'].forEach(t => {
     const panel = document.getElementById('client-tab-' + t);
     if (panel) panel.style.display = t === tab ? (t === 'messages' ? 'flex' : 'block') : 'none';
   });
 
   // Sync mobile bottom bar
-  ['overview','jobs','downloads','messages'].forEach(t => {
+  ['overview','jobs','downloads','messages','assets'].forEach(t => {
     const mobTab = document.getElementById('mob-tab-' + t);
     if (mobTab) mobTab.classList.toggle('active', t === tab);
   });
@@ -3713,6 +3923,7 @@ function clientTab(tab, el) {
   if (tab === 'jobs') loadClientJobs();
   if (tab === 'downloads') loadClientDownloads();
   if (tab === 'messages') { loadClientMessages(); clearClientMsgBadge(); }
+  if (tab === 'assets') { loadClientAssets(); }
   updateTabSlider('mobile-bottom-bar', 'mob-tab-' + tab);
 }
 
@@ -4296,6 +4507,235 @@ document.addEventListener('input', e => {
     e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px';
   }
 });
+
+// ══════════════════════════════════════
+// CLIENT ASSETS SYSTEM
+// ══════════════════════════════════════
+const ASSET_CATEGORIES = {
+  video:    { label: 'Video',     icon: '🎬', exts: ['mp4','mov','avi','mkv','webm','m4v','wmv','mts','m2ts'] },
+  audio:    { label: 'Audio',     icon: '🎵', exts: ['mp3','wav','aac','flac','ogg','m4a','aiff'] },
+  image:    { label: 'Images',    icon: '🖼️',  exts: ['jpg','jpeg','png','gif','webp','svg','psd','ai','tiff','heic'] },
+  document: { label: 'Documents', icon: '📄', exts: ['pdf','doc','docx','txt','rtf','xls','xlsx','ppt','pptx'] },
+  other:    { label: 'Other',     icon: '📦', exts: [] },
+};
+
+function getAssetCategory(filename) {
+  const ext = filename.split('.').pop().toLowerCase();
+  for (const [key, cat] of Object.entries(ASSET_CATEGORIES)) {
+    if (cat.exts.includes(ext)) return key;
+  }
+  return 'other';
+}
+
+function formatBytes(bytes) {
+  if (!bytes) return '';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/(1024*1024)).toFixed(1) + ' MB';
+}
+
+// ── CLIENT SIDE: Upload ──────────────────────────────────────
+async function handleAssetFiles(files) {
+  if (!files.length || !currentUser || !sb) return;
+  const progress = document.getElementById('asset-upload-progress');
+  const barFill = document.getElementById('asset-bar-fill');
+  const label = document.getElementById('asset-upload-label');
+  progress.style.display = 'block';
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    label.textContent = `Uploading ${file.name} (${i+1}/${files.length})…`;
+    barFill.style.width = ((i / files.length) * 100) + '%';
+
+    const category = getAssetCategory(file.name);
+    const safeName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+    const path = `${currentUser.email}/${category}/${safeName}`;
+
+    const { error: uploadError } = await sb.storage
+      .from('client-assets')
+      .upload(path, file, { upsert: false });
+
+    if (uploadError) { console.error('Upload error:', uploadError); continue; }
+
+    await sb.from('client_assets').insert({
+      client_email: currentUser.email,
+      file_name: file.name,
+      file_path: path,
+      file_type: file.type || 'application/octet-stream',
+      file_size: file.size,
+      category,
+    });
+  }
+
+  barFill.style.width = '100%';
+  label.textContent = `${files.length} file${files.length !== 1 ? 's' : ''} uploaded!`;
+  setTimeout(() => { progress.style.display = 'none'; barFill.style.width = '0%'; }, 2000);
+  loadClientAssets();
+  showToast('Files sent to Keem! 📁', 'success');
+}
+
+// Drag and drop
+document.addEventListener('DOMContentLoaded', () => {
+  const dz = document.getElementById('client-dropzone');
+  if (!dz) return;
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('dragover');
+    handleAssetFiles(e.dataTransfer.files);
+  });
+});
+
+async function loadClientAssets() {
+  if (!currentUser || !sb) return;
+  const container = document.getElementById('client-assets-list');
+  container.innerHTML = '<p style="font-size:13px;color:var(--text3);">Loading your files…</p>';
+
+  const { data } = await sb.from('client_assets')
+    .select('*')
+    .eq('client_email', currentUser.email)
+    .order('created_at', { ascending: false });
+
+  if (!data || !data.length) {
+    container.innerHTML = '<p style="font-size:13px;color:var(--text3);">No files uploaded yet.</p>';
+    return;
+  }
+
+  // Group by category
+  const grouped = {};
+  data.forEach(f => {
+    if (!grouped[f.category]) grouped[f.category] = [];
+    grouped[f.category].push(f);
+  });
+
+  container.innerHTML = Object.entries(grouped).map(([cat, files]) => {
+    const catInfo = ASSET_CATEGORIES[cat] || ASSET_CATEGORIES.other;
+    return `<div style="margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+        ${catInfo.icon} ${catInfo.label} <span style="opacity:.5;">(${files.length})</span>
+        <span style="flex:1;height:1px;background:var(--border);display:block;"></span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        ${files.map(f => `
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--glass);border:1px solid var(--glass-border);border-radius:10px;font-size:13px;">
+            <span style="font-size:18px;">${catInfo.icon}</span>
+            <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);">${f.file_name}</span>
+            <span style="color:var(--text3);font-size:11px;flex-shrink:0;">${formatBytes(f.file_size)}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── EDITOR SIDE: View assets ─────────────────────────────────
+let currentAssetFolder = 'all';
+
+async function openAssetViewer(email, name) {
+  const viewer = document.getElementById('asset-viewer');
+  document.getElementById('av-avatar').textContent = name.slice(0,2).toUpperCase();
+  document.getElementById('av-name').textContent = name + "'s Files";
+  document.getElementById('av-email').textContent = email;
+  viewer.classList.add('open');
+  currentAssetFolder = 'all';
+  await loadAssetViewer(email);
+}
+
+function closeAssetViewer(e) {
+  if (e.target === document.getElementById('asset-viewer')) {
+    document.getElementById('asset-viewer').classList.remove('open');
+  }
+}
+
+async function loadAssetViewer(email) {
+  if (!sb) return;
+  const grid = document.getElementById('av-grid');
+  grid.innerHTML = '<div class="asset-empty">Loading…</div>';
+
+  const { data } = await sb.from('client_assets')
+    .select('*')
+    .eq('client_email', email)
+    .order('created_at', { ascending: false });
+
+  if (!data || !data.length) {
+    document.getElementById('av-folders').innerHTML = '';
+    grid.innerHTML = '<div class="asset-empty">No files uploaded yet.</div>';
+    // Update badge
+    updateAssetBadge(email, 0);
+    return;
+  }
+
+  updateAssetBadge(email, data.length);
+
+  // Build folder tabs
+  const counts = { all: data.length };
+  data.forEach(f => { counts[f.category] = (counts[f.category] || 0) + 1; });
+
+  const folders = document.getElementById('av-folders');
+  const folderKeys = ['all', ...Object.keys(ASSET_CATEGORIES).filter(k => counts[k])];
+  folders.innerHTML = folderKeys.map(k => {
+    const info = k === 'all' ? { label: 'All Files', icon: '📂' } : ASSET_CATEGORIES[k];
+    return `<div class="asset-folder-tab ${k === currentAssetFolder ? 'active' : ''}" onclick="switchAssetFolder('${email}','${k}',this)">
+      ${info.icon} ${info.label}
+      <span class="folder-count">${counts[k] || 0}</span>
+    </div>`;
+  }).join('');
+
+  // Filter and render
+  const filtered = currentAssetFolder === 'all' ? data : data.filter(f => f.category === currentAssetFolder);
+  renderAssetGrid(filtered);
+}
+
+function switchAssetFolder(email, folder, el) {
+  currentAssetFolder = folder;
+  document.querySelectorAll('.asset-folder-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  // Re-filter without re-fetching
+  loadAssetViewer(email);
+}
+
+async function renderAssetGrid(files) {
+  const grid = document.getElementById('av-grid');
+  if (!files.length) {
+    grid.innerHTML = '<div class="asset-empty">No files in this folder.</div>';
+    return;
+  }
+  const items = await Promise.all(files.map(async f => {
+    const cat = ASSET_CATEGORIES[f.category] || ASSET_CATEGORIES.other;
+    const { data: urlData } = await sb.storage.from('client-assets').createSignedUrl(f.file_path, 3600);
+    const url = urlData?.signedUrl || '#';
+    return `<a class="asset-item" href="${url}" target="_blank" title="${f.file_name}" style="animation-delay:${Math.random()*0.15}s">
+      <div class="asset-icon">${cat.icon}</div>
+      <div class="asset-name">${f.file_name}</div>
+      <div class="asset-size">${formatBytes(f.file_size)}</div>
+    </a>`;
+  }));
+  grid.innerHTML = items.join('');
+}
+
+function updateAssetBadge(email, count) {
+  // Find the button for this client and update badge
+  document.querySelectorAll('.client-assets-btn').forEach(btn => {
+    if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(email)) {
+      let badge = btn.querySelector('.assets-count');
+      if (count > 0) {
+        if (!badge) { badge = document.createElement('span'); badge.className = 'assets-count'; btn.appendChild(badge); }
+        badge.textContent = count > 99 ? '99+' : count;
+      } else if (badge) {
+        badge.remove();
+      }
+    }
+  });
+}
+
+// Load asset counts for all clients after clients page loads
+async function loadAllAssetCounts() {
+  if (DEMO_MODE || !sb) return;
+  const { data } = await sb.from('client_assets').select('client_email');
+  if (!data) return;
+  const counts = {};
+  data.forEach(r => { counts[r.client_email] = (counts[r.client_email] || 0) + 1; });
+  Object.entries(counts).forEach(([email, count]) => updateAssetBadge(email, count));
+}
 </script>
 
 <!-- EmailJS (load only when configured) -->
