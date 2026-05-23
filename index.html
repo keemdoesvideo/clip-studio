@@ -166,7 +166,7 @@ body.dark .client-tab.active { color: var(--purple); border-color: var(--purple)
 #theme-toggle:hover { transform: scale(1.1); }
 #theme-toggle:active { transform: scale(0.95); }
 @media (max-width: 600px) {
-  #theme-toggle { bottom: 84px; right: 16px; width: 40px; height: 40px; font-size: 17px; }
+  #theme-toggle { display: none; }
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1822,7 +1822,7 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
   #screen-editor .topbar-logo-icon svg { width: 14px; height: 14px; }
   #screen-editor .topbar-nav { display: none; }
   #screen-editor .btn-logout { display: none; }
-  #screen-editor .main-content { padding: 16px 14px calc(76px + env(safe-area-inset-bottom, 16px)); }
+  #screen-editor .main-content { padding: 16px 14px calc(72px + max(16px, env(safe-area-inset-bottom))); }
   #screen-editor .stats-row { grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 20px; border-radius: 16px; }
   #screen-editor .stat-card + .stat-card { border-left: none; border-top: 1px solid rgba(255,255,255,0.55); }
   #screen-editor .stats-row .stat-card:nth-child(2) { border-left: 1px solid rgba(255,255,255,0.55); border-top: none; }
@@ -1919,16 +1919,15 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
   display: none;
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  height: calc(58px + env(safe-area-inset-bottom, 16px));
   background: rgba(255,255,255,0.88);
   backdrop-filter: blur(28px) saturate(200%);
   -webkit-backdrop-filter: blur(28px) saturate(200%);
   border-top: 1px solid rgba(0,0,0,0.07);
   box-shadow: 0 -1px 0 rgba(0,0,0,0.04);
   z-index: 150;
-  padding-bottom: env(safe-area-inset-bottom, 16px);
+  padding-top: 8px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
   align-items: flex-start;
-  padding-top: 6px;
 }
 
 /* Bottom tab bar */
@@ -1936,16 +1935,15 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
   display: none;
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  height: calc(58px + env(safe-area-inset-bottom, 16px));
   background: rgba(255,255,255,0.88);
   backdrop-filter: blur(28px) saturate(200%);
   -webkit-backdrop-filter: blur(28px) saturate(200%);
   border-top: 1px solid rgba(0,0,0,0.07);
   box-shadow: 0 -1px 0 rgba(0,0,0,0.04);
   z-index: 150;
-  padding-bottom: env(safe-area-inset-bottom, 16px);
+  padding-top: 8px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
   align-items: flex-start;
-  padding-top: 6px;
 }
 
 body.dark #editor-mobile-bottom-bar,
@@ -2413,10 +2411,6 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
 
 <!-- ════════ EDITOR MOBILE BOTTOM BAR ════════ -->
 <div id="editor-mobile-bottom-bar">
-  <!-- Drawer trigger -->
-  <div class="mob-tab" id="editor-mob-tab-drawer" onclick="openDrawer('editor')">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-  </div>
   <div class="mob-tab active" id="editor-mob-tab-queue" onclick="editorTabMobile('queue')">
     <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
   </div>
@@ -2633,9 +2627,6 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
 
   <!-- ════════ MOBILE BOTTOM TAB BAR ════════ -->
   <div id="mobile-bottom-bar">
-    <div class="mob-tab" id="mob-tab-drawer" onclick="openDrawer('client')">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-    </div>
     <div class="mob-tab active" id="mob-tab-overview" onclick="clientTab('overview', null)">
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
     </div>
@@ -2769,7 +2760,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         <div class="settings-section">
           <div class="settings-row">
             <div><div class="settings-row-label">Change password</div><div class="settings-row-sub">Send a reset link to your email</div></div>
-            <button class="btn-ghost" style="font-size:12px;padding:6px 12px;flex-shrink:0;" onclick="sendPasswordReset()">Send link</button>
+            <button class="btn-ghost" style="font-size:11px;padding:4px 10px;flex-shrink:0;border-radius:8px;" onclick="sendPasswordReset()">Send link</button>
           </div>
         </div>
       </div>
@@ -2790,7 +2781,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
               <div class="settings-row-label">Discord</div>
               <div class="settings-row-sub" id="editor-discord-sub">Not connected</div>
             </div>
-            <button class="btn-ghost" style="font-size:12px;padding:6px 12px;flex-shrink:0;" onclick="connectDiscord('editor')">Connect</button>
+            <button class="btn-ghost" style="font-size:11px;padding:4px 10px;flex-shrink:0;border-radius:8px;" onclick="connectDiscord('editor')">Connect</button>
           </div>
         </div>
       </div>
@@ -2946,7 +2937,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         <div class="settings-section">
           <div class="settings-row">
             <div><div class="settings-row-label">Change password</div><div class="settings-row-sub">Send a reset link to your email</div></div>
-            <button class="btn-ghost" style="font-size:12px;padding:6px 12px;flex-shrink:0;" onclick="sendPasswordReset()">Send link</button>
+            <button class="btn-ghost" style="font-size:11px;padding:4px 10px;flex-shrink:0;border-radius:8px;" onclick="sendPasswordReset()">Send link</button>
           </div>
         </div>
       </div>
@@ -2967,7 +2958,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
               <div class="settings-row-label">Discord</div>
               <div class="settings-row-sub" id="client-discord-sub">Not connected</div>
             </div>
-            <button class="btn-ghost" style="font-size:12px;padding:6px 12px;flex-shrink:0;" onclick="connectDiscord('client')">Connect</button>
+            <button class="btn-ghost" style="font-size:11px;padding:4px 10px;flex-shrink:0;border-radius:8px;" onclick="connectDiscord('client')">Connect</button>
           </div>
         </div>
       </div>
@@ -3944,10 +3935,17 @@ async function saveDrawerProfile(side) {
     youtube: document.getElementById(prefix + '-youtube').value.trim(),
     website: document.getElementById(prefix + '-website').value.trim(),
   };
-  const { error } = await sb.from('profiles').upsert(payload, { onConflict: 'email' });
-  if (error) { showToast('Error saving profile', 'error'); return; }
+  // Try update first, then insert if not exists
+  const { error: updateError } = await sb.from('profiles').update(payload).eq('email', email);
+  if (updateError) {
+    const { error: insertError } = await sb.from('profiles').insert(payload);
+    if (insertError) {
+      console.error('Profile save error:', insertError);
+      showToast('Error: ' + insertError.message, 'error');
+      return;
+    }
+  }
   showToast('Profile saved! ✓', 'success');
-  // Update drawer header name
   if (payload.name) {
     document.getElementById('drawer-' + side + '-name').textContent = payload.name;
   }
