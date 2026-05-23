@@ -1822,7 +1822,7 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
   #screen-editor .topbar-logo-icon svg { width: 14px; height: 14px; }
   #screen-editor .topbar-nav { display: none; }
   #screen-editor .btn-logout { display: none; }
-  #screen-editor .main-content { padding: 16px 14px 90px; }
+  #screen-editor .main-content { padding: 16px 14px 76px; }
   #screen-editor .stats-row { grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 20px; border-radius: 16px; }
   #screen-editor .stat-card + .stat-card { border-left: none; border-top: 1px solid rgba(255,255,255,0.55); }
   #screen-editor .stats-row .stat-card:nth-child(2) { border-left: 1px solid rgba(255,255,255,0.55); border-top: none; }
@@ -1919,12 +1919,12 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
   display: none;
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  height: 72px;
-  background: rgba(255,255,255,0.78);
+  height: 58px;
+  background: rgba(255,255,255,0.88);
   backdrop-filter: blur(28px) saturate(200%);
   -webkit-backdrop-filter: blur(28px) saturate(200%);
-  border-top: 1px solid rgba(255,255,255,0.82);
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+  border-top: 1px solid rgba(0,0,0,0.07);
+  box-shadow: 0 -1px 0 rgba(0,0,0,0.04);
   z-index: 150;
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -1934,55 +1934,240 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
   display: none;
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  height: 72px;
-  background: rgba(255,255,255,0.78);
+  height: 58px;
+  background: rgba(255,255,255,0.88);
   backdrop-filter: blur(28px) saturate(200%);
   -webkit-backdrop-filter: blur(28px) saturate(200%);
-  border-top: 1px solid rgba(255,255,255,0.82);
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+  border-top: 1px solid rgba(0,0,0,0.07);
+  box-shadow: 0 -1px 0 rgba(0,0,0,0.04);
   z-index: 150;
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
+
+body.dark #editor-mobile-bottom-bar,
+body.dark #mobile-bottom-bar {
+  background: rgba(14,14,14,0.92);
+  border-top-color: rgba(255,255,255,0.06);
+}
+
 .mob-tab {
   flex: 1;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 4px; cursor: pointer; padding: 8px 0 6px;
+  cursor: pointer; padding: 8px 0;
   -webkit-tap-highlight-color: transparent;
-  position: relative; transition: opacity 0.15s;
+  position: relative;
 }
-.mob-tab:active { opacity: 0.7; }
-.mob-tab-icon {
-  width: 26px; height: 26px; border-radius: 9px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 17px;
-  transition: background 0.2s, transform 0.2s cubic-bezier(0.34,1.6,0.64,1);
+.mob-tab svg {
+  width: 24px; height: 24px;
+  stroke: var(--text3);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.15s, transform 0.25s cubic-bezier(0.34,1.6,0.64,1);
 }
-.mob-tab.active .mob-tab-icon { background: var(--purple-dim); transform: scale(1.1); }
-.mob-tab-label {
-  font-size: 10px; font-weight: 600; letter-spacing: 0.02em;
-  color: var(--text3); transition: color 0.15s;
+.mob-tab.active svg {
+  stroke: var(--purple);
+  transform: scale(1.08);
 }
-.mob-tab.active .mob-tab-label { color: var(--purple); }
 .mob-tab-notif {
-  position: absolute; top: 6px; right: calc(50% - 22px);
-  width: 7px; height: 7px;
+  position: absolute; top: 7px; right: calc(50% - 14px);
+  width: 6px; height: 6px;
   background: var(--pink); border-radius: 50%;
   border: 1.5px solid rgba(255,255,255,0.9);
   display: none;
 }
+body.dark .mob-tab-notif { border-color: rgba(14,14,14,0.9); }
 .mob-tab-notif.visible { display: block; }
 
 /* Sliding gold indicator */
 .mob-tab-slider {
   position: absolute;
-  top: 0; height: 2.5px;
-  background: var(--gold);
-  border-radius: 0 0 3px 3px;
+  top: 0; height: 2px;
+  background: var(--purple);
+  border-radius: 0 0 2px 2px;
   transition: left 0.35s cubic-bezier(0.34, 1.4, 0.64, 1),
               width 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
   pointer-events: none;
   z-index: 1;
 }
+
+/* ════════════════════════════════════
+   SLIDE DRAWER
+════════════════════════════════════ */
+.drawer-backdrop {
+  position: fixed; inset: 0; z-index: 400;
+  background: rgba(0,0,0,0);
+  pointer-events: none;
+  transition: background 0.3s;
+}
+.drawer-backdrop.open {
+  background: rgba(0,0,0,0.45);
+  pointer-events: all;
+}
+.drawer {
+  position: fixed; top: 0; left: 0; bottom: 0;
+  width: 82vw; max-width: 320px;
+  z-index: 401;
+  background: var(--bg);
+  box-shadow: 4px 0 40px rgba(0,0,0,0.18);
+  transform: translateX(-100%);
+  transition: transform 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.drawer.open { transform: translateX(0); }
+body.dark .drawer { background: #0e0e0e; }
+
+/* Drawer header */
+.drawer-header {
+  padding: 56px 24px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 14px;
+}
+.drawer-avatar {
+  width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, #e8b84b, #f5d478);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; color: #6b4900;
+  overflow: hidden; cursor: pointer;
+  box-shadow: 0 0 0 3px rgba(232,184,75,0.25);
+}
+.drawer-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.drawer-user-name { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); }
+.drawer-user-email { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+/* Drawer nav items */
+.drawer-nav { flex: 1; padding: 12px 0; overflow-y: auto; }
+.drawer-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 24px; cursor: pointer;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.drawer-item:hover { background: var(--purple-dim); }
+.drawer-item:active { background: var(--purple-dim); }
+.drawer-item svg {
+  width: 20px; height: 20px; flex-shrink: 0;
+  stroke: var(--text2); fill: none;
+  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+}
+.drawer-item-label { font-size: 15px; font-weight: 500; color: var(--text); }
+.drawer-item.signout .drawer-item-label { color: var(--pink); }
+.drawer-item.signout svg { stroke: var(--pink); }
+.drawer-divider { height: 1px; background: var(--border); margin: 8px 0; }
+.drawer-footer { padding: 16px 24px; border-top: 1px solid var(--border); }
+
+/* Drawer sub-panels (Profile, Settings) */
+.drawer-panel {
+  position: absolute; inset: 0;
+  background: var(--bg);
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+body.dark .drawer-panel { background: #0e0e0e; }
+.drawer-panel.open { transform: translateX(0); }
+.drawer-panel-header {
+  padding: 56px 20px 16px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.drawer-back-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: none; background: rgba(0,0,0,0.05);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.drawer-back-btn svg { width: 16px; height: 16px; stroke: var(--text); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.drawer-panel-title { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); }
+.drawer-panel-body { flex: 1; overflow-y: auto; padding: 20px; }
+
+/* Settings rows */
+.settings-section { margin-bottom: 28px; }
+.settings-section-title {
+  font-size: 11px; font-weight: 700; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+.settings-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 0; border-bottom: 1px solid var(--border);
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-row-label { font-size: 14px; color: var(--text); }
+.settings-row-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.settings-toggle {
+  width: 44px; height: 26px; border-radius: 13px;
+  background: var(--border2); border: none; cursor: pointer;
+  position: relative; transition: background 0.2s; flex-shrink: 0;
+}
+.settings-toggle.on { background: var(--purple); }
+.settings-toggle::after {
+  content: ''; position: absolute;
+  top: 3px; left: 3px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #fff; transition: left 0.2s cubic-bezier(0.34,1.4,0.64,1);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.settings-toggle.on::after { left: 21px; }
+.settings-chevron {
+  width: 16px; height: 16px; stroke: var(--text3); fill: none;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+
+/* Profile form inside drawer */
+.drawer-avatar-upload {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 20px 0; border-bottom: 1px solid var(--border); margin-bottom: 20px;
+}
+.drawer-avatar-large {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: linear-gradient(135deg, #e8b84b, #f5d478);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Poppins', sans-serif; font-size: 26px; font-weight: 700; color: #6b4900;
+  overflow: hidden; cursor: pointer; position: relative;
+  box-shadow: 0 0 0 3px rgba(232,184,75,0.3);
+}
+.drawer-avatar-large img { width: 100%; height: 100%; object-fit: cover; }
+.drawer-avatar-large:hover::after {
+  content: '📷'; position: absolute; inset: 0;
+  background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center;
+  font-size: 22px; border-radius: 50%;
+}
+.drawer-field { margin-bottom: 14px; }
+.drawer-field label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 5px; }
+.drawer-field input {
+  width: 100%; padding: 10px 12px; border-radius: 10px;
+  border: 1px solid var(--border2); background: var(--bg2);
+  font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--text);
+  outline: none; transition: border-color 0.15s; box-sizing: border-box;
+}
+.drawer-field input:focus { border-color: var(--purple); }
+body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rgba(255,255,255,0.1); }
+.drawer-save-btn {
+  width: 100%; padding: 12px; border-radius: 12px;
+  background: var(--purple); border: none; cursor: pointer;
+  font-size: 14px; font-weight: 700; color: #6b4900;
+  font-family: 'DM Sans', sans-serif;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 3px 10px rgba(232,184,75,0.35);
+  margin-top: 8px;
+}
+.drawer-save-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(232,184,75,0.45); }
+.drawer-save-btn:active { transform: scale(0.97); }
+
+/* Colour swatches for appearance */
+.colour-swatches { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+.colour-swatch {
+  width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+  border: 3px solid transparent; transition: transform 0.15s, border-color 0.15s;
+}
+.colour-swatch:hover { transform: scale(1.15); }
+.colour-swatch.selected { border-color: var(--text); }
+
 </style>
 </head>
 <body>
@@ -2224,22 +2409,22 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
 
 <!-- ════════ EDITOR MOBILE BOTTOM BAR ════════ -->
 <div id="editor-mobile-bottom-bar">
+  <!-- Drawer trigger -->
+  <div class="mob-tab" id="editor-mob-tab-drawer" onclick="openDrawer('editor')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+  </div>
   <div class="mob-tab active" id="editor-mob-tab-queue" onclick="editorTabMobile('queue')">
-    <div class="mob-tab-icon">🏠</div>
-    <span class="mob-tab-label">Dashboard</span>
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
   </div>
   <div class="mob-tab" id="editor-mob-tab-alljobs" onclick="editorTabMobile('alljobs')">
-    <div class="mob-tab-icon">🎬</div>
-    <span class="mob-tab-label">All Jobs</span>
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M9 4v5"/><path d="M15 4v5"/></svg>
   </div>
   <div class="mob-tab" id="editor-mob-tab-clients" onclick="editorTabMobile('clients')">
-    <div class="mob-tab-icon">👥</div>
-    <span class="mob-tab-label">Clients</span>
+    <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/><circle cx="19" cy="8" r="2"/><path d="M22 20c0-2.2-1.3-4-3-4.5"/></svg>
   </div>
   <div class="mob-tab" id="editor-mob-tab-messages" onclick="editorTabMobile('messages')">
     <div class="mob-tab-notif" id="editor-mob-msg-dot"></div>
-    <div class="mob-tab-icon">💬</div>
-    <span class="mob-tab-label">Messages</span>
+    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
   </div>
 </div>
 
@@ -2444,30 +2629,239 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
 
   <!-- ════════ MOBILE BOTTOM TAB BAR ════════ -->
   <div id="mobile-bottom-bar">
+    <div class="mob-tab" id="mob-tab-drawer" onclick="openDrawer('client')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    </div>
     <div class="mob-tab active" id="mob-tab-overview" onclick="clientTab('overview', null)">
-      <div class="mob-tab-icon">⊞</div>
-      <span class="mob-tab-label">Overview</span>
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
     </div>
     <div class="mob-tab" id="mob-tab-jobs" onclick="clientTab('jobs', null)">
-      <div class="mob-tab-icon">🎬</div>
-      <span class="mob-tab-label">Jobs</span>
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M9 4v5"/><path d="M15 4v5"/></svg>
     </div>
     <div class="mob-tab" id="mob-tab-downloads" onclick="clientTab('downloads', null)">
       <div class="mob-tab-notif" id="mob-notif-dot"></div>
-      <div class="mob-tab-icon">⬇</div>
-      <span class="mob-tab-label">Downloads</span>
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
     </div>
     <div class="mob-tab" id="mob-tab-messages" onclick="clientTab('messages', null)">
       <div class="mob-tab-notif" id="mob-msg-dot"></div>
-      <div class="mob-tab-icon">💬</div>
-      <span class="mob-tab-label">Messages</span>
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     </div>
     <div class="mob-tab" id="mob-tab-assets" onclick="clientTab('assets', null)">
-      <div class="mob-tab-icon">📁</div>
-      <span class="mob-tab-label">Files</span>
+      <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
     </div>
   </div>
 
+</div>
+
+<!-- ════════ EDITOR DRAWER ════════ -->
+<div class="drawer-backdrop" id="editor-drawer-backdrop" onclick="closeDrawer('editor')"></div>
+<div class="drawer" id="editor-drawer">
+  <div class="drawer-header">
+    <div class="drawer-avatar" id="drawer-editor-avatar" onclick="openDrawerPanel('editor','profile')">K</div>
+    <div>
+      <div class="drawer-user-name" id="drawer-editor-name">Keem</div>
+      <div class="drawer-user-email" id="drawer-editor-email">keemdoesvideo@gmail.com</div>
+    </div>
+  </div>
+  <div class="drawer-nav">
+    <div class="drawer-item" onclick="openDrawerPanel('editor','profile')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      <span class="drawer-item-label">Profile</span>
+    </div>
+    <div class="drawer-item" onclick="openDrawerPanel('editor','settings')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span class="drawer-item-label">Settings</span>
+    </div>
+    <div class="drawer-divider"></div>
+    <div class="drawer-item signout" onclick="logout()">
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      <span class="drawer-item-label">Sign out</span>
+    </div>
+  </div>
+
+  <!-- Profile panel -->
+  <div class="drawer-panel" id="editor-panel-profile">
+    <div class="drawer-panel-header">
+      <button class="drawer-back-btn" onclick="closeDrawerPanel('editor','profile')">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="drawer-panel-title">Profile</div>
+    </div>
+    <div class="drawer-panel-body">
+      <div class="drawer-avatar-upload">
+        <div class="drawer-avatar-large" id="editor-profile-avatar" onclick="document.getElementById('editor-avatar-input').click()">K</div>
+        <input type="file" id="editor-avatar-input" accept="image/*" style="display:none" onchange="uploadDrawerAvatar(this,'editor')">
+        <small style="color:var(--text3);font-size:11px;">Tap to change photo</small>
+      </div>
+      <div class="drawer-field"><label>Display name</label><input type="text" id="ep-name" placeholder="Your name"></div>
+      <div class="drawer-field"><label>Bio</label><input type="text" id="ep-bio" placeholder="Freelance video editor…"></div>
+      <div class="drawer-field"><label>Contact</label><input type="text" id="ep-contact" placeholder="Phone or email"></div>
+      <div class="drawer-field"><label>Instagram</label><input type="text" id="ep-instagram" placeholder="@handle"></div>
+      <div class="drawer-field"><label>TikTok</label><input type="text" id="ep-tiktok" placeholder="@handle"></div>
+      <div class="drawer-field"><label>YouTube</label><input type="text" id="ep-youtube" placeholder="Channel URL"></div>
+      <div class="drawer-field"><label>Website</label><input type="text" id="ep-website" placeholder="https://"></div>
+      <button class="drawer-save-btn" onclick="saveDrawerProfile('editor')">Save profile</button>
+    </div>
+  </div>
+
+  <!-- Settings panel -->
+  <div class="drawer-panel" id="editor-panel-settings">
+    <div class="drawer-panel-header">
+      <button class="drawer-back-btn" onclick="closeDrawerPanel('editor','settings')">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="drawer-panel-title">Settings</div>
+    </div>
+    <div class="drawer-panel-body">
+      <div class="settings-section">
+        <div class="settings-section-title">Appearance</div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Dark mode</div></div>
+          <button class="settings-toggle" id="editor-dark-toggle" onclick="toggleTheme();updateDrawerToggles()" ></button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Account</div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Change password</div><div class="settings-row-sub">Send reset link to your email</div></div>
+          <button class="btn-ghost" style="font-size:12px;padding:6px 12px;" onclick="sendPasswordReset()">Send link</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Connected accounts</div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Discord</div><div class="settings-row-sub" id="editor-discord-sub">Not connected</div></div>
+          <button class="btn-ghost" style="font-size:12px;padding:6px 12px;" onclick="connectDiscord('editor')">Connect</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Notifications</div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">New job requests</div></div>
+          <button class="settings-toggle on" id="notif-new-job" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Client messages</div></div>
+          <button class="settings-toggle on" id="notif-messages" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">File uploads</div></div>
+          <button class="settings-toggle on" id="notif-uploads" onclick="this.classList.toggle('on')"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ CLIENT DRAWER ════════ -->
+<div class="drawer-backdrop" id="client-drawer-backdrop" onclick="closeDrawer('client')"></div>
+<div class="drawer" id="client-drawer">
+  <div class="drawer-header">
+    <div class="drawer-avatar" id="drawer-client-avatar" onclick="openDrawerPanel('client','profile')">?</div>
+    <div>
+      <div class="drawer-user-name" id="drawer-client-name">—</div>
+      <div class="drawer-user-email" id="drawer-client-email">—</div>
+    </div>
+  </div>
+  <div class="drawer-nav">
+    <div class="drawer-item" onclick="openDrawerPanel('client','profile')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      <span class="drawer-item-label">Profile</span>
+    </div>
+    <div class="drawer-item" onclick="openDrawerPanel('client','settings')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span class="drawer-item-label">Settings</span>
+    </div>
+    <div class="drawer-divider"></div>
+    <div class="drawer-item signout" onclick="logout()">
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      <span class="drawer-item-label">Sign out</span>
+    </div>
+  </div>
+
+  <!-- Profile panel -->
+  <div class="drawer-panel" id="client-panel-profile">
+    <div class="drawer-panel-header">
+      <button class="drawer-back-btn" onclick="closeDrawerPanel('client','profile')">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="drawer-panel-title">Profile</div>
+    </div>
+    <div class="drawer-panel-body">
+      <div class="drawer-avatar-upload">
+        <div class="drawer-avatar-large" id="client-profile-avatar" onclick="document.getElementById('client-avatar-input').click()">?</div>
+        <input type="file" id="client-avatar-input" accept="image/*" style="display:none" onchange="uploadDrawerAvatar(this,'client')">
+        <small style="color:var(--text3);font-size:11px;">Tap to change photo</small>
+      </div>
+      <div class="drawer-field"><label>Display name</label><input type="text" id="cp-name" placeholder="Your name"></div>
+      <div class="drawer-field"><label>Bio</label><input type="text" id="cp-bio" placeholder="Content creator…"></div>
+      <div class="drawer-field"><label>Contact</label><input type="text" id="cp-contact" placeholder="Phone or email"></div>
+      <div class="drawer-field"><label>Instagram</label><input type="text" id="cp-instagram" placeholder="@handle"></div>
+      <div class="drawer-field"><label>TikTok</label><input type="text" id="cp-tiktok" placeholder="@handle"></div>
+      <div class="drawer-field"><label>YouTube</label><input type="text" id="cp-youtube" placeholder="Channel URL"></div>
+      <div class="drawer-field"><label>Website</label><input type="text" id="cp-website" placeholder="https://"></div>
+      <button class="drawer-save-btn" onclick="saveDrawerProfile('client')">Save profile</button>
+    </div>
+  </div>
+
+  <!-- Settings panel -->
+  <div class="drawer-panel" id="client-panel-settings">
+    <div class="drawer-panel-header">
+      <button class="drawer-back-btn" onclick="closeDrawerPanel('client','settings')">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="drawer-panel-title">Settings</div>
+    </div>
+    <div class="drawer-panel-body">
+      <div class="settings-section">
+        <div class="settings-section-title">Appearance</div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Dark mode</div></div>
+          <button class="settings-toggle" id="client-dark-toggle" onclick="toggleTheme();updateDrawerToggles()"></button>
+        </div>
+        <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:10px;">
+          <div class="settings-row-label">Accent colour</div>
+          <div class="colour-swatches" id="client-colour-swatches">
+            <div class="colour-swatch selected" style="background:#e8b84b;" onclick="setClientAccent('#e8b84b','#f5d478',this)" title="Gold"></div>
+            <div class="colour-swatch" style="background:#8b5cf6;" onclick="setClientAccent('#8b5cf6','#a78bfa',this)" title="Purple"></div>
+            <div class="colour-swatch" style="background:#00b4a6;" onclick="setClientAccent('#00b4a6','#2dd4bf',this)" title="Teal"></div>
+            <div class="colour-swatch" style="background:#e05c8a;" onclick="setClientAccent('#e05c8a','#f472b6',this)" title="Pink"></div>
+            <div class="colour-swatch" style="background:#0ea5e9;" onclick="setClientAccent('#0ea5e9','#38bdf8',this)" title="Sky"></div>
+            <div class="colour-swatch" style="background:#059669;" onclick="setClientAccent('#059669','#34d399',this)" title="Green"></div>
+          </div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Account</div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Change password</div><div class="settings-row-sub">Send reset link to your email</div></div>
+          <button class="btn-ghost" style="font-size:12px;padding:6px 12px;" onclick="sendPasswordReset()">Send link</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Connected accounts</div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Discord</div><div class="settings-row-sub" id="client-discord-sub">Not connected</div></div>
+          <button class="btn-ghost" style="font-size:12px;padding:6px 12px;" onclick="connectDiscord('client')">Connect</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Notifications</div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Job status updates</div></div>
+          <button class="settings-toggle on" id="client-notif-status" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Delivery notifications</div></div>
+          <button class="settings-toggle on" id="client-notif-delivery" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">New messages</div></div>
+          <button class="settings-toggle on" id="client-notif-messages" onclick="this.classList.toggle('on')"></button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ════════ ASSET VIEWER (editor) ════════ -->
@@ -3006,6 +3400,7 @@ function editorTabMobile(tab) {
   updateTabSlider('editor-mobile-bottom-bar', 'editor-mob-tab-' + tab);
   if (tab === 'clients') loadClientsPage();
   if (tab === 'alljobs') loadAllJobs();
+  if (tab === 'messages') loadEditorInbox();
 }
 
 function openJobSheet(job) {
@@ -3272,6 +3667,230 @@ async function toggleClientBanner(id, email) {
 
 // Count-up animation for stat numbers
 // ── Sliding tab indicator ─────────────────────────────────────
+// ══════════════════════════════════════
+// DRAWER SYSTEM
+// ══════════════════════════════════════
+function openDrawer(side) {
+  document.getElementById(side + '-drawer').classList.add('open');
+  document.getElementById(side + '-drawer-backdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  updateDrawerToggles();
+  if (side === 'editor') populateEditorDrawer();
+  if (side === 'client') populateClientDrawer();
+}
+
+function closeDrawer(side) {
+  document.getElementById(side + '-drawer').classList.remove('open');
+  document.getElementById(side + '-drawer-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+  // Close any open panels too
+  document.querySelectorAll('#' + side + '-drawer .drawer-panel').forEach(p => p.classList.remove('open'));
+}
+
+function openDrawerPanel(side, panel) {
+  document.getElementById(side + '-panel-' + panel).classList.add('open');
+  if (side === 'editor' && panel === 'profile') loadEditorProfile();
+  if (side === 'client' && panel === 'profile') loadClientProfile();
+}
+
+function closeDrawerPanel(side, panel) {
+  document.getElementById(side + '-panel-' + panel).classList.remove('open');
+}
+
+function updateDrawerToggles() {
+  const isDark = document.body.classList.contains('dark');
+  ['editor-dark-toggle', 'client-dark-toggle'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('on', isDark);
+  });
+}
+
+// ── Swipe gesture ────────────────────────────────────────────
+(function() {
+  let touchStartX = 0, touchStartY = 0, drawerSide = null, drawerEl = null, backdropEl = null;
+  const EDGE_THRESHOLD = 28; // px from left edge to trigger
+
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    drawerSide = null;
+    // Editor screen active?
+    const editorActive = document.getElementById('screen-editor')?.classList.contains('active');
+    const clientActive = document.getElementById('screen-client')?.classList.contains('active');
+    if (editorActive) { drawerSide = 'editor'; }
+    else if (clientActive) { drawerSide = 'client'; }
+    if (!drawerSide) return;
+    drawerEl = document.getElementById(drawerSide + '-drawer');
+    backdropEl = document.getElementById(drawerSide + '-drawer-backdrop');
+  }, { passive: true });
+
+  document.addEventListener('touchmove', e => {
+    if (!drawerSide || !drawerEl) return;
+    const dx = e.touches[0].clientX - touchStartX;
+    const dy = Math.abs(e.touches[0].clientY - touchStartY);
+    if (dy > 40) return; // mostly vertical — ignore
+    const isOpen = drawerEl.classList.contains('open');
+
+    if (!isOpen && touchStartX <= EDGE_THRESHOLD && dx > 0) {
+      // Dragging open from left edge
+      const pct = Math.min(dx / 280, 1);
+      drawerEl.style.transition = 'none';
+      drawerEl.style.transform = `translateX(${-100 + pct * 100}%)`;
+      backdropEl.style.background = `rgba(0,0,0,${pct * 0.45})`;
+      backdropEl.style.pointerEvents = 'all';
+    } else if (isOpen && dx < 0) {
+      // Dragging closed
+      const pct = Math.max(0, 1 + dx / 280);
+      drawerEl.style.transition = 'none';
+      drawerEl.style.transform = `translateX(${-(1 - pct) * 100}%)`;
+      backdropEl.style.background = `rgba(0,0,0,${pct * 0.45})`;
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+    if (!drawerSide || !drawerEl) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    drawerEl.style.transition = '';
+    drawerEl.style.transform = '';
+    backdropEl.style.background = '';
+    backdropEl.style.pointerEvents = '';
+
+    if (dx > 60 && touchStartX <= EDGE_THRESHOLD) openDrawer(drawerSide);
+    else if (dx < -60 && drawerEl.classList.contains('open')) closeDrawer(drawerSide);
+  }, { passive: true });
+})();
+
+// ── Profile load/save ────────────────────────────────────────
+async function loadEditorProfile() {
+  if (DEMO_MODE || !sb) return;
+  const { data } = await sb.from('profiles').select('*').eq('email', CONFIG.editorEmail).single();
+  if (!data) return;
+  document.getElementById('ep-name').value = data.name || '';
+  document.getElementById('ep-bio').value = data.bio || '';
+  document.getElementById('ep-contact').value = data.contact || '';
+  document.getElementById('ep-instagram').value = data.instagram || '';
+  document.getElementById('ep-tiktok').value = data.tiktok || '';
+  document.getElementById('ep-youtube').value = data.youtube || '';
+  document.getElementById('ep-website').value = data.website || '';
+  if (data.avatar_url) {
+    const av = document.getElementById('editor-profile-avatar');
+    av.innerHTML = `<img src="${data.avatar_url}">`;
+  }
+}
+
+async function loadClientProfile() {
+  if (!currentUser || !sb) return;
+  const { data } = await sb.from('profiles').select('*').eq('email', currentUser.email).single();
+  if (!data) return;
+  document.getElementById('cp-name').value = data.name || '';
+  document.getElementById('cp-bio').value = data.bio || '';
+  document.getElementById('cp-contact').value = data.contact || '';
+  document.getElementById('cp-instagram').value = data.instagram || '';
+  document.getElementById('cp-tiktok').value = data.tiktok || '';
+  document.getElementById('cp-youtube').value = data.youtube || '';
+  document.getElementById('cp-website').value = data.website || '';
+  if (data.avatar_url) {
+    const av = document.getElementById('client-profile-avatar');
+    av.innerHTML = `<img src="${data.avatar_url}">`;
+  }
+}
+
+async function saveDrawerProfile(side) {
+  if (DEMO_MODE || !sb) { showToast('Profile saved! (demo)', 'success'); return; }
+  const prefix = side === 'editor' ? 'ep' : 'cp';
+  const email = side === 'editor' ? CONFIG.editorEmail : currentUser?.email;
+  if (!email) return;
+  const payload = {
+    email,
+    name: document.getElementById(prefix + '-name').value.trim(),
+    bio: document.getElementById(prefix + '-bio').value.trim(),
+    contact: document.getElementById(prefix + '-contact').value.trim(),
+    instagram: document.getElementById(prefix + '-instagram').value.trim(),
+    tiktok: document.getElementById(prefix + '-tiktok').value.trim(),
+    youtube: document.getElementById(prefix + '-youtube').value.trim(),
+    website: document.getElementById(prefix + '-website').value.trim(),
+  };
+  const { error } = await sb.from('profiles').upsert(payload, { onConflict: 'email' });
+  if (error) { showToast('Error saving profile', 'error'); return; }
+  showToast('Profile saved! ✓', 'success');
+  // Update drawer header name
+  if (payload.name) {
+    document.getElementById('drawer-' + side + '-name').textContent = payload.name;
+  }
+}
+
+async function uploadDrawerAvatar(input, side) {
+  const file = input.files[0];
+  if (!file || !sb) return;
+  const email = side === 'editor' ? CONFIG.editorEmail : currentUser?.email;
+  if (!email) return;
+  const path = `avatars/${email.replace('@','_')}_${Date.now()}.${file.name.split('.').pop()}`;
+  const { error } = await sb.storage.from('client-assets').upload(path, file, { upsert: true });
+  if (error) { showToast('Upload failed', 'error'); return; }
+  const { data: urlData } = sb.storage.from('client-assets').getPublicUrl(path);
+  const url = urlData?.publicUrl;
+  if (!url) return;
+  // Save to profile
+  await sb.from('profiles').upsert({ email, avatar_url: url }, { onConflict: 'email' });
+  // Update UI
+  const avatarId = side + '-profile-avatar';
+  document.getElementById(avatarId).innerHTML = `<img src="${url}">`;
+  document.getElementById('drawer-' + side + '-avatar').innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+  showToast('Photo updated! ✓', 'success');
+}
+
+function populateEditorDrawer() {
+  document.getElementById('drawer-editor-name').textContent = CONFIG.editorEmail.split('@')[0];
+  document.getElementById('drawer-editor-email').textContent = CONFIG.editorEmail;
+  updateDrawerToggles();
+}
+
+function populateClientDrawer() {
+  if (!currentUser) return;
+  const name = currentUser.user_metadata?.name || currentUser.email.split('@')[0];
+  document.getElementById('drawer-client-name').textContent = name;
+  document.getElementById('drawer-client-email').textContent = currentUser.email;
+  const initials = name.slice(0,2).toUpperCase();
+  const av = document.getElementById('drawer-client-avatar');
+  if (!av.querySelector('img')) av.textContent = initials;
+  updateDrawerToggles();
+}
+
+// ── Accent colour (client) ───────────────────────────────────
+function setClientAccent(primary, light, el) {
+  document.documentElement.style.setProperty('--purple', primary);
+  document.documentElement.style.setProperty('--purple-dim', light + '22');
+  document.querySelectorAll('.colour-swatch').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  localStorage.setItem('ks-client-accent', JSON.stringify({ primary, light }));
+}
+
+// Apply saved accent on load
+(function() {
+  const saved = localStorage.getItem('ks-client-accent');
+  if (saved) {
+    try {
+      const { primary, light } = JSON.parse(saved);
+      document.documentElement.style.setProperty('--purple', primary);
+      document.documentElement.style.setProperty('--purple-dim', light + '22');
+    } catch(e) {}
+  }
+})();
+
+// ── Password reset ───────────────────────────────────────────
+async function sendPasswordReset() {
+  const email = isEditor ? CONFIG.editorEmail : currentUser?.email;
+  if (!email || !sb) return;
+  const { error } = await sb.auth.resetPasswordForEmail(email);
+  if (error) { showToast('Error sending reset link', 'error'); return; }
+  showToast('Reset link sent to your email ✓', 'success');
+}
+
+// ── Discord connect (placeholder) ───────────────────────────
+function connectDiscord(side) {
+  showToast('Discord integration coming soon!', 'success');
+}
+
 function updateTabSlider(barId, activeTabId) {
   const bar = document.getElementById(barId);
   const activeTab = document.getElementById(activeTabId);
