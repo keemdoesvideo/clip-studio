@@ -362,7 +362,6 @@ h1, h2, h3, .logo-text { font-family: 'Poppins', sans-serif; }
   height: calc(100vh - 130px);
   gap: 0;
 }
-#editor-tab-messages.chat-open { display: flex; }
 
 .chat-inbox {
   width: 260px; flex-shrink: 0;
@@ -536,7 +535,6 @@ body.dark .chat-date-divider span { background: var(--bg); }
   height: calc(100vh - 200px);
   min-height: 400px;
 }
-#client-tab-messages.chat-open { display: flex; }
 #client-tab-messages .chat-window {
   flex: 1; border-radius: 16px;
 }
@@ -2013,7 +2011,7 @@ body.dark .chat-inbox-item.active { background: rgba(232,184,75,0.08); }
     </div>
 
     <!-- MESSAGES TAB -->
-    <div id="editor-tab-messages" class="chat-open">
+    <div id="editor-tab-messages" style="display:none;">
       <!-- Inbox sidebar -->
       <div class="chat-inbox">
         <div class="chat-inbox-header">💬 Messages</div>
@@ -2241,7 +2239,7 @@ body.dark .chat-inbox-item.active { background: rgba(232,184,75,0.08); }
     </div>
 
     <!-- MESSAGES TAB -->
-    <div id="client-tab-messages" class="chat-open">
+    <div id="client-tab-messages" style="display:none;">
       <div class="chat-window" style="border-radius:16px;">
         <div class="chat-header">
           <div class="chat-header-avatar">K</div>
