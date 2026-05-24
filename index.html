@@ -4041,7 +4041,64 @@ async function sendPasswordReset() {
 
 // ── Discord connect (placeholder) ───────────────────────────
 function connectDiscord(side) {
-  showToast('Discord integration coming soon!', 'success');
+  const subId = side + '-discord-sub';
+  const panelId = side + '-panel-connected';
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+
+  // Check if input already shown
+  if (panel.querySelector('.discord-input-row')) return;
+
+  const row = panel.querySelector('.settings-row');
+  const inputRow = document.createElement('div');
+  inputRow.className = 'discord-input-row';
+  inputRow.style.cssText = 'padding:12px 0;display:flex;flex-direction:column;gap:8px;';
+  inputRow.innerHTML = `
+    <div style="font-size:11px;color:var(--text3);line-height:1.7;">
+      1. Open Discord → pick a channel → <strong>Edit Channel</strong><br>
+      2. <strong>Integrations</strong> → <strong>Webhooks</strong> → <strong>New Webhook</strong><br>
+      3. Click <strong>Copy Webhook URL</strong> and paste below
+    </div>
+    <input id="${side}-discord-input" class="drawer-field input" type="url"
+      placeholder="https://discord.com/api/webhooks/…"
+      style="padding:9px 12px;border-radius:10px;border:1px solid var(--border2);background:var(--bg2);font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;">
+    <button class="drawer-save-btn" style="margin-top:0;" onclick="saveDiscordWebhook('${side}')">Save webhook</button>
+  `;
+  row.after(inputRow);
+
+  // Pre-fill if already saved
+  if (!DEMO_MODE && sb) {
+    const email = side === 'editor' ? CONFIG.editorEmail : currentUser?.email;
+    if (email) {
+      sb.from('profiles').select('discord_webhook').eq('email', email).single()
+        .then(({ data }) => {
+          if (data?.discord_webhook) {
+            document.getElementById(side + '-discord-input').value = data.discord_webhook;
+            document.getElementById(subId).textContent = 'Connected ✓';
+          }
+        });
+    }
+  }
+}
+
+async function saveDiscordWebhook(side) {
+  const input = document.getElementById(side + '-discord-input');
+  const url = input?.value.trim();
+  if (!url || !url.startsWith('https://discord.com/api/webhooks/')) {
+    showToast('Please enter a valid Discord webhook URL', 'error'); return;
+  }
+  if (DEMO_MODE || !sb) { showToast('Saved! (demo)', 'success'); return; }
+  const email = side === 'editor' ? CONFIG.editorEmail : currentUser?.email;
+  if (!email) return;
+  const { error } = await sb.from('profiles')
+    .update({ discord_webhook: url })
+    .eq('email', email);
+  if (error) {
+    // Row may not exist yet — insert
+    await sb.from('profiles').insert({ email, discord_webhook: url });
+  }
+  document.getElementById(side + '-discord-sub').textContent = 'Connected ✓';
+  showToast('Discord connected! ✓', 'success');
 }
 
 function updateTabSlider(barId, activeTabId) {
