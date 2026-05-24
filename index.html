@@ -148,8 +148,10 @@ body.dark .client-tab.active { color: var(--purple); border-color: var(--purple)
 /* Toggle button */
 #theme-toggle {
   position: fixed;
-  bottom: 28px; right: 28px;
-  width: 46px; height: 46px;
+  bottom: 28px;
+  left: 28px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   background: var(--glass);
   backdrop-filter: var(--glass-blur);
@@ -157,7 +159,9 @@ body.dark .client-tab.active { color: var(--purple); border-color: var(--purple)
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
   cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 20px;
   z-index: 500;
   transition: transform 0.25s cubic-bezier(0.34,1.6,0.64,1), box-shadow 0.2s;
@@ -166,7 +170,7 @@ body.dark .client-tab.active { color: var(--purple); border-color: var(--purple)
 #theme-toggle:hover { transform: scale(1.1); }
 #theme-toggle:active { transform: scale(0.95); }
 @media (max-width: 600px) {
-  #theme-toggle { bottom: 84px; right: 16px; width: 40px; height: 40px; font-size: 17px; }
+  #theme-toggle { display: none; }
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -884,7 +888,7 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
   background: rgba(180,190,210,0.35);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  z-index: 200;
+  z-index: 300;
   align-items: center; justify-content: center;
   padding: 20px;
 }
@@ -1488,30 +1492,6 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
   padding: 14px 18px;
   font-size: 13px; color: var(--text);
   z-index: 999;
-  transform: translateY(100px); opacity: 0;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  max-width: 320px;
-  display: flex; align-items: center; gap: 10px;
-}
-.toast.show { transform: translateY(0); opacity: 1; }
-.toast.success { border-color: rgba(0,180,166,0.3); }
-.toast.success .toast-dot { background: var(--teal); }
-.toast.error { border-color: rgba(224,92,138,0.3); }
-.toast.error .toast-dot { background: var(--pink); }
-.toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-
-/* ── Toast ── */
-.toast {
-  position: fixed; bottom: 24px; right: 24px;
-  background: rgba(255,255,255,0.88);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid rgba(255,255,255,0.95);
-  border-radius: var(--radius-sm);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-  padding: 14px 18px;
-  font-size: 13px; color: var(--text);
-  z-index: 999;
   transform: translateY(20px) scale(0.95); opacity: 0;
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   max-width: 320px;
@@ -1817,12 +1797,15 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
 /* MOBILE EDITOR <=600px */
 @media (max-width: 600px) {
   #screen-editor .topbar { padding: 0 16px; height: 52px; }
+  #screen-editor .topbar-logo { display: none; }
+  #screen-editor .topbar-nav { display: none; }
+  #screen-editor .topbar-right .user-chip { display: none; }
+  #screen-editor .topbar-right .btn-logout { display: none; }
   #screen-editor .topbar-logo-name { font-size: 14px; }
   #screen-editor .topbar-logo-icon { width: 28px; height: 28px; border-radius: 8px; }
   #screen-editor .topbar-logo-icon svg { width: 14px; height: 14px; }
-  #screen-editor .topbar-nav { display: none; }
-  #screen-editor .btn-logout { display: none; }
-  #screen-editor .main-content { padding: 16px 14px calc(76px + env(safe-area-inset-bottom, 16px)); }
+  #editor-mobile-brand { display: flex !important; }
+  #screen-editor .main-content { padding: 16px 14px calc(72px + max(16px, env(safe-area-inset-bottom))); }
   #screen-editor .stats-row { grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 20px; border-radius: 16px; }
   #screen-editor .stat-card + .stat-card { border-left: none; border-top: 1px solid rgba(255,255,255,0.55); }
   #screen-editor .stats-row .stat-card:nth-child(2) { border-left: 1px solid rgba(255,255,255,0.55); border-top: none; }
@@ -1919,16 +1902,14 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
   display: none;
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  height: calc(58px + env(safe-area-inset-bottom, 16px));
-  background: rgba(255,255,255,0.88);
+  background: rgba(255,255,255,0.92);
   backdrop-filter: blur(28px) saturate(200%);
   -webkit-backdrop-filter: blur(28px) saturate(200%);
   border-top: 1px solid rgba(0,0,0,0.07);
-  box-shadow: 0 -1px 0 rgba(0,0,0,0.04);
   z-index: 150;
-  padding-bottom: env(safe-area-inset-bottom, 16px);
+  padding-top: 10px;
+  padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
   align-items: flex-start;
-  padding-top: 6px;
 }
 
 /* Bottom tab bar */
@@ -1936,21 +1917,19 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
   display: none;
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  height: calc(58px + env(safe-area-inset-bottom, 16px));
-  background: rgba(255,255,255,0.88);
+  background: rgba(255,255,255,0.92);
   backdrop-filter: blur(28px) saturate(200%);
   -webkit-backdrop-filter: blur(28px) saturate(200%);
   border-top: 1px solid rgba(0,0,0,0.07);
-  box-shadow: 0 -1px 0 rgba(0,0,0,0.04);
   z-index: 150;
-  padding-bottom: env(safe-area-inset-bottom, 16px);
+  padding-top: 10px;
+  padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
   align-items: flex-start;
-  padding-top: 6px;
 }
 
 body.dark #editor-mobile-bottom-bar,
 body.dark #mobile-bottom-bar {
-  background: rgba(14,14,14,0.92);
+  background: rgba(14,14,14,0.95);
   border-top-color: rgba(255,255,255,0.06);
 }
 
@@ -2163,8 +2142,19 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
 .drawer-save-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(232,184,75,0.45); }
 .drawer-save-btn:active { transform: scale(0.97); }
 
-/* Colour swatches for appearance */
+.drawer-panel .btn-ghost {
+  flex: none;
+  width: auto;
+  padding: 6px 14px;
+  font-size: 12px;
+  border-radius: 8px;
+  align-self: center;
+}
 .colour-swatches { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+@media (min-width: 601px) {
+  .drawer, .drawer-backdrop { display: none !important; }
+}
+
 .colour-swatch {
   width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
   border: 3px solid transparent; transition: transform 0.15s, border-color 0.15s;
@@ -2249,6 +2239,14 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       <div class="topbar-tab" onclick="editorTab('messages', this)" id="editor-msg-tab">Messages</div>
     </div>
     <div class="topbar-right">
+      <!-- Mobile only: show studio brand on right -->
+      <div id="editor-mobile-brand" style="display:none;align-items:center;gap:8px;">
+        <div class="topbar-logo-icon" style="background:none;box-shadow:none;overflow:hidden;padding:0;width:28px;height:28px;">
+          <img src="icon-192.png" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
+        </div>
+        <span class="topbar-logo-name" style="font-size:14px;">Keem Studio</span>
+      </div>
+      <!-- Desktop only -->
       <div class="user-chip">
         <div class="user-avatar" id="editor-avatar">KB</div>
         <span class="user-name" id="editor-name-display">Karim</span>
@@ -2413,10 +2411,6 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
 
 <!-- ════════ EDITOR MOBILE BOTTOM BAR ════════ -->
 <div id="editor-mobile-bottom-bar">
-  <!-- Drawer trigger -->
-  <div class="mob-tab" id="editor-mob-tab-drawer" onclick="openDrawer('editor')">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-  </div>
   <div class="mob-tab active" id="editor-mob-tab-queue" onclick="editorTabMobile('queue')">
     <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
   </div>
@@ -2633,9 +2627,6 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
 
   <!-- ════════ MOBILE BOTTOM TAB BAR ════════ -->
   <div id="mobile-bottom-bar">
-    <div class="mob-tab" id="mob-tab-drawer" onclick="openDrawer('client')">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-    </div>
     <div class="mob-tab active" id="mob-tab-overview" onclick="clientTab('overview', null)">
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
     </div>
@@ -2769,7 +2760,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         <div class="settings-section">
           <div class="settings-row">
             <div><div class="settings-row-label">Change password</div><div class="settings-row-sub">Send a reset link to your email</div></div>
-            <button class="btn-ghost" style="font-size:12px;padding:6px 12px;flex-shrink:0;" onclick="sendPasswordReset()">Send link</button>
+            <button class="btn-ghost"  onclick="sendPasswordReset()">Send link</button>
           </div>
         </div>
       </div>
@@ -2790,7 +2781,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
               <div class="settings-row-label">Discord</div>
               <div class="settings-row-sub" id="editor-discord-sub">Not connected</div>
             </div>
-            <button class="btn-ghost" style="font-size:12px;padding:6px 12px;flex-shrink:0;" onclick="connectDiscord('editor')">Connect</button>
+            <button class="btn-ghost"  onclick="connectDiscord('editor')">Connect</button>
           </div>
         </div>
       </div>
@@ -2822,6 +2813,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       </div>
     </div>
   </div>
+</div>
 
 <!-- ════════ CLIENT DRAWER ════════ -->
 <div class="drawer-backdrop" id="client-drawer-backdrop" onclick="closeDrawer('client')"></div>
@@ -2946,7 +2938,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         <div class="settings-section">
           <div class="settings-row">
             <div><div class="settings-row-label">Change password</div><div class="settings-row-sub">Send a reset link to your email</div></div>
-            <button class="btn-ghost" style="font-size:12px;padding:6px 12px;flex-shrink:0;" onclick="sendPasswordReset()">Send link</button>
+            <button class="btn-ghost"  onclick="sendPasswordReset()">Send link</button>
           </div>
         </div>
       </div>
@@ -2967,7 +2959,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
               <div class="settings-row-label">Discord</div>
               <div class="settings-row-sub" id="client-discord-sub">Not connected</div>
             </div>
-            <button class="btn-ghost" style="font-size:12px;padding:6px 12px;flex-shrink:0;" onclick="connectDiscord('client')">Connect</button>
+            <button class="btn-ghost"  onclick="connectDiscord('client')">Connect</button>
           </div>
         </div>
       </div>
@@ -3229,7 +3221,6 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
 </div>
 
 <!-- THEME TOGGLE -->
-<button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">&#127769;</button>
 
 <!-- TOAST -->
 <div class="toast" id="toast">
@@ -3722,6 +3713,7 @@ async function loadClientsPage() {
       const { data: profiles } = await sb.from('profiles').select('email, display_name, contact, avatar_url');
       if (profiles) {
         profiles.forEach(p => {
+          if (p.email === CONFIG.editorEmail) return; // never show editor as a client
           if (!clientMap[p.email]) clientMap[p.email] = { name: p.display_name || p.email.split('@')[0], email: p.email, jobs: [] };
           // Enrich with profile data
           if (p.display_name) clientMap[p.email].name = p.display_name;
@@ -3899,7 +3891,7 @@ async function loadEditorProfile() {
   if (DEMO_MODE || !sb) return;
   const { data } = await sb.from('profiles').select('*').eq('email', CONFIG.editorEmail).single();
   if (!data) return;
-  document.getElementById('ep-name').value = data.name || '';
+  document.getElementById('ep-name').value = data.display_name || '';
   document.getElementById('ep-bio').value = data.bio || '';
   document.getElementById('ep-contact').value = data.contact || '';
   document.getElementById('ep-instagram').value = data.instagram || '';
@@ -3916,7 +3908,7 @@ async function loadClientProfile() {
   if (!currentUser || !sb) return;
   const { data } = await sb.from('profiles').select('*').eq('email', currentUser.email).single();
   if (!data) return;
-  document.getElementById('cp-name').value = data.name || '';
+  document.getElementById('cp-name').value = data.display_name || '';
   document.getElementById('cp-bio').value = data.bio || '';
   document.getElementById('cp-contact').value = data.contact || '';
   document.getElementById('cp-instagram').value = data.instagram || '';
@@ -3936,7 +3928,7 @@ async function saveDrawerProfile(side) {
   if (!email) return;
   const payload = {
     email,
-    name: document.getElementById(prefix + '-name').value.trim(),
+    display_name: document.getElementById(prefix + '-name').value.trim(),
     bio: document.getElementById(prefix + '-bio').value.trim(),
     contact: document.getElementById(prefix + '-contact').value.trim(),
     instagram: document.getElementById(prefix + '-instagram').value.trim(),
@@ -3944,12 +3936,24 @@ async function saveDrawerProfile(side) {
     youtube: document.getElementById(prefix + '-youtube').value.trim(),
     website: document.getElementById(prefix + '-website').value.trim(),
   };
-  const { error } = await sb.from('profiles').upsert(payload, { onConflict: 'email' });
-  if (error) { showToast('Error saving profile', 'error'); return; }
+  // Try update first, then insert if not exists
+  const { error: updateError } = await sb.from('profiles').update(payload).eq('email', email);
+  if (updateError) {
+    const { error: insertError } = await sb.from('profiles').insert(payload);
+    if (insertError) {
+      console.error('Profile save error:', insertError);
+      showToast('Error: ' + insertError.message, 'error');
+      return;
+    }
+  }
   showToast('Profile saved! ✓', 'success');
-  // Update drawer header name
-  if (payload.name) {
-    document.getElementById('drawer-' + side + '-name').textContent = payload.name;
+  if (payload.display_name) {
+    document.getElementById('drawer-' + side + '-name').textContent = payload.display_name;
+    // Also update desktop user chip if editor
+    if (side === 'editor') {
+      const nameEl = document.getElementById('editor-name-display');
+      if (nameEl) nameEl.textContent = payload.display_name;
+    }
   }
 }
 
@@ -4021,7 +4025,64 @@ async function sendPasswordReset() {
 
 // ── Discord connect (placeholder) ───────────────────────────
 function connectDiscord(side) {
-  showToast('Discord integration coming soon!', 'success');
+  const subId = side + '-discord-sub';
+  const panelId = side + '-panel-connected';
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+
+  // Check if input already shown
+  if (panel.querySelector('.discord-input-row')) return;
+
+  const row = panel.querySelector('.settings-row');
+  const inputRow = document.createElement('div');
+  inputRow.className = 'discord-input-row';
+  inputRow.style.cssText = 'padding:12px 0;display:flex;flex-direction:column;gap:8px;';
+  inputRow.innerHTML = `
+    <div style="font-size:11px;color:var(--text3);line-height:1.7;">
+      1. Open Discord → pick a channel → <strong>Edit Channel</strong><br>
+      2. <strong>Integrations</strong> → <strong>Webhooks</strong> → <strong>New Webhook</strong><br>
+      3. Click <strong>Copy Webhook URL</strong> and paste below
+    </div>
+    <input id="${side}-discord-input" class="drawer-field input" type="url"
+      placeholder="https://discord.com/api/webhooks/…"
+      style="padding:9px 12px;border-radius:10px;border:1px solid var(--border2);background:var(--bg2);font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;">
+    <button class="drawer-save-btn" style="margin-top:0;" onclick="saveDiscordWebhook('${side}')">Save webhook</button>
+  `;
+  row.after(inputRow);
+
+  // Pre-fill if already saved
+  if (!DEMO_MODE && sb) {
+    const email = side === 'editor' ? CONFIG.editorEmail : currentUser?.email;
+    if (email) {
+      sb.from('profiles').select('discord_webhook').eq('email', email).single()
+        .then(({ data }) => {
+          if (data?.discord_webhook) {
+            document.getElementById(side + '-discord-input').value = data.discord_webhook;
+            document.getElementById(subId).textContent = 'Connected ✓';
+          }
+        });
+    }
+  }
+}
+
+async function saveDiscordWebhook(side) {
+  const input = document.getElementById(side + '-discord-input');
+  const url = input?.value.trim();
+  if (!url || !url.startsWith('https://discord.com/api/webhooks/')) {
+    showToast('Please enter a valid Discord webhook URL', 'error'); return;
+  }
+  if (DEMO_MODE || !sb) { showToast('Saved! (demo)', 'success'); return; }
+  const email = side === 'editor' ? CONFIG.editorEmail : currentUser?.email;
+  if (!email) return;
+  const { error } = await sb.from('profiles')
+    .update({ discord_webhook: url })
+    .eq('email', email);
+  if (error) {
+    // Row may not exist yet — insert
+    await sb.from('profiles').insert({ email, discord_webhook: url });
+  }
+  document.getElementById(side + '-discord-sub').textContent = 'Connected ✓';
+  showToast('Discord connected! ✓', 'success');
 }
 
 function updateTabSlider(barId, activeTabId) {
@@ -5507,5 +5568,6 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+<button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
 </body>
 </html>
