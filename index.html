@@ -166,7 +166,7 @@ body.dark .client-tab.active { color: var(--purple); border-color: var(--purple)
 #theme-toggle:hover { transform: scale(1.1); }
 #theme-toggle:active { transform: scale(0.95); }
 @media (max-width: 600px) {
-  #theme-toggle { display: none; }
+  #theme-toggle { bottom: 84px; right: 16px; width: 40px; height: 40px; font-size: 17px; }
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1817,15 +1817,12 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
 /* MOBILE EDITOR <=600px */
 @media (max-width: 600px) {
   #screen-editor .topbar { padding: 0 16px; height: 52px; }
-  #screen-editor .topbar-logo { display: none; }
-  #screen-editor .topbar-nav { display: none; }
-  #screen-editor .topbar-right .user-chip { display: none; }
-  #screen-editor .topbar-right .btn-logout { display: none; }
   #screen-editor .topbar-logo-name { font-size: 14px; }
   #screen-editor .topbar-logo-icon { width: 28px; height: 28px; border-radius: 8px; }
   #screen-editor .topbar-logo-icon svg { width: 14px; height: 14px; }
-  #editor-mobile-brand { display: flex !important; }
-  #screen-editor .main-content { padding: 16px 14px calc(72px + max(16px, env(safe-area-inset-bottom))); }
+  #screen-editor .topbar-nav { display: none; }
+  #screen-editor .btn-logout { display: none; }
+  #screen-editor .main-content { padding: 16px 14px 76px; }
   #screen-editor .stats-row { grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 20px; border-radius: 16px; }
   #screen-editor .stat-card + .stat-card { border-left: none; border-top: 1px solid rgba(255,255,255,0.55); }
   #screen-editor .stats-row .stat-card:nth-child(2) { border-left: 1px solid rgba(255,255,255,0.55); border-top: none; }
@@ -1922,14 +1919,14 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
   display: none;
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  background: rgba(255,255,255,0.92);
+  height: 58px;
+  background: rgba(255,255,255,0.88);
   backdrop-filter: blur(28px) saturate(200%);
   -webkit-backdrop-filter: blur(28px) saturate(200%);
   border-top: 1px solid rgba(0,0,0,0.07);
+  box-shadow: 0 -1px 0 rgba(0,0,0,0.04);
   z-index: 150;
-  padding-top: 10px;
-  padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
-  align-items: flex-start;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Bottom tab bar */
@@ -1937,19 +1934,19 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
   display: none;
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  background: rgba(255,255,255,0.92);
+  height: 58px;
+  background: rgba(255,255,255,0.88);
   backdrop-filter: blur(28px) saturate(200%);
   -webkit-backdrop-filter: blur(28px) saturate(200%);
   border-top: 1px solid rgba(0,0,0,0.07);
+  box-shadow: 0 -1px 0 rgba(0,0,0,0.04);
   z-index: 150;
-  padding-top: 10px;
-  padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
-  align-items: flex-start;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 body.dark #editor-mobile-bottom-bar,
 body.dark #mobile-bottom-bar {
-  background: rgba(14,14,14,0.95);
+  background: rgba(14,14,14,0.92);
   border-top-color: rgba(255,255,255,0.06);
 }
 
@@ -2162,14 +2159,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
 .drawer-save-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(232,184,75,0.45); }
 .drawer-save-btn:active { transform: scale(0.97); }
 
-.drawer-panel .btn-ghost {
-  flex: none;
-  width: auto;
-  padding: 6px 14px;
-  font-size: 12px;
-  border-radius: 8px;
-  align-self: center;
-}
+/* Colour swatches for appearance */
 .colour-swatches { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
 .colour-swatch {
   width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
@@ -2255,14 +2245,6 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       <div class="topbar-tab" onclick="editorTab('messages', this)" id="editor-msg-tab">Messages</div>
     </div>
     <div class="topbar-right">
-      <!-- Mobile only: show studio brand on right -->
-      <div id="editor-mobile-brand" style="display:none;align-items:center;gap:8px;">
-        <div class="topbar-logo-icon" style="background:none;box-shadow:none;overflow:hidden;padding:0;width:28px;height:28px;">
-          <img src="icon-192.png" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
-        </div>
-        <span class="topbar-logo-name" style="font-size:14px;">Keem Studio</span>
-      </div>
-      <!-- Desktop only -->
       <div class="user-chip">
         <div class="user-avatar" id="editor-avatar">KB</div>
         <span class="user-name" id="editor-name-display">Karim</span>
@@ -2427,6 +2409,10 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
 
 <!-- ════════ EDITOR MOBILE BOTTOM BAR ════════ -->
 <div id="editor-mobile-bottom-bar">
+  <!-- Drawer trigger -->
+  <div class="mob-tab" id="editor-mob-tab-drawer" onclick="openDrawer('editor')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+  </div>
   <div class="mob-tab active" id="editor-mob-tab-queue" onclick="editorTabMobile('queue')">
     <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
   </div>
@@ -2643,6 +2629,9 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
 
   <!-- ════════ MOBILE BOTTOM TAB BAR ════════ -->
   <div id="mobile-bottom-bar">
+    <div class="mob-tab" id="mob-tab-drawer" onclick="openDrawer('client')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    </div>
     <div class="mob-tab active" id="mob-tab-overview" onclick="clientTab('overview', null)">
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
     </div>
@@ -2723,112 +2712,46 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       </button>
       <div class="drawer-panel-title">Settings</div>
     </div>
-    <div class="drawer-panel-body" style="padding:8px 0;">
-      <div class="drawer-item" onclick="openDrawerPanel('editor','appearance')">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-        <span class="drawer-item-label">Appearance</span>
-        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-      <div class="drawer-item" onclick="openDrawerPanel('editor','account')">
-        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <span class="drawer-item-label">Account</span>
-        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-      <div class="drawer-item" onclick="openDrawerPanel('editor','connected')">
-        <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-        <span class="drawer-item-label">Connected accounts</span>
-        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-      <div class="drawer-item" onclick="openDrawerPanel('editor','notifications')">
-        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span class="drawer-item-label">Notifications</span>
-        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-    </div>
-
-    <!-- Appearance sub-page -->
-    <div class="drawer-panel" id="editor-panel-appearance">
-      <div class="drawer-panel-header">
-        <button class="drawer-back-btn" onclick="closeDrawerPanel('editor','appearance')">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <div class="drawer-panel-title">Appearance</div>
-      </div>
-      <div class="drawer-panel-body">
-        <div class="settings-section">
-          <div class="settings-row">
-            <div><div class="settings-row-label">Dark mode</div></div>
-            <button class="settings-toggle" id="editor-dark-toggle" onclick="toggleTheme();updateDrawerToggles()"></button>
-          </div>
+    <div class="drawer-panel-body">
+      <div class="settings-section">
+        <div class="settings-section-title">Appearance</div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Dark mode</div></div>
+          <button class="settings-toggle" id="editor-dark-toggle" onclick="toggleTheme();updateDrawerToggles()" ></button>
         </div>
       </div>
-    </div>
-
-    <!-- Account sub-page -->
-    <div class="drawer-panel" id="editor-panel-account">
-      <div class="drawer-panel-header">
-        <button class="drawer-back-btn" onclick="closeDrawerPanel('editor','account')">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <div class="drawer-panel-title">Account</div>
-      </div>
-      <div class="drawer-panel-body">
-        <div class="settings-section">
-          <div class="settings-row">
-            <div><div class="settings-row-label">Change password</div><div class="settings-row-sub">Send a reset link to your email</div></div>
-            <button class="btn-ghost"  onclick="sendPasswordReset()">Send link</button>
-          </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Account</div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Change password</div><div class="settings-row-sub">Send reset link to your email</div></div>
+          <button class="btn-ghost" style="font-size:12px;padding:6px 12px;" onclick="sendPasswordReset()">Send link</button>
         </div>
       </div>
-    </div>
-
-    <!-- Connected accounts sub-page -->
-    <div class="drawer-panel" id="editor-panel-connected">
-      <div class="drawer-panel-header">
-        <button class="drawer-back-btn" onclick="closeDrawerPanel('editor','connected')">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <div class="drawer-panel-title">Connected accounts</div>
-      </div>
-      <div class="drawer-panel-body">
-        <div class="settings-section">
-          <div class="settings-row">
-            <div>
-              <div class="settings-row-label">Discord</div>
-              <div class="settings-row-sub" id="editor-discord-sub">Not connected</div>
-            </div>
-            <button class="btn-ghost"  onclick="connectDiscord('editor')">Connect</button>
-          </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Connected accounts</div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Discord</div><div class="settings-row-sub" id="editor-discord-sub">Not connected</div></div>
+          <button class="btn-ghost" style="font-size:12px;padding:6px 12px;" onclick="connectDiscord('editor')">Connect</button>
         </div>
       </div>
-    </div>
-
-    <!-- Notifications sub-page -->
-    <div class="drawer-panel" id="editor-panel-notifications">
-      <div class="drawer-panel-header">
-        <button class="drawer-back-btn" onclick="closeDrawerPanel('editor','notifications')">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <div class="drawer-panel-title">Notifications</div>
-      </div>
-      <div class="drawer-panel-body">
-        <div class="settings-section">
-          <div class="settings-row">
-            <div class="settings-row-label">New job requests</div>
-            <button class="settings-toggle on" id="notif-new-job" onclick="this.classList.toggle('on')"></button>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-label">Client messages</div>
-            <button class="settings-toggle on" id="notif-messages" onclick="this.classList.toggle('on')"></button>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-label">File uploads</div>
-            <button class="settings-toggle on" id="notif-uploads" onclick="this.classList.toggle('on')"></button>
-          </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Notifications</div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">New job requests</div></div>
+          <button class="settings-toggle on" id="notif-new-job" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Client messages</div></div>
+          <button class="settings-toggle on" id="notif-messages" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">File uploads</div></div>
+          <button class="settings-toggle on" id="notif-uploads" onclick="this.classList.toggle('on')"></button>
         </div>
       </div>
     </div>
   </div>
+</div>
 
 <!-- ════════ CLIENT DRAWER ════════ -->
 <div class="drawer-backdrop" id="client-drawer-backdrop" onclick="closeDrawer('client')"></div>
@@ -2889,46 +2812,15 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       </button>
       <div class="drawer-panel-title">Settings</div>
     </div>
-    <div class="drawer-panel-body" style="padding:8px 0;">
-      <div class="drawer-item" onclick="openDrawerPanel('client','appearance')">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-        <span class="drawer-item-label">Appearance</span>
-        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-      <div class="drawer-item" onclick="openDrawerPanel('client','account')">
-        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <span class="drawer-item-label">Account</span>
-        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-      <div class="drawer-item" onclick="openDrawerPanel('client','connected')">
-        <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-        <span class="drawer-item-label">Connected accounts</span>
-        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-      <div class="drawer-item" onclick="openDrawerPanel('client','notifications')">
-        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span class="drawer-item-label">Notifications</span>
-        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-    </div>
-
-    <!-- Appearance sub-page -->
-    <div class="drawer-panel" id="client-panel-appearance">
-      <div class="drawer-panel-header">
-        <button class="drawer-back-btn" onclick="closeDrawerPanel('client','appearance')">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <div class="drawer-panel-title">Appearance</div>
-      </div>
-      <div class="drawer-panel-body">
-        <div class="settings-section">
-          <div class="settings-row">
-            <div><div class="settings-row-label">Dark mode</div></div>
-            <button class="settings-toggle" id="client-dark-toggle" onclick="toggleTheme();updateDrawerToggles()"></button>
-          </div>
+    <div class="drawer-panel-body">
+      <div class="settings-section">
+        <div class="settings-section-title">Appearance</div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Dark mode</div></div>
+          <button class="settings-toggle" id="client-dark-toggle" onclick="toggleTheme();updateDrawerToggles()"></button>
         </div>
-        <div class="settings-section">
-          <div class="settings-section-title">Accent colour</div>
+        <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:10px;">
+          <div class="settings-row-label">Accent colour</div>
           <div class="colour-swatches" id="client-colour-swatches">
             <div class="colour-swatch selected" style="background:#e8b84b;" onclick="setClientAccent('#e8b84b','#f5d478',this)" title="Gold"></div>
             <div class="colour-swatch" style="background:#8b5cf6;" onclick="setClientAccent('#8b5cf6','#a78bfa',this)" title="Purple"></div>
@@ -2939,69 +2831,33 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Account sub-page -->
-    <div class="drawer-panel" id="client-panel-account">
-      <div class="drawer-panel-header">
-        <button class="drawer-back-btn" onclick="closeDrawerPanel('client','account')">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <div class="drawer-panel-title">Account</div>
-      </div>
-      <div class="drawer-panel-body">
-        <div class="settings-section">
-          <div class="settings-row">
-            <div><div class="settings-row-label">Change password</div><div class="settings-row-sub">Send a reset link to your email</div></div>
-            <button class="btn-ghost"  onclick="sendPasswordReset()">Send link</button>
-          </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Account</div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Change password</div><div class="settings-row-sub">Send reset link to your email</div></div>
+          <button class="btn-ghost" style="font-size:12px;padding:6px 12px;" onclick="sendPasswordReset()">Send link</button>
         </div>
       </div>
-    </div>
-
-    <!-- Connected accounts sub-page -->
-    <div class="drawer-panel" id="client-panel-connected">
-      <div class="drawer-panel-header">
-        <button class="drawer-back-btn" onclick="closeDrawerPanel('client','connected')">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <div class="drawer-panel-title">Connected accounts</div>
-      </div>
-      <div class="drawer-panel-body">
-        <div class="settings-section">
-          <div class="settings-row">
-            <div>
-              <div class="settings-row-label">Discord</div>
-              <div class="settings-row-sub" id="client-discord-sub">Not connected</div>
-            </div>
-            <button class="btn-ghost"  onclick="connectDiscord('client')">Connect</button>
-          </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Connected accounts</div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Discord</div><div class="settings-row-sub" id="client-discord-sub">Not connected</div></div>
+          <button class="btn-ghost" style="font-size:12px;padding:6px 12px;" onclick="connectDiscord('client')">Connect</button>
         </div>
       </div>
-    </div>
-
-    <!-- Notifications sub-page -->
-    <div class="drawer-panel" id="client-panel-notifications">
-      <div class="drawer-panel-header">
-        <button class="drawer-back-btn" onclick="closeDrawerPanel('client','notifications')">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <div class="drawer-panel-title">Notifications</div>
-      </div>
-      <div class="drawer-panel-body">
-        <div class="settings-section">
-          <div class="settings-row">
-            <div class="settings-row-label">Job status updates</div>
-            <button class="settings-toggle on" id="client-notif-status" onclick="this.classList.toggle('on')"></button>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-label">Delivery notifications</div>
-            <button class="settings-toggle on" id="client-notif-delivery" onclick="this.classList.toggle('on')"></button>
-          </div>
-          <div class="settings-row">
-            <div class="settings-row-label">New messages</div>
-            <button class="settings-toggle on" id="client-notif-messages" onclick="this.classList.toggle('on')"></button>
-          </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Notifications</div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Job status updates</div></div>
+          <button class="settings-toggle on" id="client-notif-status" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">Delivery notifications</div></div>
+          <button class="settings-toggle on" id="client-notif-delivery" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-row-label">New messages</div></div>
+          <button class="settings-toggle on" id="client-notif-messages" onclick="this.classList.toggle('on')"></button>
         </div>
       </div>
     </div>
@@ -3729,7 +3585,6 @@ async function loadClientsPage() {
       const { data: profiles } = await sb.from('profiles').select('email, display_name, contact, avatar_url');
       if (profiles) {
         profiles.forEach(p => {
-          if (p.email === CONFIG.editorEmail) return; // never show editor as a client
           if (!clientMap[p.email]) clientMap[p.email] = { name: p.display_name || p.email.split('@')[0], email: p.email, jobs: [] };
           // Enrich with profile data
           if (p.display_name) clientMap[p.email].name = p.display_name;
@@ -3853,16 +3708,17 @@ function updateDrawerToggles() {
 // ── Swipe gesture ────────────────────────────────────────────
 (function() {
   let touchStartX = 0, touchStartY = 0, drawerSide = null, drawerEl = null, backdropEl = null;
-  const MIN_SWIPE = 60; // minimum px to trigger open
+  const EDGE_THRESHOLD = 28; // px from left edge to trigger
 
   document.addEventListener('touchstart', e => {
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
     drawerSide = null;
+    // Editor screen active?
     const editorActive = document.getElementById('screen-editor')?.classList.contains('active');
     const clientActive = document.getElementById('screen-client')?.classList.contains('active');
-    if (editorActive) drawerSide = 'editor';
-    else if (clientActive) drawerSide = 'client';
+    if (editorActive) { drawerSide = 'editor'; }
+    else if (clientActive) { drawerSide = 'client'; }
     if (!drawerSide) return;
     drawerEl = document.getElementById(drawerSide + '-drawer');
     backdropEl = document.getElementById(drawerSide + '-drawer-backdrop');
@@ -3872,16 +3728,18 @@ function updateDrawerToggles() {
     if (!drawerSide || !drawerEl) return;
     const dx = e.touches[0].clientX - touchStartX;
     const dy = Math.abs(e.touches[0].clientY - touchStartY);
-    if (dy > 40) return;
+    if (dy > 40) return; // mostly vertical — ignore
     const isOpen = drawerEl.classList.contains('open');
 
-    if (!isOpen && dx > 0) {
+    if (!isOpen && touchStartX <= EDGE_THRESHOLD && dx > 0) {
+      // Dragging open from left edge
       const pct = Math.min(dx / 280, 1);
       drawerEl.style.transition = 'none';
       drawerEl.style.transform = `translateX(${-100 + pct * 100}%)`;
       backdropEl.style.background = `rgba(0,0,0,${pct * 0.45})`;
       backdropEl.style.pointerEvents = 'all';
     } else if (isOpen && dx < 0) {
+      // Dragging closed
       const pct = Math.max(0, 1 + dx / 280);
       drawerEl.style.transition = 'none';
       drawerEl.style.transform = `translateX(${-(1 - pct) * 100}%)`;
@@ -3897,8 +3755,8 @@ function updateDrawerToggles() {
     backdropEl.style.background = '';
     backdropEl.style.pointerEvents = '';
 
-    if (dx > MIN_SWIPE && !drawerEl.classList.contains('open')) openDrawer(drawerSide);
-    else if (dx < -MIN_SWIPE && drawerEl.classList.contains('open')) closeDrawer(drawerSide);
+    if (dx > 60 && touchStartX <= EDGE_THRESHOLD) openDrawer(drawerSide);
+    else if (dx < -60 && drawerEl.classList.contains('open')) closeDrawer(drawerSide);
   }, { passive: true });
 })();
 
@@ -3907,7 +3765,7 @@ async function loadEditorProfile() {
   if (DEMO_MODE || !sb) return;
   const { data } = await sb.from('profiles').select('*').eq('email', CONFIG.editorEmail).single();
   if (!data) return;
-  document.getElementById('ep-name').value = data.display_name || '';
+  document.getElementById('ep-name').value = data.name || '';
   document.getElementById('ep-bio').value = data.bio || '';
   document.getElementById('ep-contact').value = data.contact || '';
   document.getElementById('ep-instagram').value = data.instagram || '';
@@ -3924,7 +3782,7 @@ async function loadClientProfile() {
   if (!currentUser || !sb) return;
   const { data } = await sb.from('profiles').select('*').eq('email', currentUser.email).single();
   if (!data) return;
-  document.getElementById('cp-name').value = data.display_name || '';
+  document.getElementById('cp-name').value = data.name || '';
   document.getElementById('cp-bio').value = data.bio || '';
   document.getElementById('cp-contact').value = data.contact || '';
   document.getElementById('cp-instagram').value = data.instagram || '';
@@ -3944,7 +3802,7 @@ async function saveDrawerProfile(side) {
   if (!email) return;
   const payload = {
     email,
-    display_name: document.getElementById(prefix + '-name').value.trim(),
+    name: document.getElementById(prefix + '-name').value.trim(),
     bio: document.getElementById(prefix + '-bio').value.trim(),
     contact: document.getElementById(prefix + '-contact').value.trim(),
     instagram: document.getElementById(prefix + '-instagram').value.trim(),
@@ -3952,24 +3810,12 @@ async function saveDrawerProfile(side) {
     youtube: document.getElementById(prefix + '-youtube').value.trim(),
     website: document.getElementById(prefix + '-website').value.trim(),
   };
-  // Try update first, then insert if not exists
-  const { error: updateError } = await sb.from('profiles').update(payload).eq('email', email);
-  if (updateError) {
-    const { error: insertError } = await sb.from('profiles').insert(payload);
-    if (insertError) {
-      console.error('Profile save error:', insertError);
-      showToast('Error: ' + insertError.message, 'error');
-      return;
-    }
-  }
+  const { error } = await sb.from('profiles').upsert(payload, { onConflict: 'email' });
+  if (error) { showToast('Error saving profile', 'error'); return; }
   showToast('Profile saved! ✓', 'success');
-  if (payload.display_name) {
-    document.getElementById('drawer-' + side + '-name').textContent = payload.display_name;
-    // Also update desktop user chip if editor
-    if (side === 'editor') {
-      const nameEl = document.getElementById('editor-name-display');
-      if (nameEl) nameEl.textContent = payload.display_name;
-    }
+  // Update drawer header name
+  if (payload.name) {
+    document.getElementById('drawer-' + side + '-name').textContent = payload.name;
   }
 }
 
@@ -3978,14 +3824,15 @@ async function uploadDrawerAvatar(input, side) {
   if (!file || !sb) return;
   const email = side === 'editor' ? CONFIG.editorEmail : currentUser?.email;
   if (!email) return;
-  const ext = file.name.split('.').pop();
-  const path = `${email.replace(/[@.]/g,'_')}_${Date.now()}.${ext}`;
-  const { error } = await sb.storage.from('avatars').upload(path, file, { upsert: true });
-  if (error) { showToast('Upload failed: ' + error.message, 'error'); return; }
-  const { data: urlData } = sb.storage.from('avatars').getPublicUrl(path);
+  const path = `avatars/${email.replace('@','_')}_${Date.now()}.${file.name.split('.').pop()}`;
+  const { error } = await sb.storage.from('client-assets').upload(path, file, { upsert: true });
+  if (error) { showToast('Upload failed', 'error'); return; }
+  const { data: urlData } = sb.storage.from('client-assets').getPublicUrl(path);
   const url = urlData?.publicUrl;
-  if (!url) { showToast('Could not get image URL', 'error'); return; }
+  if (!url) return;
+  // Save to profile
   await sb.from('profiles').upsert({ email, avatar_url: url }, { onConflict: 'email' });
+  // Update UI
   const avatarId = side + '-profile-avatar';
   document.getElementById(avatarId).innerHTML = `<img src="${url}">`;
   document.getElementById('drawer-' + side + '-avatar').innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
