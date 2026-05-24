@@ -148,10 +148,8 @@ body.dark .client-tab.active { color: var(--purple); border-color: var(--purple)
 /* Toggle button */
 #theme-toggle {
   position: fixed;
-  bottom: 28px;
-  left: 28px;
-  width: 46px;
-  height: 46px;
+  bottom: 28px; right: 28px;
+  width: 46px; height: 46px;
   border-radius: 50%;
   background: var(--glass);
   backdrop-filter: var(--glass-blur);
@@ -159,9 +157,7 @@ body.dark .client-tab.active { color: var(--purple); border-color: var(--purple)
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   font-size: 20px;
   z-index: 500;
   transition: transform 0.25s cubic-bezier(0.34,1.6,0.64,1), box-shadow 0.2s;
@@ -888,7 +884,7 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
   background: rgba(180,190,210,0.35);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  z-index: 300;
+  z-index: 200;
   align-items: center; justify-content: center;
   padding: 20px;
 }
@@ -1479,6 +1475,30 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
 .empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
 .empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
 .empty-state p { font-size: 14px; }
+
+/* ── Toast ── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255,255,255,0.95);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  padding: 14px 18px;
+  font-size: 13px; color: var(--text);
+  z-index: 999;
+  transform: translateY(100px); opacity: 0;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-width: 320px;
+  display: flex; align-items: center; gap: 10px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-color: rgba(0,180,166,0.3); }
+.toast.success .toast-dot { background: var(--teal); }
+.toast.error { border-color: rgba(224,92,138,0.3); }
+.toast.error .toast-dot { background: var(--pink); }
+.toast-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
 /* ── Toast ── */
 .toast {
@@ -2151,10 +2171,6 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
   align-self: center;
 }
 .colour-swatches { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
-@media (min-width: 601px) {
-  .drawer, .drawer-backdrop { display: none !important; }
-}
-
 .colour-swatch {
   width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
   border: 3px solid transparent; transition: transform 0.15s, border-color 0.15s;
@@ -3220,6 +3236,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
 </div>
 
 <!-- THEME TOGGLE -->
+<button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">&#127769;</button>
 
 <!-- TOAST -->
 <div class="toast" id="toast">
@@ -4024,64 +4041,7 @@ async function sendPasswordReset() {
 
 // ── Discord connect (placeholder) ───────────────────────────
 function connectDiscord(side) {
-  const subId = side + '-discord-sub';
-  const panelId = side + '-panel-connected';
-  const panel = document.getElementById(panelId);
-  if (!panel) return;
-
-  // Check if input already shown
-  if (panel.querySelector('.discord-input-row')) return;
-
-  const row = panel.querySelector('.settings-row');
-  const inputRow = document.createElement('div');
-  inputRow.className = 'discord-input-row';
-  inputRow.style.cssText = 'padding:12px 0;display:flex;flex-direction:column;gap:8px;';
-  inputRow.innerHTML = `
-    <div style="font-size:11px;color:var(--text3);line-height:1.7;">
-      1. Open Discord → pick a channel → <strong>Edit Channel</strong><br>
-      2. <strong>Integrations</strong> → <strong>Webhooks</strong> → <strong>New Webhook</strong><br>
-      3. Click <strong>Copy Webhook URL</strong> and paste below
-    </div>
-    <input id="${side}-discord-input" class="drawer-field input" type="url"
-      placeholder="https://discord.com/api/webhooks/…"
-      style="padding:9px 12px;border-radius:10px;border:1px solid var(--border2);background:var(--bg2);font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;width:100%;box-sizing:border-box;">
-    <button class="drawer-save-btn" style="margin-top:0;" onclick="saveDiscordWebhook('${side}')">Save webhook</button>
-  `;
-  row.after(inputRow);
-
-  // Pre-fill if already saved
-  if (!DEMO_MODE && sb) {
-    const email = side === 'editor' ? CONFIG.editorEmail : currentUser?.email;
-    if (email) {
-      sb.from('profiles').select('discord_webhook').eq('email', email).single()
-        .then(({ data }) => {
-          if (data?.discord_webhook) {
-            document.getElementById(side + '-discord-input').value = data.discord_webhook;
-            document.getElementById(subId).textContent = 'Connected ✓';
-          }
-        });
-    }
-  }
-}
-
-async function saveDiscordWebhook(side) {
-  const input = document.getElementById(side + '-discord-input');
-  const url = input?.value.trim();
-  if (!url || !url.startsWith('https://discord.com/api/webhooks/')) {
-    showToast('Please enter a valid Discord webhook URL', 'error'); return;
-  }
-  if (DEMO_MODE || !sb) { showToast('Saved! (demo)', 'success'); return; }
-  const email = side === 'editor' ? CONFIG.editorEmail : currentUser?.email;
-  if (!email) return;
-  const { error } = await sb.from('profiles')
-    .update({ discord_webhook: url })
-    .eq('email', email);
-  if (error) {
-    // Row may not exist yet — insert
-    await sb.from('profiles').insert({ email, discord_webhook: url });
-  }
-  document.getElementById(side + '-discord-sub').textContent = 'Connected ✓';
-  showToast('Discord connected! ✓', 'success');
+  showToast('Discord integration coming soon!', 'success');
 }
 
 function updateTabSlider(barId, activeTabId) {
@@ -5567,6 +5527,5 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
-<button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
 </body>
 </html>
