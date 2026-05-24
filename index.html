@@ -568,8 +568,116 @@ body.dark .chat-inbox-item:hover,
 body.dark .chat-inbox-item.active { background: rgba(232,184,75,0.08); }
 
 /* ════════════════════════════════════
-   CLIENT ASSETS SYSTEM
+   SPOTLIGHT ONBOARDING
 ════════════════════════════════════ */
+#onboarding-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+#onboarding-overlay.active { display: block; }
+
+/* Dark backdrop with hole cut out via SVG */
+#onboarding-backdrop {
+  position: fixed; inset: 0;
+  pointer-events: all;
+  cursor: pointer;
+}
+
+/* Tooltip card */
+#onboarding-card {
+  position: fixed;
+  background: var(--bg);
+  border-radius: 18px;
+  padding: 22px 24px;
+  width: 300px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1);
+  pointer-events: all;
+  z-index: 1001;
+  animation: cardIn 0.35s cubic-bezier(0.34,1.3,0.64,1) both;
+}
+body.dark #onboarding-card { background: #1a1a1a; }
+
+.onboarding-step-label {
+  font-size: 11px; font-weight: 700;
+  color: var(--purple);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+.onboarding-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px; font-weight: 700;
+  color: var(--text); margin-bottom: 8px;
+}
+.onboarding-body {
+  font-size: 13px; color: var(--text2);
+  line-height: 1.55; margin-bottom: 18px;
+}
+.onboarding-footer {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.onboarding-dots {
+  display: flex; gap: 5px; align-items: center;
+}
+.onboarding-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--border2); transition: background 0.2s, width 0.2s;
+}
+.onboarding-dot.active {
+  background: var(--purple); width: 18px; border-radius: 3px;
+}
+.onboarding-actions { display: flex; gap: 8px; }
+.onboarding-skip {
+  font-size: 12px; color: var(--text3);
+  background: none; border: none; cursor: pointer;
+  padding: 4px 8px; border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+}
+.onboarding-skip:hover { color: var(--text); }
+.onboarding-next {
+  background: var(--purple); color: #6b4900;
+  border: none; border-radius: 10px;
+  padding: 8px 18px; font-size: 13px; font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 3px 10px rgba(232,184,75,0.35);
+}
+.onboarding-next:hover { transform: translateY(-1px); }
+.onboarding-next:active { transform: scale(0.96); }
+
+/* Arrow pointer on card */
+#onboarding-card::before {
+  content: '';
+  position: absolute;
+  width: 12px; height: 12px;
+  background: var(--bg);
+  transform: rotate(45deg);
+}
+body.dark #onboarding-card::before { background: #1a1a1a; }
+#onboarding-card.arrow-top::before { top: -6px; left: 24px; }
+#onboarding-card.arrow-bottom::before { bottom: -6px; left: 24px; }
+#onboarding-card.arrow-bottom-right::before { bottom: -6px; right: 24px; }
+#onboarding-card.arrow-left::before { left: -6px; top: 24px; }
+
+/* Spotlight pulse ring */
+@keyframes spotPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(232,184,75,0.4); }
+  70%  { box-shadow: 0 0 0 10px rgba(232,184,75,0); }
+  100% { box-shadow: 0 0 0 0 rgba(232,184,75,0); }
+}
+#onboarding-highlight {
+  position: fixed;
+  border-radius: 12px;
+  border: 2px solid var(--purple);
+  pointer-events: none;
+  z-index: 1000;
+  transition: all 0.4s cubic-bezier(0.34,1.2,0.64,1);
+  animation: spotPulse 1.8s ease-out infinite;
+}
+
+
 /* Assets button on client card */
 .client-assets-btn {
   width: 36px; height: 36px; border-radius: 50%;
@@ -2460,16 +2568,16 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         </div>
       </div>
       <div class="client-tabs">
-        <div class="client-tab active" onclick="clientTab('overview', this)">Overview</div>
+        <div class="client-tab active" id="desktop-tab-overview" onclick="clientTab('overview', this)">Overview</div>
         <div class="client-tab" onclick="clientTab('request', this)">Request a clip</div>
-        <div class="client-tab" onclick="clientTab('jobs', this)">My jobs</div>
-        <div class="client-tab" onclick="clientTab('downloads', this)" id="downloads-tab">
+        <div class="client-tab" id="desktop-tab-jobs" onclick="clientTab('jobs', this)">My jobs</div>
+        <div class="client-tab" id="downloads-tab" onclick="clientTab('downloads', this)">
           Downloads <span class="tab-unread-dot" id="downloads-notif-dot" style="display:none;"></span>
         </div>
-        <div class="client-tab" onclick="clientTab('messages', this)" id="client-msg-tab">
+        <div class="client-tab" id="client-msg-tab" onclick="clientTab('messages', this)">
           Messages <span class="tab-unread-dot" id="client-msg-dot" style="display:none;"></span>
         </div>
-        <div class="client-tab" onclick="clientTab('assets', this)">📁 Files</div>
+        <div class="client-tab" id="desktop-tab-assets" onclick="clientTab('assets', this)">📁 Files</div>
       </div>
     </div>
   </div>
@@ -3408,7 +3516,10 @@ function loginAsClient(user) {
   checkNotificationBadge(user.email);
   loadClientData(user.email);
   checkClientMsgBadge();
-  requestAnimationFrame(() => updateTabSlider('mobile-bottom-bar', 'mob-tab-overview'));
+  requestAnimationFrame(() => {
+    updateTabSlider('mobile-bottom-bar', 'mob-tab-overview');
+    setTimeout(startOnboarding, 800);
+  });
 
   // Upsert into profiles so editor can see this client even with no jobs
   if (!DEMO_MODE && sb && user.email) {
@@ -5075,8 +5186,228 @@ if (DEMO_MODE) {
 }
 
 // ══════════════════════════════════════
-// CHAT / IM SYSTEM
+// SPOTLIGHT ONBOARDING
 // ══════════════════════════════════════
+const ONBOARDING_KEY = 'ks-onboarding-done';
+let obStep = 0;
+
+function getObTarget(mobileId, desktopId) {
+  return window.innerWidth <= 600 ? mobileId : desktopId;
+}
+
+const OB_STEPS = [
+  {
+    title: 'Welcome to Keem Studio 👋',
+    body: "This is your personal client portal. Everything related to your video projects lives here. Let's take a quick tour.",
+    target: null,
+    arrow: null,
+    cardPos: 'center',
+  },
+  {
+    title: 'Your Overview',
+    body: 'This is your home screen. At a glance you can see your active jobs, what stage they\'re at, and any recent activity.',
+    get target() { return getObTarget('mob-tab-overview', 'desktop-tab-overview'); },
+    arrow: 'arrow-bottom',
+    get cardPos() { return window.innerWidth <= 600 ? 'above' : 'below'; },
+  },
+  {
+    title: 'Track Your Jobs',
+    body: 'Every clip you request lives here. Jobs move through stages: Requested → Cooking → In Progress → Awaiting Review → Delivered. Tap any job to see full details.',
+    get target() { return getObTarget('mob-tab-jobs', 'desktop-tab-jobs'); },
+    arrow: 'arrow-bottom',
+    get cardPos() { return window.innerWidth <= 600 ? 'above' : 'below'; },
+    action: () => clientTab('jobs', null),
+  },
+  {
+    title: 'Download Your Videos',
+    body: 'When Keem delivers a finished edit, it appears here. Tap any file to download it directly to your device.',
+    get target() { return getObTarget('mob-tab-downloads', 'downloads-tab'); },
+    arrow: 'arrow-bottom',
+    get cardPos() { return window.innerWidth <= 600 ? 'above' : 'below'; },
+    action: () => clientTab('downloads', null),
+  },
+  {
+    title: 'Message Keem Directly',
+    body: 'Have a note, reference, or question? Send it here. Messages are real-time — no need to switch to WhatsApp or email.',
+    get target() { return getObTarget('mob-tab-messages', 'client-msg-tab'); },
+    arrow: 'arrow-bottom',
+    get cardPos() { return window.innerWidth <= 600 ? 'above' : 'below'; },
+    action: () => clientTab('messages', null),
+  },
+  {
+    title: 'Send Files & Assets',
+    body: 'Drop raw footage, music, logos, or mood boards here. They\'re automatically organised by type so Keem can find them instantly.',
+    get target() { return getObTarget('mob-tab-assets', 'desktop-tab-assets'); },
+    arrow: 'arrow-bottom',
+    get cardPos() { return window.innerWidth <= 600 ? 'above' : 'below'; },
+    action: () => clientTab('assets', null),
+  },
+  {
+    title: 'Your Profile & Settings',
+    body: window.innerWidth <= 600
+      ? 'Swipe right from anywhere on screen to open your profile and settings — update your details, change your accent colour, connect Discord, and more.'
+      : 'Click your avatar or name in the top-right to access your profile and settings — update your details, change your accent colour, connect Discord, and more.',
+    target: null,
+    arrow: null,
+    cardPos: 'center',
+  },
+  {
+    title: "You're all set! 🎬",
+    body: "That's the full tour. If you ever need Keem, the Messages tab is your fastest route. Let's get to work.",
+    target: null,
+    arrow: null,
+    cardPos: 'center',
+    isLast: true,
+  },
+];
+
+function startOnboarding() {
+  if (localStorage.getItem(ONBOARDING_KEY)) return;
+  obStep = 0;
+  document.getElementById('onboarding-overlay').classList.add('active');
+  renderOnboardingStep();
+}
+
+function renderOnboardingStep() {
+  const step = OB_STEPS[obStep];
+  const total = OB_STEPS.length;
+
+  // Run any tab switch action for this step
+  if (step.action) step.action();
+
+  // Update text
+  document.getElementById('ob-step-label').textContent = `Step ${obStep + 1} of ${total}`;
+  document.getElementById('ob-title').textContent = step.title;
+  document.getElementById('ob-body').textContent = step.body;
+
+  // Dots
+  const dots = document.getElementById('ob-dots');
+  dots.innerHTML = OB_STEPS.map((_, i) =>
+    `<div class="onboarding-dot ${i === obStep ? 'active' : ''}"></div>`
+  ).join('');
+
+  // Next button label
+  const nextBtn = document.getElementById('ob-next-btn');
+  nextBtn.textContent = step.isLast ? 'Get started ✓' : 'Next →';
+
+  // Position spotlight
+  if (step.target) {
+    const el = document.getElementById(step.target);
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      const pad = 8;
+      positionSpotlight(
+        rect.left - pad, rect.top - pad,
+        rect.width + pad*2, rect.height + pad*2,
+        step
+      );
+    }
+  } else {
+    // No target — hide spotlight, show card centred
+    clearSpotlight();
+    positionCardCenter();
+  }
+}
+
+function positionSpotlight(x, y, w, h, step) {
+  // Animate highlight ring
+  const hl = document.getElementById('onboarding-highlight');
+  hl.style.left = x + 'px';
+  hl.style.top = y + 'px';
+  hl.style.width = w + 'px';
+  hl.style.height = h + 'px';
+  hl.style.display = 'block';
+
+  // Cut hole in backdrop
+  const hole = document.getElementById('onboarding-hole');
+  hole.setAttribute('x', x);
+  hole.setAttribute('y', y);
+  hole.setAttribute('width', w);
+  hole.setAttribute('height', h);
+  hole.setAttribute('rx', 12);
+
+  // Position card
+  const card = document.getElementById('onboarding-card');
+  card.className = step.arrow || '';
+  const cardW = 300;
+  const cardH = 180;
+  const margin = 16;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  let cx, cy;
+  if (step.cardPos === 'above') {
+    cx = Math.min(Math.max(x, margin), vw - cardW - margin);
+    cy = y - cardH - 16;
+    if (cy < margin) cy = y + h + 16; // flip below if no room
+  } else if (step.cardPos === 'below') {
+    cx = Math.min(Math.max(x, margin), vw - cardW - margin);
+    cy = y + h + 16;
+  } else {
+    cx = (vw - cardW) / 2;
+    cy = (vh - cardH) / 2;
+  }
+
+  card.style.left = cx + 'px';
+  card.style.top = cy + 'px';
+  card.style.transform = '';
+}
+
+function positionCardCenter() {
+  const hl = document.getElementById('onboarding-highlight');
+  hl.style.display = 'none';
+  const hole = document.getElementById('onboarding-hole');
+  hole.setAttribute('width', 0); hole.setAttribute('height', 0);
+
+  const card = document.getElementById('onboarding-card');
+  card.className = '';
+  card.style.left = '50%';
+  card.style.top = '50%';
+  card.style.transform = 'translate(-50%, -50%)';
+}
+
+function clearSpotlight() {
+  document.getElementById('onboarding-highlight').style.display = 'none';
+  const hole = document.getElementById('onboarding-hole');
+  hole.setAttribute('width', 0); hole.setAttribute('height', 0);
+}
+
+function onboardingNext() {
+  obStep++;
+  if (obStep >= OB_STEPS.length) {
+    finishOnboarding();
+    return;
+  }
+  // Re-animate card
+  const card = document.getElementById('onboarding-card');
+  card.style.animation = 'none';
+  void card.offsetWidth;
+  card.style.animation = 'cardIn 0.3s cubic-bezier(0.34,1.3,0.64,1) both';
+  renderOnboardingStep();
+}
+
+function finishOnboarding() {
+  localStorage.setItem(ONBOARDING_KEY, '1');
+  const overlay = document.getElementById('onboarding-overlay');
+  overlay.style.opacity = '0';
+  overlay.style.transition = 'opacity 0.4s';
+  setTimeout(() => {
+    overlay.classList.remove('active');
+    overlay.style.opacity = '';
+    overlay.style.transition = '';
+    // Return client to overview
+    clientTab('overview', null);
+  }, 400);
+}
+
+// Handle window resize — reposition spotlight
+window.addEventListener('resize', () => {
+  if (document.getElementById('onboarding-overlay').classList.contains('active')) {
+    renderOnboardingStep();
+  }
+});
+
+
 let activeChatClientEmail = null;
 let editorMsgSubscription = null;
 let clientMsgSubscription = null;
@@ -5568,6 +5899,32 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+<!-- ════════ SPOTLIGHT ONBOARDING ════════ -->
+<div id="onboarding-overlay">
+  <svg id="onboarding-backdrop" width="100%" height="100%">
+    <defs>
+      <mask id="onboarding-mask">
+        <rect width="100%" height="100%" fill="white"/>
+        <rect id="onboarding-hole" x="0" y="0" width="0" height="0" rx="12" fill="black"/>
+      </mask>
+    </defs>
+    <rect width="100%" height="100%" fill="rgba(0,0,0,0.7)" mask="url(#onboarding-mask)"/>
+  </svg>
+  <div id="onboarding-highlight"></div>
+  <div id="onboarding-card">
+    <div class="onboarding-step-label" id="ob-step-label">Step 1 of 8</div>
+    <div class="onboarding-title" id="ob-title">Welcome to Keem Studio</div>
+    <div class="onboarding-body" id="ob-body">Let's take a quick tour so you know exactly where everything is.</div>
+    <div class="onboarding-footer">
+      <div class="onboarding-dots" id="ob-dots"></div>
+      <div class="onboarding-actions">
+        <button class="onboarding-skip" onclick="finishOnboarding()">Skip</button>
+        <button class="onboarding-next" id="ob-next-btn" onclick="onboardingNext()">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
 </body>
 </html>
