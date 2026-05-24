@@ -3611,11 +3611,25 @@ window.addEventListener('load', async () => {
   if (DEMO_MODE) return;
   if (!sb) return;
 
-  // Listen for auth state changes — catches magic link hash on redirect
+  // Process magic link hash from URL if present
+  const hash = window.location.hash;
+  if (hash && hash.includes('access_token')) {
+    // Let Supabase process the hash
+    const { data, error } = await sb.auth.getSession();
+    if (data?.session) {
+      const user = data.session.user;
+      // Clean URL
+      history.replaceState(null, '', window.location.pathname);
+      if (user.email === CONFIG.editorEmail) loginAsEditor(user);
+      else loginAsClient(user);
+      return;
+    }
+  }
+
+  // Listen for auth state changes
   sb.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_IN' && session) {
       const user = session.user;
-      // Only auto-login if not already on a dashboard screen
       const onLogin = document.getElementById('screen-login')?.classList.contains('active');
       if (!onLogin) return;
       if (user.email === CONFIG.editorEmail) loginAsEditor(user);
@@ -3623,7 +3637,7 @@ window.addEventListener('load', async () => {
     }
   });
 
-  // Also check for existing session on load
+  // Check for existing session on load
   const { data } = await sb.auth.getSession();
   if (data.session) {
     const user = data.session.user;
