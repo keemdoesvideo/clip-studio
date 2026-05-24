@@ -3608,8 +3608,22 @@ async function logout() {
 
 // Check for magic link session on load
 window.addEventListener('load', async () => {
-  if (DEMO_MODE) return; // skip in demo
+  if (DEMO_MODE) return;
   if (!sb) return;
+
+  // Listen for auth state changes — catches magic link hash on redirect
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      const user = session.user;
+      // Only auto-login if not already on a dashboard screen
+      const onLogin = document.getElementById('screen-login')?.classList.contains('active');
+      if (!onLogin) return;
+      if (user.email === CONFIG.editorEmail) loginAsEditor(user);
+      else loginAsClient(user);
+    }
+  });
+
+  // Also check for existing session on load
   const { data } = await sb.auth.getSession();
   if (data.session) {
     const user = data.session.user;
