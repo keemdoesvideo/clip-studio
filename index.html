@@ -1817,11 +1817,14 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
 /* MOBILE EDITOR <=600px */
 @media (max-width: 600px) {
   #screen-editor .topbar { padding: 0 16px; height: 52px; }
+  #screen-editor .topbar-logo { display: none; }
+  #screen-editor .topbar-nav { display: none; }
+  #screen-editor .topbar-right .user-chip { display: none; }
+  #screen-editor .topbar-right .btn-logout { display: none; }
   #screen-editor .topbar-logo-name { font-size: 14px; }
   #screen-editor .topbar-logo-icon { width: 28px; height: 28px; border-radius: 8px; }
   #screen-editor .topbar-logo-icon svg { width: 14px; height: 14px; }
-  #screen-editor .topbar-nav { display: none; }
-  #screen-editor .btn-logout { display: none; }
+  #editor-mobile-brand { display: flex !important; }
   #screen-editor .main-content { padding: 16px 14px calc(72px + max(16px, env(safe-area-inset-bottom))); }
   #screen-editor .stats-row { grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 20px; border-radius: 16px; }
   #screen-editor .stat-card + .stat-card { border-left: none; border-top: 1px solid rgba(255,255,255,0.55); }
@@ -2159,7 +2162,14 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
 .drawer-save-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(232,184,75,0.45); }
 .drawer-save-btn:active { transform: scale(0.97); }
 
-/* Colour swatches for appearance */
+.drawer-panel .btn-ghost {
+  flex: none;
+  width: auto;
+  padding: 6px 14px;
+  font-size: 12px;
+  border-radius: 8px;
+  align-self: center;
+}
 .colour-swatches { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
 .colour-swatch {
   width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
@@ -2245,6 +2255,14 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       <div class="topbar-tab" onclick="editorTab('messages', this)" id="editor-msg-tab">Messages</div>
     </div>
     <div class="topbar-right">
+      <!-- Mobile only: show studio brand on right -->
+      <div id="editor-mobile-brand" style="display:none;align-items:center;gap:8px;">
+        <div class="topbar-logo-icon" style="background:none;box-shadow:none;overflow:hidden;padding:0;width:28px;height:28px;">
+          <img src="icon-192.png" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
+        </div>
+        <span class="topbar-logo-name" style="font-size:14px;">Keem Studio</span>
+      </div>
+      <!-- Desktop only -->
       <div class="user-chip">
         <div class="user-avatar" id="editor-avatar">KB</div>
         <span class="user-name" id="editor-name-display">Karim</span>
@@ -2758,7 +2776,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         <div class="settings-section">
           <div class="settings-row">
             <div><div class="settings-row-label">Change password</div><div class="settings-row-sub">Send a reset link to your email</div></div>
-            <button class="btn-ghost" style="font-size:11px;padding:5px 12px;flex-shrink:0;border-radius:8px;width:fit-content;" onclick="sendPasswordReset()">Send link</button>
+            <button class="btn-ghost"  onclick="sendPasswordReset()">Send link</button>
           </div>
         </div>
       </div>
@@ -2779,7 +2797,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
               <div class="settings-row-label">Discord</div>
               <div class="settings-row-sub" id="editor-discord-sub">Not connected</div>
             </div>
-            <button class="btn-ghost" style="font-size:11px;padding:5px 12px;flex-shrink:0;border-radius:8px;width:fit-content;" onclick="connectDiscord('editor')">Connect</button>
+            <button class="btn-ghost"  onclick="connectDiscord('editor')">Connect</button>
           </div>
         </div>
       </div>
@@ -2935,7 +2953,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         <div class="settings-section">
           <div class="settings-row">
             <div><div class="settings-row-label">Change password</div><div class="settings-row-sub">Send a reset link to your email</div></div>
-            <button class="btn-ghost" style="font-size:11px;padding:5px 12px;flex-shrink:0;border-radius:8px;width:fit-content;" onclick="sendPasswordReset()">Send link</button>
+            <button class="btn-ghost"  onclick="sendPasswordReset()">Send link</button>
           </div>
         </div>
       </div>
@@ -2956,7 +2974,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
               <div class="settings-row-label">Discord</div>
               <div class="settings-row-sub" id="client-discord-sub">Not connected</div>
             </div>
-            <button class="btn-ghost" style="font-size:11px;padding:5px 12px;flex-shrink:0;border-radius:8px;width:fit-content;" onclick="connectDiscord('client')">Connect</button>
+            <button class="btn-ghost"  onclick="connectDiscord('client')">Connect</button>
           </div>
         </div>
       </div>
@@ -3947,6 +3965,11 @@ async function saveDrawerProfile(side) {
   showToast('Profile saved! ✓', 'success');
   if (payload.display_name) {
     document.getElementById('drawer-' + side + '-name').textContent = payload.display_name;
+    // Also update desktop user chip if editor
+    if (side === 'editor') {
+      const nameEl = document.getElementById('editor-name-display');
+      if (nameEl) nameEl.textContent = payload.display_name;
+    }
   }
 }
 
