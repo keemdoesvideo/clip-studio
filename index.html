@@ -165,8 +165,11 @@ body.dark .client-tab.active { color: var(--purple); border-color: var(--purple)
 }
 #theme-toggle:hover { transform: scale(1.1); }
 #theme-toggle:active { transform: scale(0.95); }
+@media (min-width: 601px) {
+  #theme-toggle { display: flex !important; }
+}
 @media (max-width: 600px) {
-  #theme-toggle { display: none; }
+  #theme-toggle { display: none !important; }
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
