@@ -3611,15 +3611,28 @@ window.addEventListener('load', async () => {
   if (DEMO_MODE) return;
   if (!sb) return;
 
-  // Process magic link hash from URL if present
+  // Process magic link or signup confirmation from URL hash
   const hash = window.location.hash;
-  if (hash && hash.includes('access_token')) {
-    // Let Supabase process the hash
-    const { data, error } = await sb.auth.getSession();
+  if (hash && (hash.includes('access_token') || hash.includes('type=signup') || hash.includes('type=magiclink'))) {
+    // Parse the hash params
+    const params = new URLSearchParams(hash.substring(1));
+    const accessToken = params.get('access_token');
+    const refreshToken = params.get('refresh_token');
+    if (accessToken && refreshToken) {
+      const { data, error } = await sb.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+      if (data?.session) {
+        history.replaceState(null, '', window.location.pathname);
+        const user = data.session.user;
+        if (user.email === CONFIG.editorEmail) loginAsEditor(user);
+        else loginAsClient(user);
+        return;
+      }
+    }
+    // Fallback — let Supabase process it
+    const { data } = await sb.auth.getSession();
     if (data?.session) {
-      const user = data.session.user;
-      // Clean URL
       history.replaceState(null, '', window.location.pathname);
+      const user = data.session.user;
       if (user.email === CONFIG.editorEmail) loginAsEditor(user);
       else loginAsClient(user);
       return;
@@ -3628,7 +3641,7 @@ window.addEventListener('load', async () => {
 
   // Listen for auth state changes
   sb.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_IN' && session) {
+    if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session) {
       const user = session.user;
       const onLogin = document.getElementById('screen-login')?.classList.contains('active');
       if (!onLogin) return;
