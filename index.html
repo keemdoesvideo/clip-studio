@@ -2285,6 +2285,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       <div class="logo-text">Keem Studio</div>
     </div>
 
+    <!-- SIGN IN -->
     <div id="login-form-view">
       <h1 class="login-title">Welcome back</h1>
       <p class="login-sub">Sign in to your client portal.</p>
@@ -2298,7 +2299,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
           <input type="checkbox" id="client-stay-logged-in" style="width:16px;height:16px;accent-color:var(--purple);cursor:pointer;">
           <label for="client-stay-logged-in" style="font-size:13px;color:var(--text2);cursor:pointer;">Stay logged in</label>
         </div>
-        <a onclick="showMagicLinkView()" style="font-size:12px;color:var(--purple);cursor:pointer;">First time? Use magic link</a>
+        <a onclick="showSignupView()" style="font-size:12px;color:var(--purple);cursor:pointer;">First time? Sign up</a>
       </div>
       <button class="btn-primary" id="login-btn" onclick="clientLogin()">
         <span id="login-btn-text">Sign in</span>
@@ -2307,18 +2308,45 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       <div class="login-switch">Editor? <a onclick="showEditorLogin()">Sign in here →</a></div>
     </div>
 
-    <div id="magic-link-view" style="display:none;">
-      <h1 class="login-title">First time here?</h1>
-      <p class="login-sub">Enter your email and we'll send you a magic link to get started.</p>
-      <div id="magic-alert" class="alert"></div>
+    <!-- SIGN UP -->
+    <div id="signup-view" style="display:none;">
+      <h1 class="login-title">Create your account</h1>
+      <p class="login-sub">Enter your email and we'll send a confirmation link to get you set up.</p>
+      <div id="signup-alert" class="alert"></div>
       <div class="field-label">Your email</div>
-      <input class="field-input" id="magic-email" type="email" placeholder="you@email.com" autocomplete="email">
-      <button class="btn-primary" id="magic-btn" onclick="sendMagicLink()">
-        <span id="magic-btn-text">Send magic link</span>
+      <input class="field-input" id="signup-email" type="email" placeholder="you@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')clientSignup()">
+      <button class="btn-primary" id="signup-btn" onclick="clientSignup()">
+        <span id="signup-btn-text">Send confirmation email</span>
       </button>
       <div class="login-switch" style="margin-top:16px;"><a onclick="showClientLogin()" style="cursor:pointer;">← Back to sign in</a></div>
     </div>
 
+    <!-- CHECK EMAIL -->
+    <div id="check-email-view" style="display:none;">
+      <div style="text-align:center; padding: 20px 0;">
+        <div style="font-size:48px; margin-bottom:16px;">📬</div>
+        <h2 style="font-family:'Poppins',sans-serif; font-size:20px; font-weight:700; margin-bottom:10px;">Check your inbox</h2>
+        <p style="font-size:14px; color:var(--text2); line-height:1.6;">We've sent a confirmation link to <strong id="sent-to-email" style="color:var(--purple);"></strong>. Click it to set your password and access your portal.</p>
+        <button class="btn-primary" style="margin-top:24px;" onclick="showSignupView()">Resend email</button>
+        <div class="login-switch" style="margin-top:12px;"><a onclick="showClientLogin()" style="cursor:pointer;">← Back to sign in</a></div>
+      </div>
+    </div>
+
+    <!-- PASSWORD SETUP (via confirmation link) -->
+    <div id="setup-view" style="display:none;">
+      <h1 class="login-title">Set your password</h1>
+      <p class="login-sub">Almost there — choose a password to complete your account setup.</p>
+      <div id="setup-inline-alert" class="alert"></div>
+      <div class="field-label">Password</div>
+      <input class="field-input" id="setup-password-inline" type="password" placeholder="At least 8 characters" autocomplete="new-password">
+      <div class="field-label">Confirm password</div>
+      <input class="field-input" id="setup-password-confirm-inline" type="password" placeholder="Same again" autocomplete="new-password" onkeydown="if(event.key==='Enter')saveSetupPassword()">
+      <button class="btn-primary" id="setup-inline-btn" onclick="saveSetupPassword()" style="margin-top:8px;">
+        <span id="setup-inline-btn-text">Set password & enter portal</span>
+      </button>
+    </div>
+
+    <!-- EDITOR LOGIN -->
     <div id="editor-form-view" style="display:none;">
       <h1 class="login-title">Editor login</h1>
       <p class="login-sub">Sign in to your editor dashboard.</p>
@@ -2335,15 +2363,6 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         <span id="editor-btn-text">Sign in</span>
       </button>
       <div class="login-switch"><a onclick="showClientLogin()">← Back to client login</a></div>
-    </div>
-
-    <div id="check-email-view" style="display:none;">
-      <div style="text-align:center; padding: 20px 0;">
-        <div style="font-size:48px; margin-bottom:16px;">📬</div>
-        <h2 style="font-family:'Poppins',sans-serif; font-size:20px; font-weight:700; margin-bottom:10px;">Check your inbox</h2>
-        <p style="font-size:14px; color:var(--text2); line-height:1.6;">We've sent a magic link to <strong id="sent-to-email" style="color:var(--purple);"></strong>. Click it to sign in — no password required.</p>
-        <button class="btn-primary" style="margin-top:24px;" onclick="showClientLogin()">Send another link</button>
-      </div>
     </div>
   </div>
 </div>
@@ -3451,23 +3470,76 @@ function showScreen(id) {
 }
 
 function showEditorLogin() {
-  document.getElementById('login-form-view').style.display = 'none';
-  document.getElementById('magic-link-view').style.display = 'none';
+  ['login-form-view','signup-view','check-email-view','setup-view','editor-form-view'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
   document.getElementById('editor-form-view').style.display = 'block';
-  document.getElementById('check-email-view').style.display = 'none';
 }
 function showClientLogin() {
+  ['login-form-view','signup-view','check-email-view','setup-view','editor-form-view','magic-link-view'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
   document.getElementById('login-form-view').style.display = 'block';
-  document.getElementById('magic-link-view').style.display = 'none';
-  document.getElementById('editor-form-view').style.display = 'none';
-  document.getElementById('check-email-view').style.display = 'none';
 }
-function showMagicLinkView() {
-  document.getElementById('login-form-view').style.display = 'none';
-  document.getElementById('magic-link-view').style.display = 'block';
-  document.getElementById('editor-form-view').style.display = 'none';
-  document.getElementById('check-email-view').style.display = 'none';
+function showSignupView() {
+  ['login-form-view','signup-view','check-email-view','setup-view','editor-form-view'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  document.getElementById('signup-view').style.display = 'block';
 }
+function showMagicLinkView() { showSignupView(); }
+
+async function clientSignup() {
+  const email = document.getElementById('signup-email').value.trim();
+  if (!email) { showAlert('signup-alert', 'Please enter your email.', 'error'); return; }
+  if (DEMO_MODE) {
+    document.getElementById('sent-to-email').textContent = email;
+    showSignupView();
+    document.getElementById('signup-view').style.display = 'none';
+    document.getElementById('check-email-view').style.display = 'block';
+    return;
+  }
+  setLoading('signup-btn', 'signup-btn-text', true, 'Sending...');
+  const { error } = await sb.auth.signUp({
+    email,
+    password: crypto.randomUUID(), // temp password — will be overwritten in setup
+    options: { emailRedirectTo: window.location.href }
+  });
+  setLoading('signup-btn', 'signup-btn-text', false, 'Send confirmation email');
+  if (error) { showAlert('signup-alert', error.message, 'error'); return; }
+  document.getElementById('sent-to-email').textContent = email;
+  document.getElementById('signup-view').style.display = 'none';
+  document.getElementById('check-email-view').style.display = 'block';
+}
+
+async function saveSetupPassword() {
+  const password = document.getElementById('setup-password-inline').value;
+  const confirm = document.getElementById('setup-password-confirm-inline').value;
+  if (!password || password.length < 8) {
+    showAlert('setup-inline-alert', 'Password must be at least 8 characters.', 'error'); return;
+  }
+  if (password !== confirm) {
+    showAlert('setup-inline-alert', "Passwords don't match.", 'error'); return;
+  }
+  setLoading('setup-inline-btn', 'setup-inline-btn-text', true, 'Saving...');
+  const { error } = await sb.auth.updateUser({ password });
+  if (error) {
+    setLoading('setup-inline-btn', 'setup-inline-btn-text', false, 'Set password & enter portal');
+    showAlert('setup-inline-alert', error.message, 'error'); return;
+  }
+  // Mark has_password in profiles
+  if (currentUser) {
+    await sb.from('profiles').upsert({ email: currentUser.email, has_password: true }, { onConflict: 'email' });
+  }
+  setLoading('setup-inline-btn', 'setup-inline-btn-text', false, 'Set password & enter portal');
+  showToast('Password set! Welcome to Keem Studio ✓', 'success');
+  // Now enter the portal
+  if (currentUser) loginAsClient(currentUser);
+}
+
 
 async function clientLogin() {
   const email = document.getElementById('login-email').value.trim();
@@ -3484,30 +3556,6 @@ async function clientLogin() {
   setLoading('login-btn', 'login-btn-text', false, 'Sign in');
   if (error) { showAlert('login-alert', 'Incorrect email or password.', 'error'); return; }
   loginAsClient(data.user);
-}
-
-async function sendMagicLink() {
-  const email = document.getElementById('magic-email').value.trim();
-  if (!email) { showAlert('magic-alert', 'Please enter your email.', 'error'); return; }
-
-  if (DEMO_MODE) {
-    document.getElementById('sent-to-email').textContent = email;
-    document.getElementById('magic-link-view').style.display = 'none';
-    document.getElementById('check-email-view').style.display = 'block';
-    setTimeout(() => loginAsClient({ email, user_metadata: { name: email.split('@')[0] } }), 1500);
-    return;
-  }
-
-  setLoading('magic-btn', 'magic-btn-text', true, 'Sending...');
-  const { error } = await sb.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: window.location.href, shouldCreateUser: true }
-  });
-  setLoading('magic-btn', 'magic-btn-text', false, 'Send magic link');
-  if (error) { showAlert('magic-alert', error.message, 'error'); return; }
-  document.getElementById('sent-to-email').textContent = email;
-  document.getElementById('magic-link-view').style.display = 'none';
-  document.getElementById('check-email-view').style.display = 'block';
 }
 
 async function editorLogin() {
@@ -3611,31 +3659,32 @@ window.addEventListener('load', async () => {
   if (DEMO_MODE) return;
   if (!sb) return;
 
-  // Process magic link or signup confirmation from URL hash
+  // Process confirmation link or signup from URL hash
   const hash = window.location.hash;
   if (hash && (hash.includes('access_token') || hash.includes('type=signup') || hash.includes('type=magiclink'))) {
-    // Parse the hash params
     const params = new URLSearchParams(hash.substring(1));
     const accessToken = params.get('access_token');
     const refreshToken = params.get('refresh_token');
+    const type = params.get('type');
     if (accessToken && refreshToken) {
-      const { data, error } = await sb.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+      const { data } = await sb.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
       if (data?.session) {
         history.replaceState(null, '', window.location.pathname);
         const user = data.session.user;
+        currentUser = user;
+        // New signup — show password setup view
+        if (type === 'signup') {
+          ['login-form-view','signup-view','check-email-view','editor-form-view'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+          });
+          document.getElementById('setup-view').style.display = 'block';
+          return;
+        }
         if (user.email === CONFIG.editorEmail) loginAsEditor(user);
         else loginAsClient(user);
         return;
       }
-    }
-    // Fallback — let Supabase process it
-    const { data } = await sb.auth.getSession();
-    if (data?.session) {
-      history.replaceState(null, '', window.location.pathname);
-      const user = data.session.user;
-      if (user.email === CONFIG.editorEmail) loginAsEditor(user);
-      else loginAsClient(user);
-      return;
     }
   }
 
@@ -3645,6 +3694,18 @@ window.addEventListener('load', async () => {
       const user = session.user;
       const onLogin = document.getElementById('screen-login')?.classList.contains('active');
       if (!onLogin) return;
+      // New signup via confirmation link — show password setup
+      if (event === 'SIGNED_IN' && !session.user.user_metadata?.has_password) {
+        currentUser = user;
+        history.replaceState(null, '', window.location.pathname);
+        // Hide all login views, show setup
+        ['login-form-view','signup-view','check-email-view','editor-form-view'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+        document.getElementById('setup-view').style.display = 'block';
+        return;
+      }
       if (user.email === CONFIG.editorEmail) loginAsEditor(user);
       else loginAsClient(user);
     }
