@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<!-- saved from url=(0067)file:///C:/Users/Keem/Downloads/Keem_Studio_with_font_change_3.html -->
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="en">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Keem Studio</title>
-<link rel="manifest" href="file:///C:/Users/Keem/Downloads/manifest.json">
+<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#e8b84b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Keem Studio">
-<link rel="apple-touch-icon" href="file:///C:/Users/Keem/Downloads/icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com/">
-<link href="./Index with timeout_files/css2" rel="stylesheet">
-<script src="./Index with timeout_files/supabase-js@2"></script>
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
   /* Light base - clean white */
@@ -2288,7 +2288,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
   <div class="login-box">
     <div class="login-logo">
       <div class="login-logo-icon" style="background:none;box-shadow:none;overflow:hidden;padding:0;">
-        <img src="file:///C:/Users/Keem/Downloads/icon-192.png" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">
+        <img src="icon-192.png" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">
       </div>
       <div class="logo-text">Keem Studio</div>
     </div>
@@ -2301,7 +2301,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       <div class="field-label">Email</div>
       <input class="field-input" id="login-email" type="email" placeholder="you@email.com" autocomplete="email">
       <div class="field-label">Password</div>
-      <input class="field-input" id="login-password" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key===&#39;Enter&#39;)clientLogin()">
+      <input class="field-input" id="login-password" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')clientLogin()">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <div style="display:flex;align-items:center;gap:8px;">
           <input type="checkbox" id="client-stay-logged-in" style="width:16px;height:16px;accent-color:var(--purple);cursor:pointer;">
@@ -2322,7 +2322,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       <p class="login-sub">Enter your email and we'll send a confirmation link to get you set up.</p>
       <div id="signup-alert" class="alert"></div>
       <div class="field-label">Your email</div>
-      <input class="field-input" id="signup-email" type="email" placeholder="you@email.com" autocomplete="email" onkeydown="if(event.key===&#39;Enter&#39;)clientSignup()">
+      <input class="field-input" id="signup-email" type="email" placeholder="you@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')clientSignup()">
       <button class="btn-primary" id="signup-btn" onclick="clientSignup()">
         <span id="signup-btn-text">Send confirmation email</span>
       </button>
@@ -2333,7 +2333,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
     <div id="check-email-view" style="display:none;">
       <div style="text-align:center; padding: 20px 0;">
         <div style="font-size:48px; margin-bottom:16px;">📬</div>
-        <h2 style="font-family:&#39;Poppins&#39;,sans-serif; font-size:20px; font-weight:700; margin-bottom:10px;">Check your inbox</h2>
+        <h2 style="font-family:'Poppins',sans-serif; font-size:20px; font-weight:700; margin-bottom:10px;">Check your inbox</h2>
         <p style="font-size:14px; color:var(--text2); line-height:1.6;">We've sent a confirmation link to <strong id="sent-to-email" style="color:var(--purple);"></strong>. Click it to set your password and access your portal.</p>
         <button class="btn-primary" style="margin-top:24px;" onclick="showSignupView()">Resend email</button>
         <div class="login-switch" style="margin-top:12px;"><a onclick="showClientLogin()" style="cursor:pointer;">← Back to sign in</a></div>
@@ -2348,9 +2348,9 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       <div class="field-label">Password</div>
       <input class="field-input" id="setup-password-inline" type="password" placeholder="At least 8 characters" autocomplete="new-password">
       <div class="field-label">Confirm password</div>
-      <input class="field-input" id="setup-password-confirm-inline" type="password" placeholder="Same again" autocomplete="new-password" onkeydown="if(event.key===&#39;Enter&#39;)saveSetupPassword()">
+      <input class="field-input" id="setup-password-confirm-inline" type="password" placeholder="Same again" autocomplete="new-password" onkeydown="if(event.key==='Enter')saveSetupPassword()">
       <button class="btn-primary" id="setup-inline-btn" onclick="saveSetupPassword()" style="margin-top:8px;">
-        <span id="setup-inline-btn-text">Set password &amp; enter portal</span>
+        <span id="setup-inline-btn-text">Set password & enter portal</span>
       </button>
     </div>
 
@@ -2380,21 +2380,21 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
   <div class="topbar">
     <div class="topbar-logo">
       <div class="topbar-logo-icon" style="background:none;box-shadow:none;overflow:hidden;padding:0;">
-        <img src="file:///C:/Users/Keem/Downloads/icon-192.png" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+        <img src="icon-192.png" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
       </div>
       <span class="topbar-logo-name">Keem Studio</span>
     </div>
     <div class="topbar-nav">
-      <div class="topbar-tab active" onclick="editorTab(&#39;queue&#39;, this)">Dashboard</div>
-      <div class="topbar-tab" onclick="editorTab(&#39;alljobs&#39;, this)">All Jobs</div>
-      <div class="topbar-tab" onclick="editorTab(&#39;clients&#39;, this)">Clients</div>
-      <div class="topbar-tab" onclick="editorTab(&#39;messages&#39;, this)" id="editor-msg-tab">Messages</div>
+      <div class="topbar-tab active" onclick="editorTab('queue', this)">Dashboard</div>
+      <div class="topbar-tab" onclick="editorTab('alljobs', this)">All Jobs</div>
+      <div class="topbar-tab" onclick="editorTab('clients', this)">Clients</div>
+      <div class="topbar-tab" onclick="editorTab('messages', this)" id="editor-msg-tab">Messages</div>
     </div>
     <div class="topbar-right">
       <!-- Mobile only: show studio brand on right -->
       <div id="editor-mobile-brand" style="display:none;align-items:center;gap:8px;">
         <div class="topbar-logo-icon" style="background:none;box-shadow:none;overflow:hidden;padding:0;width:28px;height:28px;">
-          <img src="file:///C:/Users/Keem/Downloads/icon-192.png" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
+          <img src="icon-192.png" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
         </div>
         <span class="topbar-logo-name" style="font-size:14px;">Keem Studio</span>
       </div>
@@ -2414,7 +2414,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         <div style="display:flex;align-items:center;gap:16px;">
           <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#e8b84b,#f5d478);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#6b4900;flex-shrink:0;box-shadow:0 0 0 3px rgba(232,184,75,0.3),0 4px 12px rgba(232,184,75,0.2);">K</div>
           <div>
-            <h1 style="font-family:&#39;Poppins&#39;,sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.02em;margin-bottom:3px;" id="editor-greeting">Good morning</h1>
+            <h1 style="font-family:'Poppins',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.02em;margin-bottom:3px;" id="editor-greeting">Good morning</h1>
             <p style="font-size:12px;color:var(--text3);" id="editor-subline">Loading your queue...</p>
             <div id="attention-pill" style="display:none;margin-top:8px;"></div>
           </div>
@@ -2470,7 +2470,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         <div class="empty-state"><div class="empty-icon">📋</div><p>No active jobs. Add one above!</p></div>
       </div>
       <div id="dashboard-see-all" style="display:none;text-align:center;margin-top:16px;">
-        <button onclick="editorTab(&#39;alljobs&#39;, document.querySelector(&#39;.topbar-tab:nth-child(2)&#39;))" style="background:rgba(232,184,75,0.15);color:#6b4900;border:1px solid rgba(232,184,75,0.3);border-radius:20px;padding:9px 22px;font-size:13px;font-weight:700;cursor:pointer;font-family:&#39;DM Sans&#39;,sans-serif;">See all jobs →</button>
+        <button onclick="editorTab('alljobs', document.querySelector('.topbar-tab:nth-child(2)'))" style="background:rgba(232,184,75,0.15);color:#6b4900;border:1px solid rgba(232,184,75,0.3);border-radius:20px;padding:9px 22px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">See all jobs →</button>
       </div>
     </div>
 
@@ -2478,7 +2478,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
     <div id="editor-tab-alljobs" style="display:none;">
       <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
         <div>
-          <h1 style="font-family:&#39;Poppins&#39;,sans-serif;font-size:22px;font-weight:700;letter-spacing:-.02em;margin-bottom:4px;">All Jobs</h1>
+          <h1 style="font-family:'Poppins',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.02em;margin-bottom:4px;">All Jobs</h1>
           <p style="font-size:13px;color:var(--text3);" id="alljobs-subline">Loading...</p>
         </div>
         <button class="btn-accent" onclick="openNewJobModal()">✦ New job</button>
@@ -2508,7 +2508,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
     </div>
 
     <div id="editor-tab-clients" style="display:none;">
-      <h1 style="font-family:&#39;Poppins&#39;,sans-serif;font-size:22px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px;">Clients</h1>
+      <h1 style="font-family:'Poppins',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px;">Clients</h1>
       <p style="font-size:13px;color:var(--text3);margin-bottom:24px;">Click a client to see their full job history.</p>
       <div id="clients-list"><div class="empty-state"><div class="empty-icon">👥</div><p>No clients yet.</p></div></div>
     </div>
@@ -2553,7 +2553,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       <div class="job-sheet-handle"></div>
       <div class="job-sheet-header">
         <div class="job-sheet-title" id="sheet-title">Job details</div>
-        <button class="job-sheet-close" onclick="closeJobSheet()">✕</button>
+        <button class="job-sheet-close" onclick="closeJobSheet()">&#x2715;</button>
       </div>
       <div class="job-sheet-body" id="sheet-body"></div>
     </div>
@@ -2563,18 +2563,18 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
 
 <!-- ════════ EDITOR MOBILE BOTTOM BAR ════════ -->
 <div id="editor-mobile-bottom-bar">
-  <div class="mob-tab active" id="editor-mob-tab-queue" onclick="editorTabMobile(&#39;queue&#39;)">
-    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>
+  <div class="mob-tab active" id="editor-mob-tab-queue" onclick="editorTabMobile('queue')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
   </div>
-  <div class="mob-tab" id="editor-mob-tab-alljobs" onclick="editorTabMobile(&#39;alljobs&#39;)">
-    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 9h18"></path><path d="M9 4v5"></path><path d="M15 4v5"></path></svg>
+  <div class="mob-tab" id="editor-mob-tab-alljobs" onclick="editorTabMobile('alljobs')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M9 4v5"/><path d="M15 4v5"/></svg>
   </div>
-  <div class="mob-tab" id="editor-mob-tab-clients" onclick="editorTabMobile(&#39;clients&#39;)">
-    <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"></circle><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"></path><circle cx="19" cy="8" r="2"></circle><path d="M22 20c0-2.2-1.3-4-3-4.5"></path></svg>
+  <div class="mob-tab" id="editor-mob-tab-clients" onclick="editorTabMobile('clients')">
+    <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/><circle cx="19" cy="8" r="2"/><path d="M22 20c0-2.2-1.3-4-3-4.5"/></svg>
   </div>
-  <div class="mob-tab" id="editor-mob-tab-messages" onclick="editorTabMobile(&#39;messages&#39;)">
+  <div class="mob-tab" id="editor-mob-tab-messages" onclick="editorTabMobile('messages')">
     <div class="mob-tab-notif" id="editor-mob-msg-dot"></div>
-    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
   </div>
 </div>
 
@@ -2583,7 +2583,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
   <div class="topbar">
     <div class="topbar-logo">
       <div class="topbar-logo-icon" style="background:none;box-shadow:none;overflow:hidden;padding:0;">
-        <img src="file:///C:/Users/Keem/Downloads/icon-192.png" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+        <img src="icon-192.png" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
       </div>
       <span class="topbar-logo-name">Keem Studio</span>
     </div>
@@ -2612,16 +2612,16 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         </div>
       </div>
       <div class="client-tabs">
-        <div class="client-tab active" id="desktop-tab-overview" onclick="clientTab(&#39;overview&#39;, this)">Overview</div>
-        <div class="client-tab" onclick="clientTab(&#39;request&#39;, this)">Request a clip</div>
-        <div class="client-tab" id="desktop-tab-jobs" onclick="clientTab(&#39;jobs&#39;, this)">My jobs</div>
-        <div class="client-tab" id="downloads-tab" onclick="clientTab(&#39;downloads&#39;, this)">
+        <div class="client-tab active" id="desktop-tab-overview" onclick="clientTab('overview', this)">Overview</div>
+        <div class="client-tab" onclick="clientTab('request', this)">Request a clip</div>
+        <div class="client-tab" id="desktop-tab-jobs" onclick="clientTab('jobs', this)">My jobs</div>
+        <div class="client-tab" id="downloads-tab" onclick="clientTab('downloads', this)">
           Downloads <span class="tab-unread-dot" id="downloads-notif-dot" style="display:none;"></span>
         </div>
-        <div class="client-tab" id="client-msg-tab" onclick="clientTab(&#39;messages&#39;, this)">
+        <div class="client-tab" id="client-msg-tab" onclick="clientTab('messages', this)">
           Messages <span class="tab-unread-dot" id="client-msg-dot" style="display:none;"></span>
         </div>
-        <div class="client-tab" id="desktop-tab-assets" onclick="clientTab(&#39;assets&#39;, this)">📁 Files</div>
+        <div class="client-tab" id="desktop-tab-assets" onclick="clientTab('assets', this)">📁 Files</div>
       </div>
     </div>
   </div>
@@ -2658,7 +2658,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       </div>
       <!-- Mobile: Request a clip shortcut -->
       <div id="client-request-shortcut" style="display:none;margin-bottom:20px;">
-        <button onclick="clientTab(&#39;request&#39;,null)" style="width:100%;padding:14px;background:var(--purple);border:none;border-radius:14px;font-size:14px;font-weight:700;color:#6b4900;font-family:&#39;DM Sans&#39;,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(232,184,75,0.35);">
+        <button onclick="clientTab('request',null)" style="width:100%;padding:14px;background:var(--purple);border:none;border-radius:14px;font-size:14px;font-weight:700;color:#6b4900;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(232,184,75,0.35);">
           ✦ Request a clip
         </button>
       </div>
@@ -2764,10 +2764,10 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
 
     <!-- ASSETS TAB -->
     <div id="client-tab-assets" style="display:none;">
-      <h2 style="font-family:&#39;Poppins&#39;,sans-serif;font-size:18px;font-weight:700;margin-bottom:6px;">Send files to Keem</h2>
+      <h2 style="font-family:'Poppins',sans-serif;font-size:18px;font-weight:700;margin-bottom:6px;">Send files to Keem</h2>
       <p style="font-size:13px;color:var(--text3);margin-bottom:20px;">Drop footage, music, logos or references — they'll be organised automatically.</p>
 
-      <div class="asset-dropzone" id="client-dropzone" onclick="document.getElementById(&#39;asset-file-input&#39;).click()">
+      <div class="asset-dropzone" id="client-dropzone" onclick="document.getElementById('asset-file-input').click()">
         <div class="asset-dropzone-icon">📁</div>
         <p>Drop files here or tap to browse</p>
         <small>Video, audio, images, documents — any file type accepted</small>
@@ -2776,7 +2776,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
           <div class="asset-upload-label" id="asset-upload-label">Uploading…</div>
         </div>
       </div>
-      <input type="file" id="asset-file-input" multiple="" style="display:none;" onchange="handleAssetFiles(this.files)">
+      <input type="file" id="asset-file-input" multiple style="display:none;" onchange="handleAssetFiles(this.files)">
 
       <div id="client-assets-list" style="margin-top:8px;"></div>
     </div>
@@ -2787,47 +2787,47 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
 
 
 <!-- ════════ CLIENT MOBILE BOTTOM BAR ════════ -->
-  <div id="mobile-bottom-bar">    <div class="mob-tab active" id="mob-tab-overview" onclick="clientTab(&#39;overview&#39;, null)">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>
+  <div id="mobile-bottom-bar">    <div class="mob-tab active" id="mob-tab-overview" onclick="clientTab('overview', null)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
     </div>
-    <div class="mob-tab" id="mob-tab-jobs" onclick="clientTab(&#39;jobs&#39;, null)">
-      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 9h18"></path><path d="M9 4v5"></path><path d="M15 4v5"></path></svg>
+    <div class="mob-tab" id="mob-tab-jobs" onclick="clientTab('jobs', null)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M9 4v5"/><path d="M15 4v5"/></svg>
     </div>
-    <div class="mob-tab" id="mob-tab-downloads" onclick="clientTab(&#39;downloads&#39;, null)">
+    <div class="mob-tab" id="mob-tab-downloads" onclick="clientTab('downloads', null)">
       <div class="mob-tab-notif" id="mob-notif-dot"></div>
-      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
     </div>
-    <div class="mob-tab" id="mob-tab-messages" onclick="clientTab(&#39;messages&#39;, null)">
+    <div class="mob-tab" id="mob-tab-messages" onclick="clientTab('messages', null)">
       <div class="mob-tab-notif" id="mob-msg-dot"></div>
-      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     </div>
-    <div class="mob-tab" id="mob-tab-assets" onclick="clientTab(&#39;assets&#39;, null)">
-      <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+    <div class="mob-tab" id="mob-tab-assets" onclick="clientTab('assets', null)">
+      <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
     </div>
   </div>
 
 <!-- ════════ EDITOR DRAWER ════════ -->
-<div class="drawer-backdrop" id="editor-drawer-backdrop" onclick="closeDrawer(&#39;editor&#39;)"></div>
+<div class="drawer-backdrop" id="editor-drawer-backdrop" onclick="closeDrawer('editor')"></div>
 <div class="drawer" id="editor-drawer">
   <div class="drawer-header">
-    <div class="drawer-avatar" id="drawer-editor-avatar" onclick="openDrawerPanel(&#39;editor&#39;,&#39;profile&#39;)">K</div>
+    <div class="drawer-avatar" id="drawer-editor-avatar" onclick="openDrawerPanel('editor','profile')">K</div>
     <div>
       <div class="drawer-user-name" id="drawer-editor-name">Keem</div>
       <div class="drawer-user-email" id="drawer-editor-email">keemdoesvideo@gmail.com</div>
     </div>
   </div>
   <div class="drawer-nav">
-    <div class="drawer-item" onclick="openDrawerPanel(&#39;editor&#39;,&#39;profile&#39;)">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"></path></svg>
+    <div class="drawer-item" onclick="openDrawerPanel('editor','profile')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
       <span class="drawer-item-label">Profile</span>
     </div>
-    <div class="drawer-item" onclick="openDrawerPanel(&#39;editor&#39;,&#39;settings&#39;)">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+    <div class="drawer-item" onclick="openDrawerPanel('editor','settings')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       <span class="drawer-item-label">Settings</span>
     </div>
     <div class="drawer-divider"></div>
     <div class="drawer-item signout" onclick="logout()">
-      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       <span class="drawer-item-label">Sign out</span>
     </div>
   </div>
@@ -2835,15 +2835,15 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
   <!-- Profile panel -->
   <div class="drawer-panel" id="editor-panel-profile">
     <div class="drawer-panel-header">
-      <button class="drawer-back-btn" onclick="closeDrawerPanel(&#39;editor&#39;,&#39;profile&#39;)">
-        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      <button class="drawer-back-btn" onclick="closeDrawerPanel('editor','profile')">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <div class="drawer-panel-title">Profile</div>
     </div>
     <div class="drawer-panel-body">
       <div class="drawer-avatar-upload">
-        <div class="drawer-avatar-large" id="editor-profile-avatar" onclick="document.getElementById(&#39;editor-avatar-input&#39;).click()">K</div>
-        <input type="file" id="editor-avatar-input" accept="image/*" style="display:none" onchange="uploadDrawerAvatar(this,&#39;editor&#39;)">
+        <div class="drawer-avatar-large" id="editor-profile-avatar" onclick="document.getElementById('editor-avatar-input').click()">K</div>
+        <input type="file" id="editor-avatar-input" accept="image/*" style="display:none" onchange="uploadDrawerAvatar(this,'editor')">
         <small style="color:var(--text3);font-size:11px;">Tap to change photo</small>
       </div>
       <div class="drawer-field"><label>Display name</label><input type="text" id="ep-name" placeholder="Your name"></div>
@@ -2853,46 +2853,46 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       <div class="drawer-field"><label>TikTok</label><input type="text" id="ep-tiktok" placeholder="@handle"></div>
       <div class="drawer-field"><label>YouTube</label><input type="text" id="ep-youtube" placeholder="Channel URL"></div>
       <div class="drawer-field"><label>Website</label><input type="text" id="ep-website" placeholder="https://"></div>
-      <button class="drawer-save-btn" onclick="saveDrawerProfile(&#39;editor&#39;)">Save profile</button>
+      <button class="drawer-save-btn" onclick="saveDrawerProfile('editor')">Save profile</button>
     </div>
   </div>
 
   <!-- Settings panel -->
   <div class="drawer-panel" id="editor-panel-settings">
     <div class="drawer-panel-header">
-      <button class="drawer-back-btn" onclick="closeDrawerPanel(&#39;editor&#39;,&#39;settings&#39;)">
-        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      <button class="drawer-back-btn" onclick="closeDrawerPanel('editor','settings')">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <div class="drawer-panel-title">Settings</div>
     </div>
     <div class="drawer-panel-body" style="padding:8px 0;">
-      <div class="drawer-item" onclick="openDrawerPanel(&#39;editor&#39;,&#39;appearance&#39;)">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+      <div class="drawer-item" onclick="openDrawerPanel('editor','appearance')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
         <span class="drawer-item-label">Appearance</span>
-        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
-      <div class="drawer-item" onclick="openDrawerPanel(&#39;editor&#39;,&#39;account&#39;)">
-        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      <div class="drawer-item" onclick="openDrawerPanel('editor','account')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         <span class="drawer-item-label">Account</span>
-        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
-      <div class="drawer-item" onclick="openDrawerPanel(&#39;editor&#39;,&#39;connected&#39;)">
-        <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+      <div class="drawer-item" onclick="openDrawerPanel('editor','connected')">
+        <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
         <span class="drawer-item-label">Connected accounts</span>
-        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
-      <div class="drawer-item" onclick="openDrawerPanel(&#39;editor&#39;,&#39;notifications&#39;)">
-        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+      <div class="drawer-item" onclick="openDrawerPanel('editor','notifications')">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         <span class="drawer-item-label">Notifications</span>
-        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
     </div>
 
     <!-- Appearance sub-page -->
     <div class="drawer-panel" id="editor-panel-appearance">
       <div class="drawer-panel-header">
-        <button class="drawer-back-btn" onclick="closeDrawerPanel(&#39;editor&#39;,&#39;appearance&#39;)">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        <button class="drawer-back-btn" onclick="closeDrawerPanel('editor','appearance')">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
         <div class="drawer-panel-title">Appearance</div>
       </div>
@@ -2909,8 +2909,8 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
     <!-- Account sub-page -->
     <div class="drawer-panel" id="editor-panel-account">
       <div class="drawer-panel-header">
-        <button class="drawer-back-btn" onclick="closeDrawerPanel(&#39;editor&#39;,&#39;account&#39;)">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        <button class="drawer-back-btn" onclick="closeDrawerPanel('editor','account')">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
         <div class="drawer-panel-title">Account</div>
       </div>
@@ -2918,7 +2918,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         <div class="settings-section">
           <div class="settings-row">
             <div><div class="settings-row-label">Change password</div><div class="settings-row-sub">Send a reset link to your email</div></div>
-            <button class="btn-ghost" onclick="sendPasswordReset()">Send link</button>
+            <button class="btn-ghost"  onclick="sendPasswordReset()">Send link</button>
           </div>
         </div>
       </div>
@@ -2927,8 +2927,8 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
     <!-- Connected accounts sub-page -->
     <div class="drawer-panel" id="editor-panel-connected">
       <div class="drawer-panel-header">
-        <button class="drawer-back-btn" onclick="closeDrawerPanel(&#39;editor&#39;,&#39;connected&#39;)">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        <button class="drawer-back-btn" onclick="closeDrawerPanel('editor','connected')">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
         <div class="drawer-panel-title">Connected accounts</div>
       </div>
@@ -2939,7 +2939,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
               <div class="settings-row-label">Discord</div>
               <div class="settings-row-sub" id="editor-discord-sub">Not connected</div>
             </div>
-            <button class="btn-ghost" onclick="connectDiscord(&#39;editor&#39;)">Connect</button>
+            <button class="btn-ghost"  onclick="connectDiscord('editor')">Connect</button>
           </div>
         </div>
       </div>
@@ -2948,8 +2948,8 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
     <!-- Notifications sub-page -->
     <div class="drawer-panel" id="editor-panel-notifications">
       <div class="drawer-panel-header">
-        <button class="drawer-back-btn" onclick="closeDrawerPanel(&#39;editor&#39;,&#39;notifications&#39;)">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        <button class="drawer-back-btn" onclick="closeDrawerPanel('editor','notifications')">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
         <div class="drawer-panel-title">Notifications</div>
       </div>
@@ -2957,15 +2957,15 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         <div class="settings-section">
           <div class="settings-row">
             <div class="settings-row-label">New job requests</div>
-            <button class="settings-toggle on" id="notif-new-job" onclick="this.classList.toggle(&#39;on&#39;)"></button>
+            <button class="settings-toggle on" id="notif-new-job" onclick="this.classList.toggle('on')"></button>
           </div>
           <div class="settings-row">
             <div class="settings-row-label">Client messages</div>
-            <button class="settings-toggle on" id="notif-messages" onclick="this.classList.toggle(&#39;on&#39;)"></button>
+            <button class="settings-toggle on" id="notif-messages" onclick="this.classList.toggle('on')"></button>
           </div>
           <div class="settings-row">
             <div class="settings-row-label">File uploads</div>
-            <button class="settings-toggle on" id="notif-uploads" onclick="this.classList.toggle(&#39;on&#39;)"></button>
+            <button class="settings-toggle on" id="notif-uploads" onclick="this.classList.toggle('on')"></button>
           </div>
         </div>
       </div>
@@ -2974,27 +2974,27 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
 </div>
 
 <!-- ════════ CLIENT DRAWER ════════ -->
-<div class="drawer-backdrop" id="client-drawer-backdrop" onclick="closeDrawer(&#39;client&#39;)"></div>
+<div class="drawer-backdrop" id="client-drawer-backdrop" onclick="closeDrawer('client')"></div>
 <div class="drawer" id="client-drawer">
   <div class="drawer-header">
-    <div class="drawer-avatar" id="drawer-client-avatar" onclick="openDrawerPanel(&#39;client&#39;,&#39;profile&#39;)">?</div>
+    <div class="drawer-avatar" id="drawer-client-avatar" onclick="openDrawerPanel('client','profile')">?</div>
     <div>
       <div class="drawer-user-name" id="drawer-client-name">—</div>
       <div class="drawer-user-email" id="drawer-client-email">—</div>
     </div>
   </div>
   <div class="drawer-nav">
-    <div class="drawer-item" onclick="openDrawerPanel(&#39;client&#39;,&#39;profile&#39;)">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"></path></svg>
+    <div class="drawer-item" onclick="openDrawerPanel('client','profile')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
       <span class="drawer-item-label">Profile</span>
     </div>
-    <div class="drawer-item" onclick="openDrawerPanel(&#39;client&#39;,&#39;settings&#39;)">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+    <div class="drawer-item" onclick="openDrawerPanel('client','settings')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       <span class="drawer-item-label">Settings</span>
     </div>
     <div class="drawer-divider"></div>
     <div class="drawer-item signout" onclick="logout()">
-      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       <span class="drawer-item-label">Sign out</span>
     </div>
   </div>
@@ -3002,15 +3002,15 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
   <!-- Profile panel -->
   <div class="drawer-panel" id="client-panel-profile">
     <div class="drawer-panel-header">
-      <button class="drawer-back-btn" onclick="closeDrawerPanel(&#39;client&#39;,&#39;profile&#39;)">
-        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      <button class="drawer-back-btn" onclick="closeDrawerPanel('client','profile')">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <div class="drawer-panel-title">Profile</div>
     </div>
     <div class="drawer-panel-body">
       <div class="drawer-avatar-upload">
-        <div class="drawer-avatar-large" id="client-profile-avatar" onclick="document.getElementById(&#39;client-avatar-input&#39;).click()">?</div>
-        <input type="file" id="client-avatar-input" accept="image/*" style="display:none" onchange="uploadDrawerAvatar(this,&#39;client&#39;)">
+        <div class="drawer-avatar-large" id="client-profile-avatar" onclick="document.getElementById('client-avatar-input').click()">?</div>
+        <input type="file" id="client-avatar-input" accept="image/*" style="display:none" onchange="uploadDrawerAvatar(this,'client')">
         <small style="color:var(--text3);font-size:11px;">Tap to change photo</small>
       </div>
       <div class="drawer-field"><label>Display name</label><input type="text" id="cp-name" placeholder="Your name"></div>
@@ -3020,46 +3020,46 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       <div class="drawer-field"><label>TikTok</label><input type="text" id="cp-tiktok" placeholder="@handle"></div>
       <div class="drawer-field"><label>YouTube</label><input type="text" id="cp-youtube" placeholder="Channel URL"></div>
       <div class="drawer-field"><label>Website</label><input type="text" id="cp-website" placeholder="https://"></div>
-      <button class="drawer-save-btn" onclick="saveDrawerProfile(&#39;client&#39;)">Save profile</button>
+      <button class="drawer-save-btn" onclick="saveDrawerProfile('client')">Save profile</button>
     </div>
   </div>
 
   <!-- Settings panel -->
   <div class="drawer-panel" id="client-panel-settings">
     <div class="drawer-panel-header">
-      <button class="drawer-back-btn" onclick="closeDrawerPanel(&#39;client&#39;,&#39;settings&#39;)">
-        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      <button class="drawer-back-btn" onclick="closeDrawerPanel('client','settings')">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <div class="drawer-panel-title">Settings</div>
     </div>
     <div class="drawer-panel-body" style="padding:8px 0;">
-      <div class="drawer-item" onclick="openDrawerPanel(&#39;client&#39;,&#39;appearance&#39;)">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+      <div class="drawer-item" onclick="openDrawerPanel('client','appearance')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
         <span class="drawer-item-label">Appearance</span>
-        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
-      <div class="drawer-item" onclick="openDrawerPanel(&#39;client&#39;,&#39;account&#39;)">
-        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      <div class="drawer-item" onclick="openDrawerPanel('client','account')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         <span class="drawer-item-label">Account</span>
-        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
-      <div class="drawer-item" onclick="openDrawerPanel(&#39;client&#39;,&#39;connected&#39;)">
-        <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+      <div class="drawer-item" onclick="openDrawerPanel('client','connected')">
+        <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
         <span class="drawer-item-label">Connected accounts</span>
-        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
-      <div class="drawer-item" onclick="openDrawerPanel(&#39;client&#39;,&#39;notifications&#39;)">
-        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+      <div class="drawer-item" onclick="openDrawerPanel('client','notifications')">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         <span class="drawer-item-label">Notifications</span>
-        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <svg class="settings-chevron" style="margin-left:auto" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
     </div>
 
     <!-- Appearance sub-page -->
     <div class="drawer-panel" id="client-panel-appearance">
       <div class="drawer-panel-header">
-        <button class="drawer-back-btn" onclick="closeDrawerPanel(&#39;client&#39;,&#39;appearance&#39;)">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        <button class="drawer-back-btn" onclick="closeDrawerPanel('client','appearance')">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
         <div class="drawer-panel-title">Appearance</div>
       </div>
@@ -3073,12 +3073,12 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         <div class="settings-section">
           <div class="settings-section-title">Accent colour</div>
           <div class="colour-swatches" id="client-colour-swatches">
-            <div class="colour-swatch selected" style="background:#e8b84b;" onclick="setClientAccent(&#39;#e8b84b&#39;,&#39;#f5d478&#39;,this)" title="Gold"></div>
-            <div class="colour-swatch" style="background:#8b5cf6;" onclick="setClientAccent(&#39;#8b5cf6&#39;,&#39;#a78bfa&#39;,this)" title="Purple"></div>
-            <div class="colour-swatch" style="background:#00b4a6;" onclick="setClientAccent(&#39;#00b4a6&#39;,&#39;#2dd4bf&#39;,this)" title="Teal"></div>
-            <div class="colour-swatch" style="background:#e05c8a;" onclick="setClientAccent(&#39;#e05c8a&#39;,&#39;#f472b6&#39;,this)" title="Pink"></div>
-            <div class="colour-swatch" style="background:#0ea5e9;" onclick="setClientAccent(&#39;#0ea5e9&#39;,&#39;#38bdf8&#39;,this)" title="Sky"></div>
-            <div class="colour-swatch" style="background:#059669;" onclick="setClientAccent(&#39;#059669&#39;,&#39;#34d399&#39;,this)" title="Green"></div>
+            <div class="colour-swatch selected" style="background:#e8b84b;" onclick="setClientAccent('#e8b84b','#f5d478',this)" title="Gold"></div>
+            <div class="colour-swatch" style="background:#8b5cf6;" onclick="setClientAccent('#8b5cf6','#a78bfa',this)" title="Purple"></div>
+            <div class="colour-swatch" style="background:#00b4a6;" onclick="setClientAccent('#00b4a6','#2dd4bf',this)" title="Teal"></div>
+            <div class="colour-swatch" style="background:#e05c8a;" onclick="setClientAccent('#e05c8a','#f472b6',this)" title="Pink"></div>
+            <div class="colour-swatch" style="background:#0ea5e9;" onclick="setClientAccent('#0ea5e9','#38bdf8',this)" title="Sky"></div>
+            <div class="colour-swatch" style="background:#059669;" onclick="setClientAccent('#059669','#34d399',this)" title="Green"></div>
           </div>
         </div>
       </div>
@@ -3087,8 +3087,8 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
     <!-- Account sub-page -->
     <div class="drawer-panel" id="client-panel-account">
       <div class="drawer-panel-header">
-        <button class="drawer-back-btn" onclick="closeDrawerPanel(&#39;client&#39;,&#39;account&#39;)">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        <button class="drawer-back-btn" onclick="closeDrawerPanel('client','account')">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
         <div class="drawer-panel-title">Account</div>
       </div>
@@ -3096,7 +3096,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         <div class="settings-section">
           <div class="settings-row">
             <div><div class="settings-row-label">Change password</div><div class="settings-row-sub">Send a reset link to your email</div></div>
-            <button class="btn-ghost" onclick="sendPasswordReset()">Send link</button>
+            <button class="btn-ghost"  onclick="sendPasswordReset()">Send link</button>
           </div>
         </div>
       </div>
@@ -3105,8 +3105,8 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
     <!-- Connected accounts sub-page -->
     <div class="drawer-panel" id="client-panel-connected">
       <div class="drawer-panel-header">
-        <button class="drawer-back-btn" onclick="closeDrawerPanel(&#39;client&#39;,&#39;connected&#39;)">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        <button class="drawer-back-btn" onclick="closeDrawerPanel('client','connected')">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
         <div class="drawer-panel-title">Connected accounts</div>
       </div>
@@ -3117,7 +3117,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
               <div class="settings-row-label">Discord</div>
               <div class="settings-row-sub" id="client-discord-sub">Not connected</div>
             </div>
-            <button class="btn-ghost" onclick="connectDiscord(&#39;client&#39;)">Connect</button>
+            <button class="btn-ghost"  onclick="connectDiscord('client')">Connect</button>
           </div>
         </div>
       </div>
@@ -3126,8 +3126,8 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
     <!-- Notifications sub-page -->
     <div class="drawer-panel" id="client-panel-notifications">
       <div class="drawer-panel-header">
-        <button class="drawer-back-btn" onclick="closeDrawerPanel(&#39;client&#39;,&#39;notifications&#39;)">
-          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        <button class="drawer-back-btn" onclick="closeDrawerPanel('client','notifications')">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
         <div class="drawer-panel-title">Notifications</div>
       </div>
@@ -3135,15 +3135,15 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         <div class="settings-section">
           <div class="settings-row">
             <div class="settings-row-label">Job status updates</div>
-            <button class="settings-toggle on" id="client-notif-status" onclick="this.classList.toggle(&#39;on&#39;)"></button>
+            <button class="settings-toggle on" id="client-notif-status" onclick="this.classList.toggle('on')"></button>
           </div>
           <div class="settings-row">
             <div class="settings-row-label">Delivery notifications</div>
-            <button class="settings-toggle on" id="client-notif-delivery" onclick="this.classList.toggle(&#39;on&#39;)"></button>
+            <button class="settings-toggle on" id="client-notif-delivery" onclick="this.classList.toggle('on')"></button>
           </div>
           <div class="settings-row">
             <div class="settings-row-label">New messages</div>
-            <button class="settings-toggle on" id="client-notif-messages" onclick="this.classList.toggle(&#39;on&#39;)"></button>
+            <button class="settings-toggle on" id="client-notif-messages" onclick="this.classList.toggle('on')"></button>
           </div>
         </div>
       </div>
@@ -3168,9 +3168,9 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       <input class="form-input" id="setup-password-confirm" type="password" placeholder="Same again" autocomplete="new-password">
     </div>
     <button class="btn-primary" id="setup-btn" onclick="saveAccountPassword()" style="width:100%;margin-top:8px;">
-      <span id="setup-btn-text">Set password &amp; continue</span>
+      <span id="setup-btn-text">Set password & continue</span>
     </button>
-    <button onclick="closeModal(&#39;modal-account-setup&#39;)" style="width:100%;margin-top:10px;background:none;border:none;font-size:13px;color:var(--text3);cursor:pointer;">Skip for now</button>
+    <button onclick="closeModal('modal-account-setup')" style="width:100%;margin-top:10px;background:none;border:none;font-size:13px;color:var(--text3);cursor:pointer;">Skip for now</button>
   </div>
 </div>
 
@@ -3183,7 +3183,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         <h2 id="av-name">Client Files</h2>
         <p id="av-email"></p>
       </div>
-      <button class="asset-panel-close" onclick="document.getElementById(&#39;asset-viewer&#39;).classList.remove(&#39;open&#39;)">×</button>
+      <button class="asset-panel-close" onclick="document.getElementById('asset-viewer').classList.remove('open')">×</button>
     </div>
     <div class="asset-folders" id="av-folders"></div>
     <div class="asset-grid" id="av-grid">
@@ -3197,11 +3197,11 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
   <div class="modal" style="max-width:440px;">
     <div class="modal-header">
       <div class="modal-title">Edit profile</div>
-      <div class="modal-close" onclick="closeModal(&#39;modal-profile&#39;)">×</div>
+      <div class="modal-close" onclick="closeModal('modal-profile')">×</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:24px;">
       <div class="profile-avatar-big" id="profile-avatar-preview">A</div>
-      <button class="add-clip-btn" style="margin-top:8px;" onclick="document.getElementById(&#39;avatar-upload&#39;).click()">Change photo</button>
+      <button class="add-clip-btn" style="margin-top:8px;" onclick="document.getElementById('avatar-upload').click()">Change photo</button>
       <input type="file" id="avatar-upload" accept="image/*" style="display:none;" onchange="handleAvatarUpload(this)">
     </div>
     <div class="form-group">
@@ -3215,24 +3215,24 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
     <div style="margin-bottom:20px;">
       <div style="background:rgba(88,101,242,0.07);border:1px solid rgba(88,101,242,0.18);border-radius:14px;padding:16px 18px;">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-          <span style="font-size:20px;">💬</span>
+          <span style="font-size:20px;">&#x1f4ac;</span>
           <div>
             <div style="font-size:13px;font-weight:700;color:#1a1a2e;">Connect Discord</div>
             <div style="font-size:11px;color:rgba(26,26,46,0.45);">Get pinged when your edit is ready</div>
           </div>
         </div>
         <div style="font-size:11px;color:rgba(26,26,46,0.5);line-height:1.7;margin-bottom:12px;">
-          1. Open Discord → go to your server<br>
-          2. Pick a channel → <strong>Edit Channel</strong> → <strong>Integrations</strong><br>
-          3. Click <strong>Webhooks</strong> → <strong>New Webhook</strong> → <strong>Copy Webhook URL</strong><br>
-          4. Paste it below — totally optional!
+          1. Open Discord &rarr; go to your server<br>
+          2. Pick a channel &rarr; <strong>Edit Channel</strong> &rarr; <strong>Integrations</strong><br>
+          3. Click <strong>Webhooks</strong> &rarr; <strong>New Webhook</strong> &rarr; <strong>Copy Webhook URL</strong><br>
+          4. Paste it below &mdash; totally optional!
         </div>
         <div class="form-label" style="margin-bottom:6px;">Webhook URL <span class="optional">optional</span></div>
         <input class="form-input" id="profile-discord" placeholder="https://discord.com/api/webhooks/..." style="margin-bottom:0;font-size:12px;">
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn-ghost" onclick="closeModal(&#39;modal-profile&#39;)">Cancel</button>
+      <button class="btn-ghost" onclick="closeModal('modal-profile')">Cancel</button>
       <button class="btn-submit" id="profile-save-btn" onclick="saveProfile()">
         <span id="profile-save-text">Save profile</span>
       </button>
@@ -3245,7 +3245,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title">Add new job</div>
-      <div class="modal-close" onclick="closeModal(&#39;modal-new-job&#39;)">×</div>
+      <div class="modal-close" onclick="closeModal('modal-new-job')">×</div>
     </div>
     <div class="form-group">
       <div class="form-label">Client name *</div>
@@ -3284,7 +3284,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       <textarea class="form-textarea" id="m-notes" placeholder="Any notes about this job..."></textarea>
     </div>
     <div class="modal-actions">
-      <button class="btn-ghost" onclick="closeModal(&#39;modal-new-job&#39;)">Cancel</button>
+      <button class="btn-ghost" onclick="closeModal('modal-new-job')">Cancel</button>
       <button class="btn-submit" id="m-submit-btn" onclick="editorAddJob()">
         <span id="m-submit-text">Add job</span>
       </button>
@@ -3297,7 +3297,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title">Edit job</div>
-      <div class="modal-close" onclick="closeModal(&#39;modal-edit-job&#39;)">×</div>
+      <div class="modal-close" onclick="closeModal('modal-edit-job')">×</div>
     </div>
     <div class="form-group">
       <div class="form-label">Client name *</div>
@@ -3330,7 +3330,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       <textarea class="form-textarea" id="e-notes" placeholder="Any notes about this job..."></textarea>
     </div>
     <div class="modal-actions">
-      <button class="btn-ghost" onclick="closeModal(&#39;modal-edit-job&#39;)">Cancel</button>
+      <button class="btn-ghost" onclick="closeModal('modal-edit-job')">Cancel</button>
       <button class="btn-submit" id="e-submit-btn" onclick="saveEditJob()">
         <span id="e-submit-text">Save changes</span>
       </button>
@@ -3343,7 +3343,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
   <div class="modal" style="max-width:480px;">
     <div class="modal-header">
       <div class="modal-title">Send review link</div>
-      <div class="modal-close" onclick="closeModal(&#39;modal-review&#39;)">×</div>
+      <div class="modal-close" onclick="closeModal('modal-review')">×</div>
     </div>
     <p style="font-size:13px; color:var(--text2); margin-bottom:20px;" id="review-job-title"></p>
     <div class="form-group">
@@ -3356,7 +3356,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
     </div>
     <p style="font-size:11px; color:var(--text3); margin-top:-10px; margin-bottom:16px;">ℹ️ Status will update to "Awaiting Review" and the client will be notified with the link.</p>
     <div class="modal-actions">
-      <button class="btn-ghost" onclick="closeModal(&#39;modal-review&#39;)">Cancel</button>
+      <button class="btn-ghost" onclick="closeModal('modal-review')">Cancel</button>
       <button class="btn-deliver" id="review-btn" onclick="sendReviewLink()" style="border-radius:var(--radius-sm);padding:12px 24px;font-size:13px;background:var(--amber);color:#0c0c10;">
         <span id="review-btn-text">🔗 Send review link</span>
       </button>
@@ -3369,7 +3369,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
   <div class="modal" style="max-width:480px;">
     <div class="modal-header">
       <div class="modal-title">Deliver final file</div>
-      <div class="modal-close" onclick="closeModal(&#39;modal-deliver&#39;)">×</div>
+      <div class="modal-close" onclick="closeModal('modal-deliver')">×</div>
     </div>
     <p style="font-size:13px; color:var(--text2); margin-bottom:20px;" id="deliver-job-title"></p>
     <div class="form-group">
@@ -3382,7 +3382,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
     </div>
     <p style="font-size:11px; color:var(--text3); margin-top:-10px; margin-bottom:16px;">ℹ️ This will mark the job as Delivered, move it to the Delivered tab, and email the client to check their portal.</p>
     <div class="modal-actions">
-      <button class="btn-ghost" onclick="closeModal(&#39;modal-deliver&#39;)">Cancel</button>
+      <button class="btn-ghost" onclick="closeModal('modal-deliver')">Cancel</button>
       <button class="btn-deliver" id="deliver-btn" onclick="deliverJob()" style="border-radius:var(--radius-sm); padding:12px 24px; font-size:13px;">
         <span id="deliver-btn-text">✓ Mark delivered &amp; notify</span>
       </button>
@@ -3395,7 +3395,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
   <div class="modal" style="max-width:520px;">
     <div class="modal-header">
       <div class="modal-title" id="view-job-title-modal">Job details</div>
-      <div class="modal-close" onclick="closeModal(&#39;modal-view-job&#39;)">×</div>
+      <div class="modal-close" onclick="closeModal('modal-view-job')">×</div>
     </div>
     <div id="view-job-body"></div>
   </div>
@@ -6299,11 +6299,11 @@ if ('serviceWorker' in navigator) {
   <svg id="onboarding-backdrop" width="100%" height="100%">
     <defs>
       <mask id="onboarding-mask">
-        <rect width="100%" height="100%" fill="white"></rect>
-        <rect id="onboarding-hole" x="0" y="0" width="0" height="0" rx="12" fill="black"></rect>
+        <rect width="100%" height="100%" fill="white"/>
+        <rect id="onboarding-hole" x="0" y="0" width="0" height="0" rx="12" fill="black"/>
       </mask>
     </defs>
-    <rect width="100%" height="100%" fill="rgba(0,0,0,0.7)" mask="url(#onboarding-mask)"></rect>
+    <rect width="100%" height="100%" fill="rgba(0,0,0,0.7)" mask="url(#onboarding-mask)"/>
   </svg>
   <div id="onboarding-highlight"></div>
   <div id="onboarding-card">
@@ -6321,6 +6321,5 @@ if ('serviceWorker' in navigator) {
 </div>
 
 <button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
-
-
-</body></html>
+</body>
+</html>
