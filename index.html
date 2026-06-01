@@ -5853,26 +5853,49 @@ async function sendPushToEditor(title, body) {
 let editorMsgPollInterval = null;
 let clientMsgPollInterval = null;
 
+let lastEditorMsgTimestamp = null;
+let lastClientMsgTimestamp = null;
+
 function startEditorMsgPolling() {
   if (editorMsgPollInterval) clearInterval(editorMsgPollInterval);
-  editorMsgPollInterval = setInterval(() => {
+  editorMsgPollInterval = setInterval(async () => {
     if (DEMO_MODE || !sb) return;
-    loadEditorInbox();
-    const msgTab = document.getElementById('editor-tab-messages');
-    if (msgTab && msgTab.style.display !== 'none' && activeChatClientEmail) {
-      editorLoadMessages(activeChatClientEmail);
+    // Check badge silently
+    const { data: latest } = await sb.from('messages')
+      .select('created_at')
+      .eq('sender_role', 'client')
+      .order('created_at', { ascending: false })
+      .limit(1);
+    const ts = latest?.[0]?.created_at;
+    if (ts !== lastEditorMsgTimestamp) {
+      lastEditorMsgTimestamp = ts;
+      loadEditorInbox();
+      const msgTab = document.getElementById('editor-tab-messages');
+      if (msgTab && msgTab.style.display !== 'none' && activeChatClientEmail) {
+        editorLoadMessages(activeChatClientEmail);
+      }
     }
   }, 3000);
 }
 
 function startClientMsgPolling() {
   if (clientMsgPollInterval) clearInterval(clientMsgPollInterval);
-  clientMsgPollInterval = setInterval(() => {
+  clientMsgPollInterval = setInterval(async () => {
     if (DEMO_MODE || !sb || !currentUser) return;
-    checkClientMsgBadge();
-    const msgTab = document.getElementById('client-tab-messages');
-    if (msgTab && msgTab.style.display !== 'none') {
-      loadClientMessages();
+    // Check for new messages silently
+    const { data: latest } = await sb.from('messages')
+      .select('created_at')
+      .eq('recipient_email', currentUser.email)
+      .order('created_at', { ascending: false })
+      .limit(1);
+    const ts = latest?.[0]?.created_at;
+    if (ts !== lastClientMsgTimestamp) {
+      lastClientMsgTimestamp = ts;
+      checkClientMsgBadge();
+      const msgTab = document.getElementById('client-tab-messages');
+      if (msgTab && msgTab.style.display !== 'none') {
+        loadClientMessages();
+      }
     }
   }, 3000);
 }
