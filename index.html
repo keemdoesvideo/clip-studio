@@ -3454,6 +3454,7 @@ try {
 let currentUser = null;
 let isEditor = false;
 let manualLoginInProgress = false;
+const deletedClientEmails = new Set();
 let allJobs = [];
 let allJobsCache = [];
 let deliverJobId = null;
@@ -4043,6 +4044,7 @@ async function loadClientsPage() {
   const clientMap = {};
   allJobs.forEach(j => {
     const key = j.client_email || j.client || 'unknown';
+    if (deletedClientEmails.has(key)) return; // skip deleted
     if (!clientMap[key]) clientMap[key] = { name: j.client || 'Unknown', email: j.client_email || '', jobs: [] };
     clientMap[key].jobs.push(j);
   });
@@ -4053,9 +4055,9 @@ async function loadClientsPage() {
       const { data: profiles } = await sb.from('profiles').select('email, display_name, contact, avatar_url');
       if (profiles) {
         profiles.forEach(p => {
-          if (p.email === CONFIG.editorEmail) return; // never show editor as a client
+          if (p.email === CONFIG.editorEmail) return;
+          if (deletedClientEmails.has(p.email)) return; // skip deleted
           if (!clientMap[p.email]) clientMap[p.email] = { name: p.display_name || p.email.split('@')[0], email: p.email, jobs: [] };
-          // Enrich with profile data
           if (p.display_name) clientMap[p.email].name = p.display_name;
           if (p.contact) clientMap[p.email].contact = p.contact;
           if (p.avatar_url) clientMap[p.email].avatar_url = p.avatar_url;
@@ -6205,7 +6207,8 @@ async function deleteClient(email, name) {
   if (!confirm(`Delete ${name} completely? This will remove all their jobs, files, messages and account data. This cannot be undone.`)) return;
   if (!sb) return;
 
-  // Immediately remove from DOM so it feels instant
+  // Immediately add to exclusion set and remove from DOM
+  deletedClientEmails.add(email);
   const container = document.getElementById('clients-list');
   if (container) {
     container.querySelectorAll('[data-client-email]').forEach(el => {
