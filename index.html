@@ -107,8 +107,8 @@ body.dark .form-select,
 body.dark .form-textarea,
 body.dark .clip-link-input,
 body.dark .status-select {
-  background: rgba(30,30,30,0.9);
-  border-color: rgba(255,255,255,0.1);
+  background: rgba(22,22,22,0.95);
+  border-color: rgba(255,255,255,0.08);
   color: var(--text);
 }
 body.dark .field-input::placeholder,
@@ -1066,19 +1066,48 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
   background: none;
   border: none;
   padding: 0;
+  position: relative;
 }
-.clip-link-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-.clip-link-num { font-size: 11px; color: var(--text3); font-weight: 600; min-width: 16px; font-family: 'Poppins', sans-serif; }
+/* Vertical connector line */
+.clip-links-wrapper::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 16px;
+  bottom: 16px;
+  width: 1.5px;
+  background: rgba(232,184,75,0.3);
+  border-radius: 2px;
+}
+.clip-link-row {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 8px; position: relative;
+}
+/* Dot on the vertical line */
+.clip-link-row::before {
+  content: '';
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(232,184,75,0.5);
+  flex-shrink: 0;
+  margin-left: 7px;
+}
+.clip-link-num { display: none; }
+.clip-link-icon {
+  font-size: 14px; flex-shrink: 0; color: var(--purple);
+}
 .clip-link-input {
   flex: 1;
   background: var(--bg2);
   border: 1px solid var(--border2);
   border-radius: 10px;
-  padding: 10px 14px;
+  padding: 11px 14px 11px 36px;
   font-size: 13px; color: var(--text);
   font-family: 'DM Sans', sans-serif;
   outline: none;
   transition: border-color 0.2s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23e8b84b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 12px center;
 }
 .clip-link-input:focus { border-color: var(--purple); }
 .clip-link-input::placeholder { color: var(--text3); }
@@ -1087,8 +1116,9 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
   background: transparent; border: none;
   cursor: pointer; color: var(--text3); font-size: 16px;
   display: flex; align-items: center; justify-content: center;
-  border-radius: 6px; transition: all 0.15s;
+  border-radius: 6px; transition: all 0.15s; flex-shrink: 0;
 }
+.clip-link-remove:hover { color: var(--pink); }
 .clip-link-remove:hover { color: var(--pink); background: var(--pink-dim); }
 .add-clip-btn {
   display: flex; align-items: center; gap: 6px;
@@ -2700,15 +2730,13 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
           </div>
           <button class="add-clip-btn" onclick="addClipLink()">＋ Add another clip link</button>
         </div>
-        <div class="form-row-2">
-          <div class="form-group" style="margin-bottom:0;">
-            <div class="form-label">Deadline <span class="optional">optional</span></div>
-            <input class="form-input" id="c-deadline" type="date">
-          </div>
-          <div class="form-group" style="margin-bottom:0;">
-            <div class="form-label">Notes for editor <span class="optional">optional</span></div>
-            <input class="form-input" id="c-notes" placeholder="Any special instructions...">
-          </div>
+        <div class="form-group">
+          <div class="form-label">Deadline <span class="optional">optional</span></div>
+          <input class="form-input" id="c-deadline" type="date" style="max-width:260px;">
+        </div>
+        <div class="form-group">
+          <div class="form-label">Notes for editor <span class="optional">optional</span></div>
+          <input class="form-input" id="c-notes" placeholder="Any special instructions...">
         </div>
         <button class="btn-submit" style="margin-top:20px;width:100%;" id="c-submit-btn" onclick="submitClientRequest()">
           <span id="c-submit-text">Submit request</span>
