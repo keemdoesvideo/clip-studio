@@ -3505,7 +3505,7 @@ async function clientSignup() {
   setLoading('signup-btn', 'signup-btn-text', true, 'Sending...');
   const { error } = await sb.auth.signUp({
     email,
-    password: crypto.randomUUID(), // temp password — will be overwritten in setup
+    password: 'TempPass123!_' + Math.random().toString(36).slice(2), // satisfies all requirements, overwritten in setup
     options: { emailRedirectTo: window.location.href }
   });
   setLoading('signup-btn', 'signup-btn-text', false, 'Send confirmation email');
