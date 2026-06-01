@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Keem Studio</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#e8b84b">
@@ -5127,6 +5127,15 @@ function clientTab(tab, el) {
     const panel = document.getElementById('client-tab-' + t);
     if (panel) panel.style.display = t === tab ? (t === 'messages' ? 'flex' : 'block') : 'none';
   });
+
+  // Show greeting only on overview tab
+  const greeting = document.getElementById('client-hello');
+  const greetingSub = document.getElementById('client-month-sub');
+  const avatarBig = document.getElementById('client-avatar-big');
+  const isOverview = tab === 'overview';
+  if (greeting) greeting.style.display = isOverview ? '' : 'none';
+  if (greetingSub) greetingSub.style.display = isOverview ? '' : 'none';
+  if (avatarBig) avatarBig.style.display = isOverview ? '' : 'none';
 
   // Sync mobile bottom bar
   ['overview','jobs','downloads','messages','assets'].forEach(t => {
