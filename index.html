@@ -3629,86 +3629,67 @@ async function editorLogin() {
 }
 
 function loginAsEditor(user) {
-  currentUser = user;
-  isEditor = true;
-  const name = user.name || user.email.split('@')[0];
-  const initials = name.substring(0, 2).toUpperCase();
-  document.getElementById('editor-avatar').textContent = initials;
-  document.getElementById('editor-name-display').textContent = name;
-  showScreen('editor');
-  loadEditorData();
-  requestAnimationFrame(() => updateTabSlider('editor-mobile-bottom-bar', 'editor-mob-tab-queue'));
-  startEditorMsgPolling();
-
-  // Global realtime — always-on message listener
-  if (sb) {
-    sb.channel('editor-global-messages')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'sender_role=eq.client' }, payload => {
-        // Always reload inbox for badge
-        loadEditorInbox();
-        // If messages tab is open and this client is active, reload chat
-        const msgTab = document.getElementById('editor-tab-messages');
-        if (msgTab && msgTab.style.display !== 'none' && activeChatClientEmail === payload.new.sender_email) {
-          editorLoadMessages(activeChatClientEmail);
-        }
-      }).subscribe();
+  try {
+    currentUser = user;
+    isEditor = true;
+    const name = user.name || user.email.split('@')[0];
+    const initials = name.substring(0, 2).toUpperCase();
+    const av = document.getElementById('editor-avatar');
+    if (av) av.textContent = initials;
+    const nd = document.getElementById('editor-name-display');
+    if (nd) nd.textContent = name;
+    showScreen('editor');
+    loadEditorData();
+    requestAnimationFrame(() => updateTabSlider('editor-mobile-bottom-bar', 'editor-mob-tab-queue'));
+    startEditorMsgPolling();
+  } catch(e) {
+    console.error('loginAsEditor error:', e);
   }
 }
 
 function loginAsClient(user) {
-  currentUser = user;
-  isEditor = false;
-  const name = user.user_metadata?.display_name || user.name || user.email.split('@')[0];
-  const initials = name.substring(0, 2).toUpperCase();
-  const avatarUrl = user.user_metadata?.avatar_url;
+  try {
+    currentUser = user;
+    isEditor = false;
+    const name = user.user_metadata?.display_name || user.name || user.email.split('@')[0];
+    const initials = name.substring(0, 2).toUpperCase();
+    const avatarUrl = user.user_metadata?.avatar_url;
 
-  document.getElementById('client-name-top').textContent = name;
-  document.getElementById('client-hello').textContent = `Hey ${name}! 👋`;
+    const nameTop = document.getElementById('client-name-top');
+    if (nameTop) nameTop.textContent = name;
+    const hello = document.getElementById('client-hello');
+    if (hello) hello.textContent = `Hey ${name}! 👋`;
 
-  const avatarTop = document.getElementById('client-avatar-top');
-  const avatarBig = document.getElementById('client-avatar-big');
-  if (avatarUrl) {
-    avatarTop.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="avatar">`;
-    avatarBig.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="avatar">`;
-  } else {
-    avatarTop.textContent = initials;
-    avatarBig.textContent = initials;
-  }
+    const avatarTop = document.getElementById('client-avatar-top');
+    const avatarBig = document.getElementById('client-avatar-big');
+    if (avatarUrl) {
+      if (avatarTop) avatarTop.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="avatar">`;
+      if (avatarBig) avatarBig.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="avatar">`;
+    } else {
+      if (avatarTop) avatarTop.textContent = initials;
+      if (avatarBig) avatarBig.textContent = initials;
+    }
 
-  showScreen('client');
-  checkNotificationBadge(user.email);
-  loadClientData(user.email);
-  checkClientMsgBadge();
-  startClientMsgPolling();
-  requestAnimationFrame(() => {
-    updateTabSlider('mobile-bottom-bar', 'mob-tab-overview');
-    setTimeout(startOnboarding, 800);
-    checkFirstLogin(user);
-  });
+    showScreen('client');
+    checkNotificationBadge(user.email);
+    loadClientData(user.email);
+    checkClientMsgBadge();
+    startClientMsgPolling();
+    requestAnimationFrame(() => {
+      updateTabSlider('mobile-bottom-bar', 'mob-tab-overview');
+      setTimeout(startOnboarding, 800);
+      checkFirstLogin(user);
+    });
 
-  // Global realtime — always-on message listener for this client
-  if (sb) {
-    sb.channel('client-global-messages-' + user.email)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `recipient_email=eq.${user.email}` }, () => {
-        // Show badge dot regardless of which tab is open
-        const dot = document.getElementById('client-msg-dot');
-        if (dot) dot.style.display = 'block';
-        const mobDot = document.getElementById('mob-msg-dot');
-        if (mobDot) mobDot.style.display = 'block';
-        // If messages tab is open, reload instantly
-        const msgTab = document.getElementById('client-tab-messages');
-        if (msgTab && msgTab.style.display !== 'none') {
-          loadClientMessages();
-        }
-      }).subscribe();
-  }
-
-  // Upsert into profiles so editor can see this client even with no jobs
-  if (!DEMO_MODE && sb && user.email) {
-    sb.from('profiles').upsert({
-      email: user.email,
-      display_name: name,
-    }, { onConflict: 'email', ignoreDuplicates: true }).then(() => {});
+    // Upsert into profiles so editor can see this client even with no jobs
+    if (!DEMO_MODE && sb && user.email) {
+      sb.from('profiles').upsert({
+        email: user.email,
+        display_name: name,
+      }, { onConflict: 'email', ignoreDuplicates: true }).then(() => {});
+    }
+  } catch(e) {
+    console.error('loginAsClient error:', e);
   }
 }
 
@@ -3797,9 +3778,13 @@ window.addEventListener('load', async () => {
   // Check for existing session on load
   const { data } = await sb.auth.getSession();
   if (data.session) {
-    const user = data.session.user;
-    if (user.email === CONFIG.editorEmail) loginAsEditor(user);
-    else loginAsClient(user);
+    try {
+      const user = data.session.user;
+      if (user.email === CONFIG.editorEmail) loginAsEditor(user);
+      else loginAsClient(user);
+    } catch(e) {
+      console.error('Auto-login error:', e);
+    }
   }
 });
 
