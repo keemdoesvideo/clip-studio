@@ -560,7 +560,13 @@ body.dark .chat-date-divider span { background: var(--bg); }
   #client-tab-messages { height: calc(100vh - 180px); }
 }
 
-body.dark .chat-inbox,
+/* iOS input zoom fix */
+@media (max-width: 600px) {
+  input[type="email"], input[type="password"], input[type="text"], textarea {
+    font-size: 16px !important;
+  }
+}
+
 body.dark .chat-window { background: rgba(26,26,26,0.85); }
 body.dark .chat-msg.theirs .chat-bubble { background: rgba(40,40,40,0.9); border-color: rgba(255,255,255,0.08); }
 body.dark .chat-input { background: rgba(30,30,30,0.9); border-color: rgba(255,255,255,0.1); color: var(--text); }
@@ -590,12 +596,13 @@ body.dark .chat-inbox-item.active { background: rgba(232,184,75,0.08); }
   position: fixed;
   background: var(--bg);
   border-radius: 18px;
-  padding: 22px 24px;
-  width: 300px;
+  padding: 20px;
+  width: min(300px, calc(100vw - 32px));
   box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1);
   pointer-events: all;
   z-index: 1001;
   animation: cardIn 0.35s cubic-bezier(0.34,1.3,0.64,1) both;
+  box-sizing: border-box;
 }
 body.dark #onboarding-card { background: #1a1a1a; }
 
@@ -1899,7 +1906,7 @@ body.dark .asset-folder-tab .folder-count { background: rgba(255,255,255,0.06); 
   .modal-backdrop { padding: 12px; align-items: flex-end; }
   .modal { border-radius: 20px 20px 16px 16px; padding: 24px 20px; max-height: 85vh; }
 
-  #mobile-bottom-bar { display: flex; }
+  #mobile-bottom-bar.screen-active { display: flex; }
 }
 
 /* MOBILE EDITOR <=600px */
@@ -2769,9 +2776,11 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
 
   </div>
 
-  <!-- ════════ MOBILE BOTTOM TAB BAR ════════ -->
-  <div id="mobile-bottom-bar">
-    <div class="mob-tab active" id="mob-tab-overview" onclick="clientTab('overview', null)">
+</div>
+
+
+<!-- ════════ CLIENT MOBILE BOTTOM BAR ════════ -->
+  <div id="mobile-bottom-bar">    <div class="mob-tab active" id="mob-tab-overview" onclick="clientTab('overview', null)">
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
     </div>
     <div class="mob-tab" id="mob-tab-jobs" onclick="clientTab('jobs', null)">
@@ -2789,8 +2798,6 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
     </div>
   </div>
-
-</div>
 
 <!-- ════════ EDITOR DRAWER ════════ -->
 <div class="drawer-backdrop" id="editor-drawer-backdrop" onclick="closeDrawer('editor')"></div>
@@ -3465,8 +3472,10 @@ const DEMO_CLIENT_EMAIL = 'ailinicia@email.com';
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
-  const bar = document.getElementById('editor-mobile-bottom-bar');
-  if (bar) bar.classList.toggle('screen-active', id === 'editor');
+  const editorBar = document.getElementById('editor-mobile-bottom-bar');
+  if (editorBar) editorBar.classList.toggle('screen-active', id === 'editor');
+  const clientBar = document.getElementById('mobile-bottom-bar');
+  if (clientBar) clientBar.classList.toggle('screen-active', id === 'client');
 }
 
 function showEditorLogin() {
@@ -3555,6 +3564,12 @@ async function clientLogin() {
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
   setLoading('login-btn', 'login-btn-text', false, 'Sign in');
   if (error) { showAlert('login-alert', 'Incorrect email or password.', 'error'); return; }
+  // Guard: editor email must use editor login
+  if (data.user.email === CONFIG.editorEmail) {
+    await sb.auth.signOut();
+    showAlert('login-alert', 'Please use the editor login below.', 'error');
+    return;
+  }
   loginAsClient(data.user);
 }
 
@@ -3648,6 +3663,14 @@ async function checkNotificationBadge(email) {
 }
 
 async function logout() {
+  // Close any open drawers first
+  ['editor','client'].forEach(side => {
+    const drawer = document.getElementById(side + '-drawer');
+    const backdrop = document.getElementById(side + '-drawer-backdrop');
+    if (drawer) drawer.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('open');
+  });
+  document.body.style.overflow = '';
   if (!DEMO_MODE && sb) await sb.auth.signOut();
   currentUser = null; isEditor = false;
   showClientLogin();
@@ -5528,8 +5551,8 @@ function positionSpotlight(x, y, w, h, step) {
   // Position card
   const card = document.getElementById('onboarding-card');
   card.className = step.arrow || '';
-  const cardW = 300;
-  const cardH = 180;
+  const cardW = Math.min(300, window.innerWidth - 32);
+  const cardH = 200;
   const margin = 16;
   const vw = window.innerWidth;
   const vh = window.innerHeight;
@@ -5538,12 +5561,12 @@ function positionSpotlight(x, y, w, h, step) {
   if (step.cardPos === 'above') {
     cx = Math.min(Math.max(x, margin), vw - cardW - margin);
     cy = y - cardH - 16;
-    if (cy < margin) cy = y + h + 16; // flip below if no room
+    if (cy < margin) cy = y + h + 16;
   } else if (step.cardPos === 'below') {
     cx = Math.min(Math.max(x, margin), vw - cardW - margin);
-    cy = y + h + 16;
+    cy = Math.min(y + h + 16, vh - cardH - margin);
   } else {
-    cx = (vw - cardW) / 2;
+    cx = Math.max(margin, (vw - cardW) / 2);
     cy = (vh - cardH) / 2;
   }
 
