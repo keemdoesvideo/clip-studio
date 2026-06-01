@@ -565,6 +565,7 @@ body.dark .chat-date-divider span { background: var(--bg); }
   input[type="email"], input[type="password"], input[type="text"], textarea {
     font-size: 16px !important;
   }
+  #client-request-shortcut { display: block !important; }
 }
 
 body.dark .chat-window { background: rgba(26,26,26,0.85); }
@@ -2655,6 +2656,12 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
       <div class="section-header" style="margin-bottom:14px;">
         <div class="section-title">Recent activity</div>
       </div>
+      <!-- Mobile: Request a clip shortcut -->
+      <div id="client-request-shortcut" style="display:none;margin-bottom:20px;">
+        <button onclick="clientTab('request',null)" style="width:100%;padding:14px;background:var(--purple);border:none;border-radius:14px;font-size:14px;font-weight:700;color:#6b4900;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(232,184,75,0.35);">
+          ✦ Request a clip
+        </button>
+      </div>
       <div id="client-overview-recent"></div>
     </div>
 
@@ -4042,6 +4049,11 @@ async function loadClientsPage() {
         </div>
         <button class="client-assets-btn" id="assets-btn-${id}" onclick="event.stopPropagation();openAssetViewer('${c.email}','${c.name}')" title="View client files">
           📁
+        </button>
+        <button onclick="event.stopPropagation();deleteClient('${c.email}','${c.name}')" title="Delete client"
+          style="width:36px;height:36px;border-radius:50%;background:rgba(224,92,138,0.1);border:1px solid rgba(224,92,138,0.2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:transform 0.2s,box-shadow 0.2s;flex-shrink:0;"
+          onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+          🗑
         </button>
         <span id="cbanner-arrow-${id}" style="font-size:16px;color:var(--text3);transition:transform .25s cubic-bezier(.34,1.4,.64,1)">▾</span>
       </div>
@@ -5780,7 +5792,10 @@ async function editorLoadMessages(clientEmail) {
   if (!sb) return;
   const { data } = await sb.from('messages')
     .select('*')
-    .or(`and(sender_email.eq.${clientEmail},sender_role.eq.client),and(sender_email.eq.${CONFIG.editorEmail},sender_role.eq.editor)`)
+    .or(
+      `and(sender_email.eq.${clientEmail},sender_role.eq.client),` +
+      `and(sender_role.eq.editor,recipient_email.eq.${clientEmail})`
+    )
     .order('created_at', { ascending: true });
   renderChatMessages(data || [], 'editor-chat-messages', CONFIG.editorEmail);
 }
@@ -5795,6 +5810,7 @@ async function editorSendMessage() {
   await sb.from('messages').insert({
     sender_email: CONFIG.editorEmail,
     sender_role: 'editor',
+    recipient_email: activeChatClientEmail,
     body,
     read_by_client: false,
     read_by_editor: true
@@ -5811,19 +5827,27 @@ async function loadClientMessages() {
   if (!currentUser || !sb) return;
   const { data } = await sb.from('messages')
     .select('*')
-    .or(`and(sender_email.eq.${currentUser.email},sender_role.eq.client),and(sender_email.eq.${CONFIG.editorEmail},sender_role.eq.editor)`)
+    .or(
+      `and(sender_email.eq.${currentUser.email},sender_role.eq.client),` +
+      `and(sender_role.eq.editor,recipient_email.eq.${currentUser.email})`
+    )
     .order('created_at', { ascending: true });
   renderChatMessages(data || [], 'client-chat-messages', currentUser.email);
 
-  // Mark read
+  // Mark read — only messages sent TO this client
   await sb.from('messages').update({ read_by_client: true })
-    .eq('sender_role', 'editor').eq('read_by_client', false);
+    .eq('sender_role', 'editor')
+    .eq('recipient_email', currentUser.email)
+    .eq('read_by_client', false);
 
   // Realtime
   if (clientMsgSubscription) sb.removeChannel(clientMsgSubscription);
   clientMsgSubscription = sb.channel('client-chat-' + currentUser.email)
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => {
-      loadClientMessages();
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+      const m = payload.new;
+      if (m.sender_email === currentUser.email || m.recipient_email === currentUser.email) {
+        loadClientMessages();
+      }
     }).subscribe();
 }
 
@@ -5836,6 +5860,7 @@ async function clientSendMessage() {
   await sb.from('messages').insert({
     sender_email: currentUser.email,
     sender_role: 'client',
+    recipient_email: CONFIG.editorEmail,
     body,
     read_by_editor: false,
     read_by_client: true
@@ -5987,6 +6012,7 @@ async function loadClientAssets() {
             <span style="font-size:18px;">${catInfo.icon}</span>
             <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);">${f.file_name}</span>
             <span style="color:var(--text3);font-size:11px;flex-shrink:0;">${formatBytes(f.file_size)}</span>
+            <button onclick="deleteClientAsset(${f.id},'${f.file_path}')" style="background:none;border:none;cursor:pointer;padding:4px;color:var(--pink);font-size:16px;flex-shrink:0;" title="Delete file">🗑</button>
           </div>`).join('')}
       </div>
     </div>`;
@@ -6069,14 +6095,69 @@ async function renderAssetGrid(files) {
     const cat = ASSET_CATEGORIES[f.category] || ASSET_CATEGORIES.other;
     const { data: urlData } = await sb.storage.from('client-assets').createSignedUrl(f.file_path, 3600);
     const url = urlData?.signedUrl || '#';
-    return `<a class="asset-item" href="${url}" target="_blank" title="${f.file_name}" style="animation-delay:${Math.random()*0.15}s">
-      <div class="asset-icon">${cat.icon}</div>
-      <div class="asset-name">${f.file_name}</div>
-      <div class="asset-size">${formatBytes(f.file_size)}</div>
-    </a>`;
+    return `<div class="asset-item" style="animation-delay:${Math.random()*0.15}s;position:relative;">
+      <a href="${url}" target="_blank" title="${f.file_name}" style="display:contents;">
+        <div class="asset-icon">${cat.icon}</div>
+        <div class="asset-name">${f.file_name}</div>
+        <div class="asset-size">${formatBytes(f.file_size)}</div>
+      </a>
+      <button onclick="event.preventDefault();editorDeleteAsset(${f.id},'${f.file_path}')"
+        style="position:absolute;top:6px;right:6px;background:rgba(224,92,138,0.15);border:none;border-radius:6px;padding:2px 6px;cursor:pointer;font-size:12px;color:var(--pink);" title="Delete">🗑</button>
+    </div>`;
   }));
   grid.innerHTML = items.join('');
 }
+
+async function deleteClientAsset(id, filePath) {
+  if (!confirm('Delete this file? This cannot be undone.')) return;
+  if (!sb) return;
+  await sb.storage.from('client-assets').remove([filePath]);
+  await sb.from('client_assets').delete().eq('id', id);
+  showToast('File deleted.', 'success');
+  loadClientAssets();
+}
+
+async function editorDeleteAsset(id, filePath) {
+  if (!confirm('Delete this file? This cannot be undone.')) return;
+  if (!sb) return;
+  await sb.storage.from('client-assets').remove([filePath]);
+  await sb.from('client_assets').delete().eq('id', id);
+  showToast('File deleted.', 'success');
+  // Reload the viewer
+  if (document.getElementById('av-name').textContent) {
+    const email = document.getElementById('av-email').textContent;
+    loadAssetViewer(email);
+  }
+}
+
+async function deleteClient(email, name) {
+  if (!confirm(`Delete ${name} completely? This will remove all their jobs, files, messages and account data. This cannot be undone.`)) return;
+  if (!sb) return;
+  showToast('Deleting client data…', 'success');
+
+  try {
+    // 1. Get all their asset file paths
+    const { data: assets } = await sb.from('client_assets').select('file_path').eq('client_email', email);
+    if (assets?.length) {
+      const paths = assets.map(a => a.file_path);
+      await sb.storage.from('client-assets').remove(paths);
+    }
+    // 2. Delete from all tables
+    await sb.from('client_assets').delete().eq('client_email', email);
+    await sb.from('messages').delete().eq('sender_email', email);
+    await sb.from('messages').delete().eq('recipient_email', email);
+    await sb.from('jobs').delete().eq('client_email', email);
+    await sb.from('profiles').delete().eq('email', email);
+    // 3. Delete auth user via admin (requires service role — skip if unavailable)
+    // This requires server-side, so we just clean the data
+    showToast(`${name} and all their data deleted. ✓`, 'success');
+    loadClientsPage();
+  } catch (err) {
+    console.error('Delete client error:', err);
+    showToast('Error deleting client: ' + err.message, 'error');
+  }
+}
+
 
 function updateAssetBadge(email, count) {
   // Find the button for this client and update badge
