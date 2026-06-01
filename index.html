@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0067)file:///C:/Users/Keem/Downloads/Keem_Studio_with_font_change_1.html -->
+<!-- saved from url=(0067)file:///C:/Users/Keem/Downloads/Keem_Studio_with_font_change_2.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,8 +11,8 @@
 <meta name="apple-mobile-web-app-title" content="Keem Studio">
 <link rel="apple-touch-icon" href="file:///C:/Users/Keem/Downloads/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com/">
-<link href="./Index close to end_files/css2" rel="stylesheet">
-<script src="./Index close to end_files/supabase-js@2"></script>
+<link href="./Index so close to final build_files/css2" rel="stylesheet">
+<script src="./Index so close to final build_files/supabase-js@2"></script>
 <style>
 :root {
   /* Light base - clean white */
@@ -3453,6 +3453,7 @@ try {
 
 let currentUser = null;
 let isEditor = false;
+let manualLoginInProgress = false;
 let allJobs = [];
 let allJobsCache = [];
 let deliverJobId = null;
@@ -3568,7 +3569,9 @@ async function clientLogin() {
   }
 
   setLoading('login-btn', 'login-btn-text', true, 'Signing in...');
+  manualLoginInProgress = true;
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  manualLoginInProgress = false;
   setLoading('login-btn', 'login-btn-text', false, 'Sign in');
   if (error) { showAlert('login-alert', 'Incorrect email or password.', 'error'); return; }
   // Guard: editor email must use editor login
@@ -3595,10 +3598,12 @@ async function editorLogin() {
 
   setLoading('editor-btn', 'editor-btn-text', true, 'Signing in...');
   const stayLoggedIn = document.getElementById('editor-stay-logged-in')?.checked;
+  manualLoginInProgress = true;
   const { data, error } = await sb.auth.signInWithPassword({
     email, password: pass,
     options: stayLoggedIn ? { persistSession: true } : {}
   });
+  manualLoginInProgress = false;
   setLoading('editor-btn', 'editor-btn-text', false, 'Sign in');
   if (error) { showAlert('editor-alert', error.message, 'error'); return; }
   if (data.user.email === CONFIG.editorEmail) {
@@ -3753,6 +3758,7 @@ window.addEventListener('load', async () => {
 
   // Listen for auth state changes
   sb.auth.onAuthStateChange((event, session) => {
+    if (manualLoginInProgress) return;
     if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session) {
       const user = session.user;
       const onLogin = document.getElementById('screen-login')?.classList.contains('active');
@@ -3761,7 +3767,6 @@ window.addEventListener('load', async () => {
       if (event === 'SIGNED_IN' && !session.user.user_metadata?.has_password) {
         currentUser = user;
         history.replaceState(null, '', window.location.pathname);
-        // Hide all login views, show setup
         ['login-form-view','signup-view','check-email-view','editor-form-view'].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.style.display = 'none';
