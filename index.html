@@ -3494,6 +3494,8 @@ const CONFIG = {
   emailjsServiceId: 'service_qike8ko',
   emailjsDeliveryTemplateId: 'template_ixqevf9',
   emailjsReviewTemplateId: 'template_ihg6vxh',
+  vapidPublicKey: 'BMWvf4t1PMWL14zsBTTt9lkQjEXCzGmN724zETadwH4utxaUUbLvgpdEvI9zsR5ION5Lk_bjqlb92aRJa63HG6Q',
+  pushFunctionUrl: 'https://ncgwiqjkcnpsenfijnhm.supabase.co/functions/v1/send-push',
   emailjsPublicKey: '9eEUxHp-Qv_Eq_a5U',
   portalUrl: 'https://keemdoesvideo.github.io/clip-studio/', // e.g. https://yourusername.github.io/clip-studio
 };
@@ -3699,6 +3701,7 @@ function loginAsEditor(user) {
     loadEditorData();
     requestAnimationFrame(() => updateTabSlider('editor-mobile-bottom-bar', 'editor-mob-tab-queue'));
     startEditorMsgPolling();
+    registerPush(user.email);
   } catch(e) {
     console.error('loginAsEditor error:', e);
   }
@@ -3732,6 +3735,7 @@ function loginAsClient(user) {
     loadClientData(user.email);
     checkClientMsgBadge();
     startClientMsgPolling();
+    registerPush(user.email);
     requestAnimationFrame(() => {
       updateTabSlider('mobile-bottom-bar', 'mob-tab-overview');
       setTimeout(startOnboarding, 800);
@@ -4939,6 +4943,8 @@ async function deliverJob() {
 
   setLoading('deliver-btn', 'deliver-btn-text', false, '✓ Mark delivered & notify');
   closeModal('modal-deliver');
+  // Push notification to client
+  if (email) sendPushToUser(email, '🎬 Your edit is ready!', `${job?.title || 'Your video'} has been delivered. Tap to download.`);
   showToast('Delivered! Client notified.', 'success');
   loadEditorData();
 }
@@ -5433,6 +5439,7 @@ async function submitClientRequest() {
   document.getElementById('c-links-wrapper').innerHTML = `<div class="clip-link-row"><span class="clip-link-num">1</span><input class="clip-link-input" placeholder="https://clips.twitch.tv/... or Dropbox link"><button class="clip-link-remove" onclick="removeClipLink(this)">×</button></div>`;
 
   showToast('Request submitted! Your editor will get on it.', 'success');
+  sendPushToEditor('New job request ✦', `${currentUser?.user_metadata?.display_name || currentUser?.email?.split('@')[0]} requested: ${title}`);
 }
 
 // ══════════════════════════════════════
@@ -5771,7 +5778,78 @@ let activeChatClientEmail = null;
 let editorMsgSubscription = null;
 let clientMsgSubscription = null;
 
-// ── Message polling (3s fallback) ────────────────────────────
+// ══════════════════════════════════════
+// WEB PUSH NOTIFICATIONS
+// ══════════════════════════════════════
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+
+async function registerPush(email) {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  if (DEMO_MODE || !sb) return;
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') return;
+
+    const reg = await navigator.serviceWorker.ready;
+    const existing = await reg.pushManager.getSubscription();
+    if (existing) {
+      await savePushSubscription(email, existing);
+      return;
+    }
+
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(CONFIG.vapidPublicKey)
+    });
+    await savePushSubscription(email, sub);
+    console.log('Push subscription registered');
+  } catch(e) {
+    console.warn('Push registration failed:', e);
+  }
+}
+
+async function savePushSubscription(email, subscription) {
+  if (!sb) return;
+  const subJson = JSON.parse(JSON.stringify(subscription));
+  // Upsert — one subscription per device per user
+  await sb.from('push_subscriptions').upsert(
+    { user_email: email, subscription: subJson },
+    { onConflict: 'user_email' }
+  );
+}
+
+async function sendPushToUser(email, title, body) {
+  if (DEMO_MODE || !sb) return;
+  try {
+    const { data: subs } = await sb.from('push_subscriptions')
+      .select('subscription')
+      .eq('user_email', email);
+    if (!subs?.length) return;
+
+    for (const row of subs) {
+      await fetch(CONFIG.pushFunctionUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscription: row.subscription, title, body })
+      });
+    }
+  } catch(e) {
+    console.warn('Push send failed:', e);
+  }
+}
+
+// Send push to editor
+async function sendPushToEditor(title, body) {
+  await sendPushToUser(CONFIG.editorEmail, title, body);
+}
+
+
 let editorMsgPollInterval = null;
 let clientMsgPollInterval = null;
 
@@ -5974,6 +6052,8 @@ async function editorSendMessage() {
     read_by_editor: true
   });
   editorLoadMessages(activeChatClientEmail);
+  // Push notification to client
+  sendPushToUser(activeChatClientEmail, 'New message from Keem Studio', body.substring(0, 80));
 }
 
 function editorChatKeydown(e) {
@@ -6024,6 +6104,8 @@ async function clientSendMessage() {
     read_by_client: true
   });
   loadClientMessages();
+  // Push notification to editor
+  sendPushToEditor('New message from ' + (currentUser.user_metadata?.display_name || currentUser.email.split('@')[0]), body.substring(0, 80));
 }
 
 function clientChatKeydown(e) {
