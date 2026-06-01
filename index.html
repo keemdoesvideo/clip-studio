@@ -3683,7 +3683,7 @@ function loginAsClient(user) {
     });
 
     // Upsert into profiles so editor can see this client even with no jobs
-    if (!DEMO_MODE && sb && user.email) {
+    if (!DEMO_MODE && sb && user.email && !deletedClientEmails.has(user.email)) {
       sb.from('profiles').upsert({
         email: user.email,
         display_name: name,
@@ -6226,8 +6226,11 @@ async function deleteClient(email, name) {
     await sb.from('client_assets').delete().eq('client_email', email);
     await sb.from('messages').delete().eq('sender_email', email);
     await sb.from('messages').delete().eq('recipient_email', email);
-    await sb.from('jobs').delete().eq('client_email', email);
-    await sb.from('profiles').delete().eq('email', email);
+    const { error: profileErr } = await sb.from('profiles').delete().eq('email', email);
+    if (profileErr) console.error('Profile delete error:', profileErr);
+
+    const { error: jobsErr } = await sb.from('jobs').delete().eq('client_email', email);
+    if (jobsErr) console.error('Jobs delete error:', jobsErr);
 
     showToast(`${name} deleted. ✓`, 'success');
     await loadClientsPage();
