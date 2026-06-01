@@ -1927,6 +1927,7 @@ body.dark .clip-btn:hover { background: rgba(232,184,75,0.25); }
   #screen-client .topbar-logo-name { font-size: 14px; }
   #screen-client .topbar-logo-icon { width: 28px; height: 28px; border-radius: 8px; }
   #screen-client .topbar-logo-icon svg { width: 14px; height: 14px; }
+  #screen-client .topbar-right { display: none; }
 
   .client-tabs { display: none; }
 
@@ -4351,10 +4352,22 @@ async function saveDrawerProfile(side) {
   showToast('Profile saved! ✓', 'success');
   if (payload.display_name) {
     document.getElementById('drawer-' + side + '-name').textContent = payload.display_name;
-    // Also update desktop user chip if editor
     if (side === 'editor') {
       const nameEl = document.getElementById('editor-name-display');
       if (nameEl) nameEl.textContent = payload.display_name;
+    }
+    if (side === 'client') {
+      // Update hero greeting and top name
+      const hello = document.getElementById('client-hello');
+      if (hello) hello.textContent = `Hey ${payload.display_name}! 👋`;
+      const nameTop = document.getElementById('client-name-top');
+      if (nameTop) nameTop.textContent = payload.display_name;
+      // Update avatar initials if no photo
+      const initials = payload.display_name.substring(0, 2).toUpperCase();
+      const avatarBig = document.getElementById('client-avatar-big');
+      if (avatarBig && !avatarBig.querySelector('img')) avatarBig.textContent = initials;
+      const avatarTop = document.getElementById('client-avatar-top');
+      if (avatarTop && !avatarTop.querySelector('img')) avatarTop.textContent = initials;
     }
   }
 }
@@ -4375,6 +4388,14 @@ async function uploadDrawerAvatar(input, side) {
   const avatarId = side + '-profile-avatar';
   document.getElementById(avatarId).innerHTML = `<img src="${url}">`;
   document.getElementById('drawer-' + side + '-avatar').innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+  // Update client portal hero avatar
+  if (side === 'client') {
+    const imgTag = `<img src="${url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="avatar">`;
+    const avatarBig = document.getElementById('client-avatar-big');
+    if (avatarBig) avatarBig.innerHTML = imgTag;
+    const avatarTop = document.getElementById('client-avatar-top');
+    if (avatarTop) avatarTop.innerHTML = imgTag;
+  }
   showToast('Photo updated! ✓', 'success');
 }
 
