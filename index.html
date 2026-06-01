@@ -3618,6 +3618,20 @@ function loginAsEditor(user) {
   showScreen('editor');
   loadEditorData();
   requestAnimationFrame(() => updateTabSlider('editor-mobile-bottom-bar', 'editor-mob-tab-queue'));
+
+  // Global realtime — always-on message listener
+  if (sb) {
+    sb.channel('editor-global-messages')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'sender_role=eq.client' }, payload => {
+        // Always reload inbox for badge
+        loadEditorInbox();
+        // If messages tab is open and this client is active, reload chat
+        const msgTab = document.getElementById('editor-tab-messages');
+        if (msgTab && msgTab.style.display !== 'none' && activeChatClientEmail === payload.new.sender_email) {
+          editorLoadMessages(activeChatClientEmail);
+        }
+      }).subscribe();
+  }
 }
 
 function loginAsClient(user) {
@@ -3649,6 +3663,23 @@ function loginAsClient(user) {
     setTimeout(startOnboarding, 800);
     checkFirstLogin(user);
   });
+
+  // Global realtime — always-on message listener for this client
+  if (sb) {
+    sb.channel('client-global-messages-' + user.email)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `recipient_email=eq.${user.email}` }, () => {
+        // Show badge dot regardless of which tab is open
+        const dot = document.getElementById('client-msg-dot');
+        if (dot) dot.style.display = 'block';
+        const mobDot = document.getElementById('mob-msg-dot');
+        if (mobDot) mobDot.style.display = 'block';
+        // If messages tab is open, reload instantly
+        const msgTab = document.getElementById('client-tab-messages');
+        if (msgTab && msgTab.style.display !== 'none') {
+          loadClientMessages();
+        }
+      }).subscribe();
+  }
 
   // Upsert into profiles so editor can see this client even with no jobs
   if (!DEMO_MODE && sb && user.email) {
@@ -6136,11 +6167,10 @@ async function deleteClient(email, name) {
   showToast('Deleting client data…', 'success');
 
   try {
-    // 1. Get all their asset file paths
+    // 1. Get all their asset file paths and delete from storage
     const { data: assets } = await sb.from('client_assets').select('file_path').eq('client_email', email);
     if (assets?.length) {
-      const paths = assets.map(a => a.file_path);
-      await sb.storage.from('client-assets').remove(paths);
+      await sb.storage.from('client-assets').remove(assets.map(a => a.file_path));
     }
     // 2. Delete from all tables
     await sb.from('client_assets').delete().eq('client_email', email);
@@ -6148,13 +6178,14 @@ async function deleteClient(email, name) {
     await sb.from('messages').delete().eq('recipient_email', email);
     await sb.from('jobs').delete().eq('client_email', email);
     await sb.from('profiles').delete().eq('email', email);
-    // 3. Delete auth user via admin (requires service role — skip if unavailable)
-    // This requires server-side, so we just clean the data
-    showToast(`${name} and all their data deleted. ✓`, 'success');
-    loadClientsPage();
+
+    showToast(`${name} deleted. ✓`, 'success');
+
+    // Force reload clients page immediately
+    await loadClientsPage();
   } catch (err) {
     console.error('Delete client error:', err);
-    showToast('Error deleting client: ' + err.message, 'error');
+    showToast('Error: ' + err.message, 'error');
   }
 }
 
