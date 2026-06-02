@@ -4801,7 +4801,7 @@ async function changeStatus(id, newStatus) {
       cooking: null
     };
     const msg = pushMessages[newStatus];
-    if (msg) sendPushToUser(job.client_email, 'Keem Studio Update', msg);
+    if (msg) sendPushToUser(job.client_email, '🎬 Job Update', msg);
   }
   loadEditorData();
 }
@@ -4878,7 +4878,7 @@ async function sendReviewLink() {
   const job = allJobs.find(j => j.id == reviewJobId);
   await updateJob(reviewJobId, { status: 'awaiting_review', review_link: link });
   // Push notification to client
-  if (job?.client_email) sendPushToUser(job.client_email, '👀 Your edit is ready to review!', `"${job?.title || 'Your clip'}" is ready for your feedback.`);
+  if (job?.client_email) sendPushToUser(job.client_email, '👀 Ready to review', `"${job?.title || 'Your clip'}" is ready for your feedback.`);
 
   // Discord notification
   if (job?.client_email) {
@@ -4958,7 +4958,7 @@ async function deliverJob() {
   setLoading('deliver-btn', 'deliver-btn-text', false, '✓ Mark delivered & notify');
   closeModal('modal-deliver');
   // Push notification to client
-  if (email) sendPushToUser(email, '🎬 Your edit is ready!', `${job?.title || 'Your video'} has been delivered. Tap to download.`);
+  if (email) sendPushToUser(email, '🎬 Edit delivered!', `${job?.title || 'Your video'} is ready to download.`);
   showToast('Delivered! Client notified.', 'success');
   loadEditorData();
 }
@@ -5453,7 +5453,7 @@ async function submitClientRequest() {
   document.getElementById('c-links-wrapper').innerHTML = `<div class="clip-link-row"><span class="clip-link-num">1</span><input class="clip-link-input" placeholder="https://clips.twitch.tv/... or Dropbox link"><button class="clip-link-remove" onclick="removeClipLink(this)">×</button></div>`;
 
   showToast('Request submitted! Your editor will get on it.', 'success');
-  sendPushToEditor('New job request ✦', `${currentUser?.user_metadata?.display_name || currentUser?.email?.split('@')[0]} requested: ${title}`);
+  sendPushToEditor('✦ New job request', `${currentUser?.user_metadata?.display_name || currentUser?.email?.split('@')[0]}: ${title}`);
 }
 
 // ══════════════════════════════════════
@@ -6101,7 +6101,7 @@ async function editorSendMessage() {
   });
   editorLoadMessages(activeChatClientEmail);
   // Push notification to client
-  sendPushToUser(activeChatClientEmail, 'New message from Keem Studio', body.substring(0, 80));
+  sendPushToUser(activeChatClientEmail, '💬 New message', body.substring(0, 80));
 }
 
 function editorChatKeydown(e) {
@@ -6167,7 +6167,7 @@ async function clientSendMessage() {
   });
   loadClientMessages();
   // Push notification to editor
-  sendPushToEditor('New message from ' + (currentUser.user_metadata?.display_name || currentUser.email.split('@')[0]), body.substring(0, 80));
+  sendPushToEditor('💬 ' + (currentUser.user_metadata?.display_name || currentUser.email.split('@')[0]), body.substring(0, 80));
 }
 
 function clientChatKeydown(e) {
