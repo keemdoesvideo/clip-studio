@@ -3805,24 +3805,35 @@ function loginAsClient(user) {
   try {
     currentUser = user;
     isEditor = false;
-    const name = user.user_metadata?.display_name || user.name || user.email.split('@')[0];
-    const initials = name.substring(0, 2).toUpperCase();
-    const avatarUrl = user.user_metadata?.avatar_url;
+
+    // Set initial fallback values from auth metadata
+    const fallbackName = user.user_metadata?.display_name || user.name || user.email.split('@')[0];
+    const fallbackInitials = fallbackName.substring(0, 2).toUpperCase();
+    const fallbackAvatar = user.user_metadata?.avatar_url;
 
     const nameTop = document.getElementById('client-name-top');
-    if (nameTop) nameTop.textContent = name;
     const hello = document.getElementById('client-hello');
-    if (hello) hello.textContent = `Hey ${name}! 👋`;
-
     const avatarTop = document.getElementById('client-avatar-top');
     const avatarBig = document.getElementById('client-avatar-big');
-    if (avatarUrl) {
-      if (avatarTop) avatarTop.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="avatar">`;
-      if (avatarBig) avatarBig.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="avatar">`;
-    } else {
-      if (avatarTop) avatarTop.textContent = initials;
-      if (avatarBig) avatarBig.textContent = initials;
-    }
+    const drawerName = document.getElementById('drawer-client-name');
+    const drawerAvatar = document.getElementById('drawer-client-avatar');
+
+    const applyProfile = (name, avatarUrl) => {
+      const initials = name.substring(0, 2).toUpperCase();
+      if (nameTop) nameTop.textContent = name;
+      if (hello) hello.textContent = `Hey ${name}! 👋`;
+      if (drawerName) drawerName.textContent = name;
+      const imgTag = avatarUrl ? `<img src="${avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="avatar">` : null;
+      if (avatarTop) avatarTop.innerHTML = imgTag || initials;
+      if (avatarBig) avatarBig.innerHTML = imgTag || initials;
+      if (drawerAvatar) {
+        if (imgTag) drawerAvatar.innerHTML = imgTag;
+        else if (!drawerAvatar.querySelector('img')) drawerAvatar.textContent = initials;
+      }
+    };
+
+    // Apply fallback immediately
+    applyProfile(fallbackName, fallbackAvatar);
 
     showScreen('client');
     checkNotificationBadge(user.email);
@@ -3836,12 +3847,17 @@ function loginAsClient(user) {
       checkFirstLogin(user);
     });
 
-    // Upsert into profiles so editor can see this client even with no jobs
-    if (!DEMO_MODE && sb && user.email && !deletedClientEmails.has(user.email)) {
-      sb.from('profiles').upsert({
-        email: user.email,
-        display_name: name,
-      }, { onConflict: 'email', ignoreDuplicates: true }).then(() => {});
+    // Load real profile from DB and override — this is the source of truth
+    if (!DEMO_MODE && sb && user.email) {
+      sb.from('profiles').select('display_name, avatar_url').eq('email', user.email).single()
+        .then(({ data }) => {
+          if (data?.display_name || data?.avatar_url) {
+            applyProfile(data.display_name || fallbackName, data.avatar_url || fallbackAvatar);
+          } else if (!deletedClientEmails.has(user.email)) {
+            // No profile yet — create one with fallback name
+            sb.from('profiles').upsert({ email: user.email, display_name: fallbackName }, { onConflict: 'email', ignoreDuplicates: true }).then(() => {});
+          }
+        });
     }
   } catch(e) {
     console.error('loginAsClient error:', e);
