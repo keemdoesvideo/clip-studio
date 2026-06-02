@@ -4533,13 +4533,26 @@ function populateEditorDrawer() {
 
 function populateClientDrawer() {
   if (!currentUser) return;
-  const name = currentUser.user_metadata?.name || currentUser.email.split('@')[0];
-  document.getElementById('drawer-client-name').textContent = name;
+  // Set fallback immediately
+  const fallback = currentUser.user_metadata?.display_name || currentUser.email.split('@')[0];
+  document.getElementById('drawer-client-name').textContent = fallback;
   document.getElementById('drawer-client-email').textContent = currentUser.email;
-  const initials = name.slice(0,2).toUpperCase();
   const av = document.getElementById('drawer-client-avatar');
-  if (!av.querySelector('img')) av.textContent = initials;
+  if (!av.querySelector('img')) av.textContent = fallback.slice(0,2).toUpperCase();
   updateDrawerToggles();
+  // Load from profiles as source of truth
+  if (sb && currentUser.email) {
+    sb.from('profiles').select('display_name, avatar_url').eq('email', currentUser.email).single()
+      .then(({ data }) => {
+        if (data?.display_name) {
+          document.getElementById('drawer-client-name').textContent = data.display_name;
+          if (!av.querySelector('img')) av.textContent = data.display_name.slice(0,2).toUpperCase();
+        }
+        if (data?.avatar_url && !av.querySelector('img')) {
+          av.innerHTML = `<img src="${data.avatar_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+        }
+      });
+  }
 }
 
 // ── Accent colour (client) ───────────────────────────────────
@@ -6276,12 +6289,27 @@ async function loadEditorInbox() {
 
 async function editorOpenChat(clientEmail) {
   activeChatClientEmail = clientEmail;
-  const window2 = document.getElementById('editor-chat-window');
   document.getElementById('editor-chat-empty').style.display = 'none';
   const active = document.getElementById('editor-chat-active');
   active.style.display = 'flex';
+
+  // Set fallback name immediately
   document.getElementById('editor-chat-avatar').textContent = clientEmail.slice(0,2).toUpperCase();
-  document.getElementById('editor-chat-name').textContent = clientEmail;
+  document.getElementById('editor-chat-name').textContent = clientEmail.split('@')[0];
+
+  // Load profile for real name/avatar
+  if (sb) {
+    sb.from('profiles').select('display_name, avatar_url').eq('email', clientEmail).single()
+      .then(({ data }) => {
+        if (data?.display_name) {
+          document.getElementById('editor-chat-name').textContent = data.display_name;
+          document.getElementById('editor-chat-avatar').textContent = data.display_name.substring(0,2).toUpperCase();
+        }
+        if (data?.avatar_url) {
+          document.getElementById('editor-chat-avatar').innerHTML = `<img src="${data.avatar_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+        }
+      });
+  }
 
   // Mark active in inbox
   document.querySelectorAll('.chat-inbox-item').forEach(el => {
