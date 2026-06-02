@@ -2327,6 +2327,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
 .colour-swatches { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
 @media (min-width: 601px) {
   .drawer, .drawer-backdrop { display: none !important; }
+  .drawer.desktop-open, .drawer-backdrop.desktop-open { display: block !important; }
 }
 
 .colour-swatch {
@@ -2457,7 +2458,7 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         <span class="topbar-logo-name" style="font-size:14px;">Keem Studio</span>
       </div>
       <!-- Desktop only -->
-      <div class="user-chip">
+      <div class="user-chip" onclick="openDrawer('editor')" style="cursor:pointer;" title="Edit profile">
         <div class="user-avatar" id="editor-avatar">KB</div>
         <span class="user-name" id="editor-name-display">Karim</span>
       </div>
@@ -4208,8 +4209,15 @@ async function toggleClientBanner(id, email) {
 // DRAWER SYSTEM
 // ══════════════════════════════════════
 function openDrawer(side) {
-  document.getElementById(side + '-drawer').classList.add('open');
-  document.getElementById(side + '-drawer-backdrop').classList.add('open');
+  const drawer = document.getElementById(side + '-drawer');
+  const backdrop = document.getElementById(side + '-drawer-backdrop');
+  drawer.classList.add('open');
+  backdrop.classList.add('open');
+  // On desktop, also add desktop-open to override the display:none media query
+  if (window.innerWidth > 600) {
+    drawer.classList.add('desktop-open');
+    backdrop.classList.add('desktop-open');
+  }
   document.body.style.overflow = 'hidden';
   updateDrawerToggles();
   if (side === 'editor') populateEditorDrawer();
@@ -4217,10 +4225,11 @@ function openDrawer(side) {
 }
 
 function closeDrawer(side) {
-  document.getElementById(side + '-drawer').classList.remove('open');
-  document.getElementById(side + '-drawer-backdrop').classList.remove('open');
+  const drawer = document.getElementById(side + '-drawer');
+  const backdrop = document.getElementById(side + '-drawer-backdrop');
+  drawer.classList.remove('open', 'desktop-open');
+  backdrop.classList.remove('open', 'desktop-open');
   document.body.style.overflow = '';
-  // Close any open panels too
   document.querySelectorAll('#' + side + '-drawer .drawer-panel').forEach(p => p.classList.remove('open'));
 }
 
@@ -4809,21 +4818,23 @@ async function changeStatus(id, newStatus) {
 function toggleJobCard(id) {
   const body = document.getElementById('jobbody-' + id);
   const card = document.getElementById('jobcard-' + id);
+  if (!body || !card) { console.warn('toggleJobCard: missing element for id', id); return; }
   const arrow = card.querySelector('.expand-arrow');
-  if (!body) return;
   const isOpen = body.style.display !== 'none';
-  arrow.style.transition = 'transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1)';
+  if (arrow) {
+    arrow.style.transition = 'transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1)';
+  }
   if (!isOpen) {
     body.style.display = 'block';
     body.style.animation = 'none';
     void body.offsetWidth;
     body.style.animation = 'accordionOpen 0.45s cubic-bezier(0.34, 1.3, 0.64, 1) both';
-    arrow.style.transform = 'rotate(180deg)';
+    if (arrow) arrow.style.transform = 'rotate(180deg)';
   } else {
     body.style.animation = 'none';
     void body.offsetWidth;
     body.style.animation = 'accordionClose 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards';
-    arrow.style.transform = 'rotate(0deg)';
+    if (arrow) arrow.style.transform = 'rotate(0deg)';
     body.addEventListener('animationend', () => { body.style.display = 'none'; }, { once: true });
   }
 }
