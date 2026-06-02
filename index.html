@@ -3496,6 +3496,7 @@ const CONFIG = {
   emailjsReviewTemplateId: 'template_ihg6vxh',
   vapidPublicKey: 'BMWvf4t1PMWL14zsBTTt9lkQjEXCzGmN724zETadwH4utxaUUbLvgpdEvI9zsR5ION5Lk_bjqlb92aRJa63HG6Q',
   pushFunctionUrl: 'https://ncgwiqjkcnpsenfijnhm.supabase.co/functions/v1/send-push',
+  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5jZ3dpcWprY25wc2VuZmlqbmhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5NDExNzAsImV4cCI6MjA5NDUxNzE3MH0.YgHQ8h0baE4_oJVUMQcQdr16dqiL1qn-R1jBuP-Ql4M',
   emailjsPublicKey: '9eEUxHp-Qv_Eq_a5U',
   portalUrl: 'https://keemdoesvideo.github.io/clip-studio/', // e.g. https://yourusername.github.io/clip-studio
 };
@@ -5843,7 +5844,7 @@ async function sendPushToUser(email, title, body) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${CONFIG.supabaseKey}`
+          'Authorization': `Bearer ${CONFIG.anonKey}`
         },
         body: JSON.stringify({ subscription: sub, title, body })
       });
