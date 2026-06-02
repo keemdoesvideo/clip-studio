@@ -3740,17 +3740,32 @@ function loginAsEditor(user) {
   try {
     currentUser = user;
     isEditor = true;
-    const name = user.name || user.email.split('@')[0];
-    const initials = name.substring(0, 2).toUpperCase();
+    // Set initial values from auth
+    const fallbackName = user.name || user.email.split('@')[0];
     const av = document.getElementById('editor-avatar');
-    if (av) av.textContent = initials;
     const nd = document.getElementById('editor-name-display');
-    if (nd) nd.textContent = name;
+    if (av) av.textContent = fallbackName.substring(0, 2).toUpperCase();
+    if (nd) nd.textContent = fallbackName;
     showScreen('editor');
     loadEditorData();
     requestAnimationFrame(() => updateTabSlider('editor-mobile-bottom-bar', 'editor-mob-tab-queue'));
     startEditorMsgPolling();
     registerPush(user.email);
+    // Load profile from DB to get display name and avatar
+    if (sb) {
+      sb.from('profiles').select('display_name, avatar_url').eq('email', user.email).single()
+        .then(({ data }) => {
+          if (!data) return;
+          if (data.display_name && nd) nd.textContent = data.display_name;
+          if (av) {
+            if (data.avatar_url) {
+              av.innerHTML = `<img src="${data.avatar_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+            } else if (data.display_name) {
+              av.textContent = data.display_name.substring(0, 2).toUpperCase();
+            }
+          }
+        });
+    }
   } catch(e) {
     console.error('loginAsEditor error:', e);
   }
@@ -6661,7 +6676,7 @@ async function handleEditorAvatarUpload(input) {
   const { data, error } = await sb.storage.from('avatars').upload(path, file, { upsert: true });
   if (error) { showToast('Upload failed: ' + error.message, 'error'); return; }
   const { data: urlData } = sb.storage.from('avatars').getPublicUrl(path);
-  const url = urlData.publicUrl;
+  const url = urlData.publicUrl + '?t=' + Date.now();
   // Update modal preview
   document.getElementById('editor-profile-avatar-preview').innerHTML = `<img src="${url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
   // Update topbar avatar
