@@ -2804,9 +2804,9 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
     <div id="client-tab-messages" style="display:none;">
       <div class="chat-window" style="border-radius:16px;">
         <div class="chat-header">
-          <div class="chat-header-avatar">K</div>
+          <div class="chat-header-avatar" id="client-editor-chat-avatar">K</div>
           <div>
-            <div class="chat-header-name">Keem Studio</div>
+            <div class="chat-header-name" id="client-editor-chat-name">Keem Studio</div>
             <div class="chat-header-status">Your editor</div>
           </div>
         </div>
@@ -5187,7 +5187,25 @@ function clientTab(tab, el) {
   if (tab === 'overview') loadClientOverview();
   if (tab === 'jobs') loadClientJobs();
   if (tab === 'downloads') loadClientDownloads();
-  if (tab === 'messages') { loadClientMessages(); clearClientMsgBadge(); }
+  if (tab === 'messages') {
+    loadClientMessages();
+    clearClientMsgBadge();
+    // Load editor profile into chat header
+    if (sb) {
+      sb.from('profiles').select('display_name, avatar_url').eq('email', CONFIG.editorEmail).single()
+        .then(({ data }) => {
+          if (data) {
+            const nameEl = document.getElementById('client-editor-chat-name');
+            const avatarEl = document.getElementById('client-editor-chat-avatar');
+            if (nameEl && data.display_name) nameEl.textContent = data.display_name;
+            if (avatarEl) {
+              if (data.avatar_url) avatarEl.innerHTML = `<img src="${data.avatar_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+              else avatarEl.textContent = (data.display_name || 'K').substring(0, 2).toUpperCase();
+            }
+          }
+        });
+    }
+  }
   if (tab === 'assets') { loadClientAssets(); }
   updateTabSlider('mobile-bottom-bar', 'mob-tab-' + tab);
 }
@@ -6010,14 +6028,30 @@ async function loadEditorInbox() {
     list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px;">No conversations yet</div>';
     return;
   }
+  // Fetch profiles to get display names and avatars
+  const clientEmails = Object.keys(clients);
+  let profileMap = {};
+  if (clientEmails.length && sb) {
+    const { data: profiles } = await sb.from('profiles')
+      .select('email, display_name, avatar_url')
+      .in('email', clientEmails);
+    if (profiles) profiles.forEach(p => { profileMap[p.email] = p; });
+  }
+
   list.innerHTML = Object.entries(clients).map(([email, data]) => {
-    const initials = email.slice(0, 2).toUpperCase();
+    const profile = profileMap[email];
+    const name = profile?.display_name || email.split('@')[0];
+    const avatarUrl = profile?.avatar_url;
+    const initials = name.substring(0, 2).toUpperCase();
+    const avatarHTML = avatarUrl
+      ? `<img src="${avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`
+      : initials;
     const preview = data.latest.body.slice(0, 40) + (data.latest.body.length > 40 ? '…' : '');
     const isActive = email === activeChatClientEmail;
     return `<div class="chat-inbox-item ${isActive ? 'active' : ''}" onclick="editorOpenChat('${email}')">
-      <div class="chat-inbox-avatar">${initials}</div>
+      <div class="chat-inbox-avatar" style="overflow:hidden;">${avatarHTML}</div>
       <div class="chat-inbox-info">
-        <div class="chat-inbox-name">${email}</div>
+        <div class="chat-inbox-name">${name}</div>
         <div class="chat-inbox-preview">${escapeHtml(preview)}</div>
       </div>
       ${data.unread ? `<div class="chat-inbox-unread">${data.unread}</div>` : ''}
@@ -6100,8 +6134,13 @@ async function editorSendMessage() {
     read_by_editor: true
   });
   editorLoadMessages(activeChatClientEmail);
-  // Push notification to client
-  sendPushToUser(activeChatClientEmail, '💬 New message', body.substring(0, 80));
+  // Push notification to client using editor's profile name
+  let editorName = 'Keem';
+  if (sb) {
+    const { data } = await sb.from('profiles').select('display_name').eq('email', CONFIG.editorEmail).single();
+    if (data?.display_name) editorName = data.display_name;
+  }
+  sendPushToUser(activeChatClientEmail, `💬 ${editorName}`, body.substring(0, 80));
 }
 
 function editorChatKeydown(e) {
