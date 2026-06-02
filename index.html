@@ -1974,7 +1974,7 @@ body.dark .clip-btn:hover { background: rgba(232,184,75,0.25); }
   #screen-editor .topbar-logo { display: none; }
   #screen-editor .topbar-nav { display: none; }
   #screen-editor .topbar-right .user-chip { display: none; }
-  #screen-editor .topbar-right .btn-logout { display: none; }
+  #screen-editor .btn-logout { display: none; }
   #screen-editor .topbar-logo-name { font-size: 14px; }
   #screen-editor .topbar-logo-icon { width: 28px; height: 28px; border-radius: 8px; }
   #screen-editor .topbar-logo-icon svg { width: 14px; height: 14px; }
@@ -2327,7 +2327,6 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
 .colour-swatches { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
 @media (min-width: 601px) {
   .drawer, .drawer-backdrop { display: none !important; }
-  .drawer.desktop-open, .drawer-backdrop.desktop-open { display: block !important; }
 }
 
 .colour-swatch {
@@ -2457,10 +2456,18 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
         </div>
         <span class="topbar-logo-name" style="font-size:14px;">Keem Studio</span>
       </div>
-      <!-- Desktop only -->
-      <div class="user-chip" onclick="openDrawer('editor')" style="cursor:pointer;" title="Edit profile">
-        <div class="user-avatar" id="editor-avatar">KB</div>
-        <span class="user-name" id="editor-name-display">Karim</span>
+      <!-- Desktop profile dropdown -->
+      <div style="position:relative;">
+        <div class="profile-chip" id="editor-profile-chip" onclick="toggleEditorProfileMenu()">
+          <div class="user-avatar" id="editor-avatar">KB</div>
+          <span class="user-name" id="editor-name-display">Karim</span>
+          <span style="font-size:11px;color:var(--text3);margin-left:2px;">▾</span>
+        </div>
+        <div class="profile-menu" id="editor-profile-menu" style="display:none;position:absolute;right:0;top:100%;left:auto;z-index:600;min-width:160px;">
+          <div class="profile-menu-item" onclick="closeEditorProfileMenu();openDrawer('editor')">👤 Edit profile</div>
+          <div class="profile-menu-divider"></div>
+          <div class="profile-menu-item danger" onclick="logout()">Sign out</div>
+        </div>
       </div>
       <button class="btn-logout" onclick="logout()">Sign out</button>
     </div>
@@ -4816,8 +4823,10 @@ async function changeStatus(id, newStatus) {
 }
 
 function toggleJobCard(id) {
+  console.log('toggleJobCard called with id:', id, typeof id);
   const body = document.getElementById('jobbody-' + id);
   const card = document.getElementById('jobcard-' + id);
+  console.log('body:', body, 'card:', card);
   if (!body || !card) { console.warn('toggleJobCard: missing element for id', id); return; }
   const arrow = card.querySelector('.expand-arrow');
   const isOpen = body.style.display !== 'none';
@@ -5077,14 +5086,32 @@ async function saveEditJob() {
 // PROFILE
 // ══════════════════════════════════════
 let profileMenuOpen = false;
+let editorProfileMenuOpen = false;
+
 function toggleProfileMenu() {
   profileMenuOpen = !profileMenuOpen;
   document.getElementById('profile-menu').style.display = profileMenuOpen ? 'block' : 'none';
+}
+
+function toggleEditorProfileMenu() {
+  editorProfileMenuOpen = !editorProfileMenuOpen;
+  document.getElementById('editor-profile-menu').style.display = editorProfileMenuOpen ? 'block' : 'none';
+}
+
+function closeEditorProfileMenu() {
+  editorProfileMenuOpen = false;
+  const m = document.getElementById('editor-profile-menu');
+  if (m) m.style.display = 'none';
 }
 document.addEventListener('click', e => {
   if (!document.getElementById('profile-chip')?.contains(e.target)) {
     profileMenuOpen = false;
     const m = document.getElementById('profile-menu');
+    if (m) m.style.display = 'none';
+  }
+  if (!document.getElementById('editor-profile-chip')?.contains(e.target)) {
+    editorProfileMenuOpen = false;
+    const m = document.getElementById('editor-profile-menu');
     if (m) m.style.display = 'none';
   }
 });
