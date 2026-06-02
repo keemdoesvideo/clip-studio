@@ -164,25 +164,43 @@ body.dark .client-tab.active { color: var(--purple); border-color: var(--purple)
   position: fixed;
   bottom: 28px;
   left: 28px;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: var(--glass);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
+  width: 64px;
+  height: 32px;
+  border-radius: 32px;
+  background: #f5d478;
+  border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 20px;
+  padding: 3px;
   z-index: 500;
-  transition: transform 0.25s cubic-bezier(0.34,1.6,0.64,1), box-shadow 0.2s;
+  transition: background 0.3s ease;
   -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  font-size: 0;
 }
-#theme-toggle:hover { transform: scale(1.1); }
-#theme-toggle:active { transform: scale(0.95); }
+body.dark #theme-toggle {
+  background: #1a3a4a;
+}
+#theme-toggle-knob {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #e8a020;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: transform 0.3s cubic-bezier(0.34,1.4,0.64,1), background 0.3s ease;
+  transform: translateX(0);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  flex-shrink: 0;
+}
+body.dark #theme-toggle-knob {
+  background: #4ab3e8;
+  transform: translateX(32px);
+}
+#theme-toggle:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.2); }
 @media (max-width: 600px) {
   #theme-toggle { display: none; }
 }
@@ -3499,14 +3517,14 @@ body.dark .drawer-field input { background: rgba(30,30,30,0.9); border-color: rg
 // THEME
 function applyTheme(dark) {
   document.body.classList.toggle('dark', dark);
-  const btn = document.getElementById('theme-toggle');
-  if (btn) btn.innerHTML = dark ? '&#9728;&#65039;' : '&#127769;';
+  const knob = document.getElementById('theme-toggle-knob');
+  if (knob) knob.textContent = dark ? '🌙' : '☀️';
 }
 function toggleTheme() {
   const isDark = document.body.classList.toggle('dark');
   localStorage.setItem('ks-theme', isDark ? 'dark' : 'light');
-  const btn = document.getElementById('theme-toggle');
-  if (btn) btn.innerHTML = isDark ? '&#9728;&#65039;' : '&#127769;';
+  const knob = document.getElementById('theme-toggle-knob');
+  if (knob) knob.textContent = isDark ? '🌙' : '☀️';
 }
 // Apply saved theme immediately
 (function() {
@@ -5719,6 +5737,23 @@ const OB_STEPS = [
     cardPos: 'center',
   },
   {
+    get title() {
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      const isAndroid = /android/i.test(navigator.userAgent);
+      return isIOS ? '📲 Add to your Home Screen' : isAndroid ? '📲 Add to your Home Screen' : '💻 Install as an App';
+    },
+    get body() {
+      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      const isAndroid = /android/i.test(navigator.userAgent);
+      if (isIOS) return "Tap the Share button (□↑) at the bottom of Safari, then tap \"Add to Home Screen\". You'll get push notifications and it'll feel like a native app.";
+      if (isAndroid) return "Tap the three-dot menu (⋮) in Chrome, then tap \"Add to Home screen\". You'll get push notifications and it'll open like a native app.";
+      return "Open this page in Chrome or Edge, click the install icon (⊕) in the address bar, then click Install. The app will open in its own window.";
+    },
+    target: null,
+    arrow: null,
+    cardPos: 'center',
+  },
+  {
     title: "You're all set! 🎬",
     body: "That's the full tour. If you ever need Keem, the Messages tab is your fastest route. Let's get to work.",
     target: null,
@@ -5797,10 +5832,12 @@ function positionSpotlight(x, y, w, h, step) {
   const card = document.getElementById('onboarding-card');
   card.className = step.arrow || '';
   const cardW = Math.min(300, window.innerWidth - 32);
-  const cardH = 200;
+  const cardH = 220;
   const margin = 16;
   const vw = window.innerWidth;
   const vh = window.innerHeight;
+
+  card.style.width = cardW + 'px';
 
   let cx, cy;
   if (step.cardPos === 'above') {
@@ -5828,9 +5865,11 @@ function positionCardCenter() {
 
   const card = document.getElementById('onboarding-card');
   card.className = '';
-  card.style.left = '50%';
+  const cardW = Math.min(300, window.innerWidth - 32);
+  card.style.width = cardW + 'px';
+  card.style.left = Math.max(16, (window.innerWidth - cardW) / 2) + 'px';
   card.style.top = '50%';
-  card.style.transform = 'translate(-50%, -50%)';
+  card.style.transform = 'translateY(-50%)';
 }
 
 function clearSpotlight() {
@@ -6702,6 +6741,8 @@ if ('serviceWorker' in navigator) {
   </div>
 </div>
 
-<button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
+<button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+  <div id="theme-toggle-knob">☀️</div>
+</button>
 </body>
 </html>
