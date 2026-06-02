@@ -5841,7 +5841,10 @@ async function sendPushToUser(email, title, body) {
         : row.subscription;
       const res = await fetch(CONFIG.pushFunctionUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${CONFIG.supabaseKey}`
+        },
         body: JSON.stringify({ subscription: sub, title, body })
       });
       const result = await res.json();
