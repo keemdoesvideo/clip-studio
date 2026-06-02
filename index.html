@@ -4650,6 +4650,22 @@ async function loadAllJobs() {
   }
 
   renderAllJobs();
+
+  // Delegated click handler for job cards in All Jobs tab
+  const list = document.getElementById('alljobs-list');
+  if (list && !list.dataset.clickBound) {
+    list.dataset.clickBound = '1';
+    list.addEventListener('click', e => {
+      const header = e.target.closest('.job-card-header');
+      if (header) {
+        const card = header.closest('.job-card-expanded');
+        if (card) {
+          const id = card.id.replace('jobcard-', '');
+          toggleJobCard(id);
+        }
+      }
+    });
+  }
 }
 
 function renderAllJobs() {
