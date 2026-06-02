@@ -4115,7 +4115,9 @@ async function loadEditorData() {
 
   const active = await getJobs({ status: ['queued', 'in_progress', 'awaiting_review'] });
   const cooking = await getJobs({ status: 'cooking' });
-  const jobs = [...active, ...cooking];
+  let jobs = [...active, ...cooking];
+  // Enrich with profile display names
+  jobs = await enrichJobsWithProfileNames(jobs);
   allJobs = jobs;
   allJobsCache = jobs;
 
@@ -4461,17 +4463,21 @@ async function saveDrawerProfile(side) {
     youtube: document.getElementById(prefix + '-youtube').value.trim(),
     website: document.getElementById(prefix + '-website').value.trim(),
   };
-  // Try update first, then insert if not exists
-  const { error: updateError } = await sb.from('profiles').update(payload).eq('email', email);
-  if (updateError) {
-    const { error: insertError } = await sb.from('profiles').insert(payload);
-    if (insertError) {
-      console.error('Profile save error:', insertError);
-      showToast('Error: ' + insertError.message, 'error');
-      return;
-    }
+
+  const { error } = await sb.from('profiles').upsert(payload, { onConflict: 'email' });
+  if (error) {
+    console.error('Profile save error:', error);
+    showToast('Error: ' + error.message, 'error');
+    return;
   }
+
+  // Also update jobs so client name shows correctly on editor side
+  if (side === 'client' && payload.display_name) {
+    await sb.from('jobs').update({ client: payload.display_name }).eq('client_email', email);
+  }
+
   showToast('Profile saved! ✓', 'success');
+
   if (payload.display_name) {
     document.getElementById('drawer-' + side + '-name').textContent = payload.display_name;
     if (side === 'editor') {
@@ -4479,12 +4485,10 @@ async function saveDrawerProfile(side) {
       if (nameEl) nameEl.textContent = payload.display_name;
     }
     if (side === 'client') {
-      // Update hero greeting and top name
       const hello = document.getElementById('client-hello');
       if (hello) hello.textContent = `Hey ${payload.display_name}! 👋`;
       const nameTop = document.getElementById('client-name-top');
       if (nameTop) nameTop.textContent = payload.display_name;
-      // Update avatar initials if no photo
       const initials = payload.display_name.substring(0, 2).toUpperCase();
       const avatarBig = document.getElementById('client-avatar-big');
       if (avatarBig && !avatarBig.querySelector('img')) avatarBig.textContent = initials;
@@ -4708,6 +4712,22 @@ function renderEditorJobs(jobs) {
   }
 }
 
+async function enrichJobsWithProfileNames(jobs) {
+  if (DEMO_MODE || !sb || !jobs.length) return jobs;
+  const emails = [...new Set(jobs.map(j => j.client_email).filter(Boolean))];
+  if (!emails.length) return jobs;
+  const { data: profiles } = await sb.from('profiles')
+    .select('email, display_name')
+    .in('email', emails);
+  if (!profiles?.length) return jobs;
+  const map = {};
+  profiles.forEach(p => { if (p.display_name) map[p.email] = p.display_name; });
+  return jobs.map(j => ({
+    ...j,
+    client: (j.client_email && map[j.client_email]) ? map[j.client_email] : j.client
+  }));
+}
+
 async function loadAllJobs() {
   // Fetch all non-delivered jobs — including any orphaned/legacy statuses
   let active;
@@ -4717,6 +4737,7 @@ async function loadAllJobs() {
     const { data } = await sb.from('jobs').select('*').neq('status', 'delivered').order('created_at', { ascending: false });
     active = data || [];
   }
+  active = await enrichJobsWithProfileNames(active);
   allJobsCache = active;
   allJobs = active;
 
