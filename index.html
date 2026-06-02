@@ -4784,13 +4784,24 @@ function jobCardHTML(job, isActive) {
 }
 
 async function changeStatus(id, newStatus) {
+  const job = allJobs.find(j => j.id == id);
   await updateJob(id, { status: newStatus });
-  const labels = { queued: 'Requested', in_progress: 'Currently Editing', awaiting_review: 'Awaiting Review' };
+  const labels = { queued: 'Requested', cooking: 'Cooking', in_progress: 'Currently Editing', awaiting_review: 'Awaiting Review' };
   showToast(`Status updated to "${labels[newStatus]}"`, 'success');
-  // Update the card colour class immediately
   const card = document.getElementById('jobcard-' + id);
   if (card) {
     card.className = card.className.replace(/status-\w+/g, '') + ` status-${newStatus}`;
+  }
+  // Push notification to client
+  if (job?.client_email) {
+    const pushMessages = {
+      in_progress: `✂️ Keem has started editing "${job.title}"!`,
+      awaiting_review: `👀 "${job.title}" is ready for your review!`,
+      queued: null,
+      cooking: null
+    };
+    const msg = pushMessages[newStatus];
+    if (msg) sendPushToUser(job.client_email, 'Keem Studio Update', msg);
   }
   loadEditorData();
 }
@@ -4866,6 +4877,8 @@ async function sendReviewLink() {
   setLoading('review-btn', 'review-btn-text', true, 'Sending...');
   const job = allJobs.find(j => j.id == reviewJobId);
   await updateJob(reviewJobId, { status: 'awaiting_review', review_link: link });
+  // Push notification to client
+  if (job?.client_email) sendPushToUser(job.client_email, '👀 Your edit is ready to review!', `"${job?.title || 'Your clip'}" is ready for your feedback.`);
 
   // Discord notification
   if (job?.client_email) {
