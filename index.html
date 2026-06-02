@@ -5826,18 +5826,26 @@ async function savePushSubscription(email, subscription) {
 
 async function sendPushToUser(email, title, body) {
   if (DEMO_MODE || !sb) return;
+  console.log('sendPushToUser called for:', email, title);
   try {
-    const { data: subs } = await sb.from('push_subscriptions')
+    const { data: subs, error } = await sb.from('push_subscriptions')
       .select('subscription')
       .eq('user_email', email);
+    console.log('Push subs found:', subs?.length, error);
     if (!subs?.length) return;
 
     for (const row of subs) {
-      await fetch(CONFIG.pushFunctionUrl, {
+      // Handle subscription being stored as string or object
+      const sub = typeof row.subscription === 'string'
+        ? JSON.parse(row.subscription)
+        : row.subscription;
+      const res = await fetch(CONFIG.pushFunctionUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subscription: row.subscription, title, body })
+        body: JSON.stringify({ subscription: sub, title, body })
       });
+      const result = await res.json();
+      console.log('Push result:', result);
     }
   } catch(e) {
     console.warn('Push send failed:', e);
