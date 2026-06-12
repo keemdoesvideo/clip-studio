@@ -3688,7 +3688,10 @@ async function saveSetupPassword() {
   setLoading('setup-inline-btn', 'setup-inline-btn-text', false, 'Set password & enter portal');
   showToast('Password set! Welcome to Keem Studio ✓', 'success');
   // Now enter the portal
-  if (currentUser) loginAsClient(currentUser);
+  if (currentUser) {
+    if (currentUser.email === CONFIG.editorEmail) loginAsEditor(currentUser);
+    else loginAsClient(currentUser);
+  }
 }
 
 
@@ -3892,7 +3895,7 @@ window.addEventListener('load', async () => {
 
   // Process confirmation link or signup from URL hash
   const hash = window.location.hash;
-  if (hash && (hash.includes('access_token') || hash.includes('type=signup') || hash.includes('type=magiclink'))) {
+  if (hash && (hash.includes('access_token') || hash.includes('type=signup') || hash.includes('type=magiclink') || hash.includes('type=recovery'))) {
     const params = new URLSearchParams(hash.substring(1));
     const accessToken = params.get('access_token');
     const refreshToken = params.get('refresh_token');
@@ -3903,12 +3906,18 @@ window.addEventListener('load', async () => {
         history.replaceState(null, '', window.location.pathname);
         const user = data.session.user;
         currentUser = user;
-        // New signup — show password setup view
-        if (type === 'signup') {
+        // New signup OR password recovery — show password setup view
+        if (type === 'signup' || type === 'recovery') {
           ['login-form-view','signup-view','check-email-view','editor-form-view'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.style.display = 'none';
           });
+          if (type === 'recovery') {
+            const title = document.querySelector('#setup-view .login-title');
+            const sub = document.querySelector('#setup-view .login-sub');
+            if (title) title.textContent = 'Reset your password';
+            if (sub) sub.textContent = 'Choose a new password for your account.';
+          }
           document.getElementById('setup-view').style.display = 'block';
           return;
         }
@@ -3922,6 +3931,22 @@ window.addEventListener('load', async () => {
   // Listen for auth state changes
   sb.auth.onAuthStateChange((event, session) => {
     if (manualLoginInProgress) return;
+    // Password recovery link clicked — show reset password view
+    if (event === 'PASSWORD_RECOVERY' && session) {
+      currentUser = session.user;
+      history.replaceState(null, '', window.location.pathname);
+      showScreen('login');
+      ['login-form-view','signup-view','check-email-view','editor-form-view'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+      const title = document.querySelector('#setup-view .login-title');
+      const sub = document.querySelector('#setup-view .login-sub');
+      if (title) title.textContent = 'Reset your password';
+      if (sub) sub.textContent = 'Choose a new password for your account.';
+      document.getElementById('setup-view').style.display = 'block';
+      return;
+    }
     if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session) {
       const user = session.user;
       const onLogin = document.getElementById('screen-login')?.classList.contains('active');
